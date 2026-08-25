@@ -76,7 +76,7 @@ try {
                     <i class="fa-solid fa-cloud-arrow-down text-gold-400"></i> App
                 </button>
                 <?php if ($registrationEnabled): ?>
-                    <a href="register.php" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-gold-950/40 border border-gold-500/20 text-gold-400 hover:bg-gold-500/10 hover:border-gold-500/40 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg transition flex items-center justify-center">
+                    <a href="register.php?t_id=<?php echo $tournamentId; ?>" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-gold-950/40 border border-gold-500/20 text-gold-400 hover:bg-gold-500/10 hover:border-gold-500/40 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg transition flex items-center justify-center">
                         Register
                     </a>
                 <?php else: ?>

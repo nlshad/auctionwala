@@ -316,7 +316,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         <?php else: ?>
             <!-- Form Container -->
-            <form action="register.php" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 max-w-xl mx-auto space-y-6">
+            <form action="register.php?t_id=<?php echo $tournamentId; ?>" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 max-w-xl mx-auto space-y-6">
             
             <div class="space-y-5">
                 <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-3 flex items-center gap-2">
