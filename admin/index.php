@@ -315,88 +315,90 @@ try {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             <!-- Left Side: Player Roster & Approvals (8 Cols) -->
-            <div class="lg:col-span-8 glass-panel rounded-2xl p-5 border border-gold-500/15">
-                <div class="border-b border-white/5 pb-3 mb-4 flex justify-between items-center">
+            <div class="lg:col-span-8 glass-panel rounded-2xl p-6 border border-white/60 shadow-xl">
+                <div class="border-b border-slate-200 pb-3 mb-4 flex justify-between items-center">
                     <div>
-                        <h3 class="text-base font-bold text-gold-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-baseball-bat-ball text-base text-gray-400"></i> Player Registrations
+                        <h3 class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-baseball-bat-ball text-amber-600"></i> Player Registrations
                         </h3>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mt-1">Review Registrations & Set Base Prices</p>
+                        <p class="text-[10px] text-slate-600 uppercase tracking-wider font-extrabold mt-0.5">Review Registrations & Set Base Prices</p>
                     </div>
-                    <span class="text-xs font-bold text-gray-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-md">
+                    <span class="text-xs font-black text-white bg-slate-900 px-3 py-1.5 rounded-xl shadow-sm">
                         Total Players: <?php echo count($players); ?>
                     </span>
                 </div>
 
                 <!-- Search bar -->
                 <div class="relative mb-4 flex-shrink-0">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
                     <input type="text" id="players-search-input" onkeyup="filterRegistrations()" placeholder="Search by name, mobile, role, hometown or status..." 
-                           class="w-full bg-black/40 border border-white/10 rounded-xl pl-8 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 transition">
+                           class="w-full bg-white/95 border-2 border-slate-300 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-900 font-extrabold placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 transition shadow-sm">
                 </div>
 
                 <!-- Players Table Container -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
-                            <tr class="border-b border-white/5 text-gray-500 font-semibold uppercase tracking-wider">
+                            <tr class="border-b border-slate-300 text-slate-900 font-black uppercase tracking-wider text-[11px]">
                                 <th class="pb-3 pr-2">Player</th>
-                                <th class="pb-3 px-2">Role/Hometown</th>
+                                <th class="pb-3 px-2">Role / Hometown</th>
                                 <th class="pb-3 px-2 font-mono">Registration ID</th>
                                 <th class="pb-3 px-2">Status</th>
                                 <th class="pb-3 pl-2 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-white/5" id="players-table-tbody">
+                        <tbody class="divide-y divide-slate-200" id="players-table-tbody">
                             <?php if (empty($players)): ?>
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-gray-500 uppercase tracking-widest font-semibold">
+                                    <td colspan="5" class="py-8 text-center text-slate-600 uppercase tracking-widest font-extrabold">
                                         No player entries recorded.
                                     </td>
                                 </tr>
                             <?php else: ?>
                                 <tr id="no-players-results-row" class="hidden">
-                                    <td colspan="5" class="py-8 text-center text-gray-500 uppercase tracking-widest font-semibold">
+                                    <td colspan="5" class="py-8 text-center text-slate-600 uppercase tracking-widest font-extrabold">
                                         No matching players found.
                                     </td>
                                 </tr>
                                 <?php foreach ($players as $p): ?>
-                                    <tr class="player-reg-row hover:bg-white/[0.02] transition"
+                                    <tr class="player-reg-row hover:bg-slate-50/80 transition"
                                         data-name="<?php echo htmlspecialchars(strtolower($p['name'])); ?>"
                                         data-mobile="<?php echo htmlspecialchars(strtolower($p['mobile'])); ?>"
                                         data-role="<?php echo htmlspecialchars(strtolower($p['role'])); ?>"
                                         data-place="<?php echo htmlspecialchars(strtolower($p['place'])); ?>"
                                         data-status="<?php echo htmlspecialchars(strtolower($p['payment_status'])); ?>">
                                         <!-- Player photo + name -->
-                                        <td class="py-3.5 pr-2 flex items-center gap-3 cursor-pointer hover:bg-white/5 transition rounded-lg p-2" onclick="openPlayerDetailsModal(<?php echo $p['id']; ?>)">
-                                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-white/10 bg-black/40 cursor-zoom-in flex-shrink-0" onclick="event.stopPropagation(); openImageLightbox(this.querySelector('img').src, '<?php echo htmlspecialchars(addslashes($p['name'])); ?>')">
+                                        <td class="py-3.5 pr-2 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition rounded-lg p-2" onclick="openPlayerDetailsModal(<?php echo $p['id']; ?>)">
+                                            <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm cursor-zoom-in flex-shrink-0" onclick="event.stopPropagation(); openImageLightbox(this.querySelector('img').src, '<?php echo htmlspecialchars(addslashes($p['name'])); ?>')">
                                                 <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($p['profile_image'] ?: 'player_placeholder.jpg'); ?>" alt="Profile" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>player_placeholder.jpg';">
                                             </div>
                                             <div>
-                                                <div class="font-bold text-white group-hover:text-gold-400 transition"><?php echo htmlspecialchars($p['name']); ?></div>
-                                                <div class="text-[10px] text-gray-500"><?php echo htmlspecialchars($p['mobile']); ?></div>
+                                                <div class="font-black text-slate-900 text-sm leading-tight hover:text-amber-800 transition"><?php echo htmlspecialchars($p['name']); ?></div>
+                                                <div class="text-xs text-slate-700 font-bold font-mono mt-0.5"><?php echo htmlspecialchars($p['mobile']); ?></div>
                                             </div>
                                         </td>
                                         
                                         <!-- Role / Hometown -->
                                         <td class="py-3.5 px-2">
-                                            <div class="font-semibold text-gold-400"><?php echo htmlspecialchars($p['role']); ?></div>
-                                            <div class="text-[10px] text-gray-500 flex items-center gap-0.5"><i class="fa-solid fa-location-dot text-gray-500 text-[10px]"></i> <?php echo htmlspecialchars($p['place']); ?></div>
+                                            <div class="font-black text-amber-800 text-xs uppercase"><?php echo htmlspecialchars($p['role']); ?></div>
+                                            <div class="text-xs text-slate-700 font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-location-dot text-slate-500 text-[10px]"></i> <?php echo htmlspecialchars($p['place']); ?></div>
                                         </td>
 
                                         <!-- UTR Code -->
-                                        <td class="py-3.5 px-2 font-mono text-gray-300 font-semibold">
-                                            <?php echo htmlspecialchars($p['payment_utr']); ?>
+                                        <td class="py-3.5 px-2">
+                                            <span class="text-slate-900 font-black font-mono text-xs bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-300 shadow-sm inline-block select-all">
+                                                <?php echo htmlspecialchars($p['payment_utr']); ?>
+                                            </span>
                                         </td>
 
                                         <!-- Status Badge -->
                                         <td class="py-3.5 px-2">
                                             <?php if ($p['payment_status'] === 'Verified'): ?>
-                                                <span class="bg-gold-950/60 border border-gold-500/20 text-gold-400 font-bold px-2 py-0.5 rounded text-[9px] uppercase tracking-wide">Verified</span>
+                                                <span class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 font-black px-2.5 py-1 rounded-lg text-[10px] uppercase shadow-sm">Verified</span>
                                             <?php elseif ($p['payment_status'] === 'Rejected'): ?>
-                                                <span class="bg-red-950/60 border border-red-500/20 text-red-400 font-bold px-2 py-0.5 rounded text-[9px] uppercase tracking-wide">Rejected</span>
+                                                <span class="bg-red-500/15 border border-red-500/30 text-red-800 font-black px-2.5 py-1 rounded-lg text-[10px] uppercase shadow-sm">Rejected</span>
                                             <?php else: ?>
-                                                <span class="bg-yellow-950/60 border border-yellow-500/20 text-yellow-400 font-bold px-2 py-0.5 rounded text-[9px] uppercase tracking-wide animate-pulse">Pending</span>
+                                                <span class="bg-amber-500/20 border border-amber-500/40 text-amber-900 font-black px-2.5 py-1 rounded-lg text-[10px] uppercase shadow-sm animate-pulse">Pending</span>
                                             <?php endif; ?>
                                         </td>
 
@@ -407,17 +409,17 @@ try {
                                                     <form action="index.php" method="POST" class="inline-flex gap-1.5 items-center">
                                                         <input type="hidden" name="player_id" value="<?php echo $p['id']; ?>">
                                                         <!-- Base Price Set Input -->
-                                                        <div class="flex items-center bg-black/40 border border-white/10 rounded-lg px-1.5 py-1 max-w-[75px]">
-                                                            <span class="text-gray-500 mr-0.5 font-bold">₹</span>
+                                                        <div class="flex items-center bg-white border border-slate-300 rounded-lg px-2 py-1 max-w-[80px] shadow-sm">
+                                                            <span class="text-slate-700 mr-0.5 font-black">₹</span>
                                                             <input type="number" name="base_price" value="100" min="100" step="100" required
-                                                                   class="w-full bg-transparent text-white focus:outline-none font-bold text-center text-[10px]">
+                                                                   class="w-full bg-transparent text-slate-900 focus:outline-none font-black text-center text-xs">
                                                         </div>
                                                         <button type="submit" name="action" value="verify_player"
-                                                                class="bg-gold-500 hover:bg-gold-400 text-black font-extrabold px-2 py-1.5 rounded-lg transition text-[9px] uppercase tracking-wider">
+                                                                class="bg-slate-900 hover:bg-slate-800 text-white font-black px-3 py-1.5 rounded-lg transition text-[10px] uppercase tracking-wider shadow-sm">
                                                             Verify
                                                         </button>
                                                         <button type="submit" name="action" value="reject_player"
-                                                                class="bg-red-950/30 border border-red-500/30 hover:bg-red-500/10 text-red-400 font-bold px-1.5 py-1.5 rounded-lg transition text-[9px] uppercase">
+                                                                class="bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 font-black px-2.5 py-1.5 rounded-lg transition text-[10px] uppercase shadow-sm">
                                                             Reject
                                                         </button>
                                                     </form>
@@ -426,14 +428,14 @@ try {
                                                 <div class="inline-flex gap-1.5 items-center">
                                                     <!-- Edit Button -->
                                                     <button onclick='openPlayerEditModal(<?php echo json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT); ?>)'
-                                                            class="bg-blue-950/40 border border-blue-500/30 hover:bg-blue-500/20 text-blue-400 font-bold px-2 py-1.5 rounded-lg transition text-[9px] uppercase flex items-center gap-1">
+                                                            class="bg-cyan-50 hover:bg-cyan-100 border border-cyan-300 text-cyan-800 font-black px-2.5 py-1.5 rounded-lg transition text-[10px] uppercase flex items-center gap-1 shadow-sm">
                                                         <i class="fa-solid fa-pen text-[10px]"></i> Edit
                                                     </button>
                                                     <!-- Delete Button -->
                                                     <form action="index.php" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete player <?php echo htmlspecialchars($p['name'], ENT_QUOTES); ?>?');" class="inline">
                                                         <input type="hidden" name="player_id" value="<?php echo $p['id']; ?>">
                                                         <button type="submit" name="action" value="delete_player"
-                                                                class="bg-red-950/40 border border-red-500/30 hover:bg-red-500/20 text-red-400 font-bold px-2 py-1.5 rounded-lg transition text-[9px] uppercase flex items-center gap-1">
+                                                                class="bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 font-black px-2.5 py-1.5 rounded-lg transition text-[10px] uppercase flex items-center gap-1 shadow-sm">
                                                             <i class="fa-solid fa-trash-can text-[10px]"></i> Delete
                                                         </button>
                                                     </form>
@@ -452,14 +454,14 @@ try {
             <div class="lg:col-span-4 space-y-6">
                 
                 <!-- Add Team Toggle Button -->
-                <button id="add-team-btn" onclick="toggleAddTeamForm()" class="w-full bg-gradient-to-r from-gold-500/10 to-amber-500/10 border border-gold-500/35 hover:border-gold-500/50 text-gold-400 hover:text-gold-300 font-extrabold uppercase text-[10px] tracking-wider py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gold-500/15 transition duration-200 shadow-md">
-                    <i class="fa-solid fa-plus-circle text-xs text-gold-400"></i> Add Franchise Team
+                <button id="add-team-btn" onclick="toggleAddTeamForm()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black uppercase text-xs tracking-wider py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition duration-200">
+                    <i class="fa-solid fa-plus-circle text-sm text-slate-950"></i> Add Franchise Team
                 </button>
 
                 <!-- Create Franchise Form -->
-                <div id="add-team-panel" class="glass-panel rounded-2xl p-5 border border-gold-500/15 hidden">
-                    <h3 class="text-base font-bold text-gold-400 border-b border-white/5 pb-2 mb-4 flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus text-base text-gray-400"></i> Add Franchise Team
+                <div id="add-team-panel" class="glass-panel rounded-2xl p-6 border border-white/60 shadow-xl hidden">
+                    <h3 class="text-base font-black text-slate-900 border-b border-slate-200 pb-3 mb-4 flex items-center gap-2 uppercase tracking-tight">
+                        <i class="fa-solid fa-plus text-amber-600"></i> Add Franchise Team
                     </h3>
 
                     <form action="index.php" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -467,80 +469,80 @@ try {
                         
                         <!-- Team Name -->
                         <div>
-                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Franchise Name</label>
+                            <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Franchise Name</label>
                             <input type="text" name="team_name" required placeholder="e.g. Wayanad Warriors"
-                                   class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500 transition">
+                                   class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 transition shadow-sm placeholder-slate-400">
                         </div>
 
                         <!-- Login Username -->
                         <div>
-                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Manager Username</label>
+                            <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Manager Username</label>
                             <input type="text" name="username" required placeholder="e.g. wayanad"
-                                   class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono">
+                                   class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 transition font-mono shadow-sm placeholder-slate-400">
                         </div>
 
                         <!-- Login Password -->
                         <div>
-                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Manager Password</label>
+                            <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Manager Password</label>
                             <input type="password" name="password" required placeholder="••••••••"
-                                   class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500 transition">
+                                   class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 transition shadow-sm placeholder-slate-400">
                         </div>
 
                         <!-- Total Purse Points -->
                         <div>
-                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">purse balance (₹)</label>
+                            <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Purse Balance (₹)</label>
                             <input type="number" name="purse" value="10000" min="1000" step="500" required
-                                   class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-gold-400 font-bold focus:outline-none focus:border-gold-500 transition font-mono">
+                                   class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-amber-800 font-black focus:outline-none focus:border-amber-500 transition font-mono shadow-sm">
                         </div>
 
                         <!-- Franchise Logo Upload -->
                         <div>
-                            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Franchise Logo (PNG / JPG)</label>
+                            <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Franchise Logo (PNG / JPG)</label>
                             <input type="file" name="logo" accept="image/*"
-                                   class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:uppercase file:bg-gold-500/10 file:text-gold-400 hover:file:bg-gold-500/20 file:cursor-pointer">
+                                   class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-2 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-black file:uppercase file:bg-slate-900 file:text-white cursor-pointer shadow-sm">
                         </div>
 
                         <!-- Submit -->
                         <button type="submit"
-                                class="w-full bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold uppercase text-[10px] tracking-wider py-3.5 px-4 rounded-xl hover:from-gold-400 hover:to-gold-500 transition duration-300">
+                                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-black uppercase text-xs tracking-wider py-3.5 px-4 rounded-xl transition duration-200 shadow-md">
                             Build Franchise
                         </button>
                     </form>
                 </div>
 
                 <!-- Franchise Standings Overview -->
-                <div class="glass-panel rounded-2xl p-5 border border-gold-500/15">
-                    <h3 class="text-base font-bold text-gold-400 border-b border-white/5 pb-2 mb-4 flex items-center gap-1.5">
-                        <i class="fa-solid fa-trophy text-base text-gray-400"></i> Franchise Standings
+                <div class="glass-panel rounded-2xl p-6 border border-white/60 shadow-xl">
+                    <h3 class="text-base font-black text-slate-900 border-b border-slate-200 pb-3 mb-4 flex items-center gap-2 uppercase tracking-tight">
+                        <i class="fa-solid fa-trophy text-amber-600"></i> Franchise Standings
                     </h3>
                     <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
                         <?php if (empty($teams)): ?>
-                            <div class="text-center py-6 text-xs text-gray-500 uppercase font-semibold">No teams added.</div>
+                            <div class="text-center py-6 text-xs text-slate-600 uppercase font-extrabold">No teams added.</div>
                         <?php else: ?>
                             <?php foreach ($teams as $t): ?>
-                                <div class="p-3 bg-white/5 border border-white/5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:border-gold-500/20 transition">
+                                <div class="p-3.5 bg-white/90 border border-slate-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-sm hover:border-amber-500 transition">
                                     <div class="flex items-center gap-2.5 cursor-pointer hover:opacity-85 transition duration-200" onclick="openFranchiseDetailsModal(<?php echo $t['id']; ?>)">
-                                        <img src="<?php echo $uploadPath; ?><?php echo $t['logo'] ? htmlspecialchars($t['logo']) : 'team_placeholder.jpg'; ?>" class="w-7 h-7 rounded object-contain bg-black/40 p-0.5 border border-white/10 shadow-sm" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>team_placeholder.jpg';">
+                                        <img src="<?php echo $uploadPath; ?><?php echo $t['logo'] ? htmlspecialchars($t['logo']) : 'team_placeholder.jpg'; ?>" class="w-8 h-8 rounded-lg object-contain bg-white p-0.5 border border-slate-300 shadow-sm" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>team_placeholder.jpg';">
                                         <div>
-                                            <div class="font-bold text-white hover:text-gold-400 transition flex items-center gap-1">
+                                            <div class="font-black text-slate-900 hover:text-amber-800 transition flex items-center gap-1 text-sm">
                                                 <?php echo htmlspecialchars($t['team_name']); ?>
-                                                <i class="fa-solid fa-up-right-from-square text-[8px] text-gray-500"></i>
+                                                <i class="fa-solid fa-up-right-from-square text-[9px] text-slate-500"></i>
                                             </div>
-                                            <div class="text-[10px] text-gray-500 mt-1">
-                                                Roster: <strong class="text-gray-300 font-bold"><?php echo $t['current_squad_size']; ?>/<?php echo $t['max_squad_size']; ?></strong> 
-                                                | User: <strong class="text-gold-500 font-mono"><?php echo htmlspecialchars($t['manager_username']); ?></strong>
+                                            <div class="text-[11px] text-slate-700 font-bold mt-0.5">
+                                                Roster: <strong class="text-slate-900 font-black"><?php echo $t['current_squad_size']; ?>/<?php echo $t['max_squad_size']; ?></strong> 
+                                                | User: <strong class="text-amber-800 font-mono font-black"><?php echo htmlspecialchars($t['manager_username']); ?></strong>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between sm:justify-end gap-3.5">
                                         <div class="text-right">
-                                            <div class="font-bold text-gold-400 font-mono">₹<?php echo number_format($t['remaining_purse']); ?></div>
-                                            <div class="text-[9px] text-gray-500 mt-0.5">Purse Left</div>
+                                            <div class="font-black text-amber-800 font-mono text-sm">₹<?php echo number_format($t['remaining_purse']); ?></div>
+                                            <div class="text-[9px] text-slate-600 font-extrabold uppercase mt-0.5">Purse Left</div>
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <!-- Edit Team -->
                                             <button onclick="event.stopPropagation(); openTeamEditModal(<?php echo htmlspecialchars(json_encode($t, JSON_HEX_APOS | JSON_HEX_QUOT)); ?>)"
-                                                    class="bg-blue-950/40 border border-blue-500/30 hover:bg-blue-500/20 text-blue-400 font-bold px-2 py-1 rounded transition text-[9px] uppercase tracking-wider flex items-center gap-1">
+                                                    class="bg-cyan-50 hover:bg-cyan-100 border border-cyan-300 text-cyan-800 font-black px-2 py-1 rounded-lg transition text-[10px] uppercase tracking-wider flex items-center gap-1 shadow-sm">
                                                 <i class="fa-solid fa-pen text-[10px]"></i> Edit
                                             </button>
                                             <!-- Delete Team -->
@@ -549,7 +551,7 @@ try {
                                                   class="inline" onclick="event.stopPropagation();">
                                                 <input type="hidden" name="team_id" value="<?php echo $t['id']; ?>">
                                                 <button type="submit" name="action" value="delete_team"
-                                                        class="<?php echo $t['current_squad_size'] > 0 ? 'bg-zinc-800 border border-white/5 text-gray-500 cursor-not-allowed opacity-50' : 'bg-red-950/40 border border-red-500/30 hover:bg-red-500/20 text-red-400'; ?> font-bold px-2 py-1 rounded transition text-[9px] uppercase tracking-wider flex items-center gap-1"
+                                                        class="<?php echo $t['current_squad_size'] > 0 ? 'bg-slate-200 border border-slate-300 text-slate-400 cursor-not-allowed opacity-50' : 'bg-red-50 hover:bg-red-100 border border-red-300 text-red-700'; ?> font-black px-2 py-1 rounded-lg transition text-[10px] uppercase tracking-wider flex items-center gap-1 shadow-sm"
                                                         <?php if ($t['current_squad_size'] > 0) echo 'title="Release all players to delete"'; ?>>
                                                     <i class="fa-solid fa-trash-can text-[10px]"></i> Delete
                                                  </button>
@@ -563,20 +565,20 @@ try {
                 </div>
 
                 <!-- Registration Status Control -->
-                <div class="glass-panel rounded-2xl p-5 border border-gold-500/15">
-                    <h3 class="text-base font-bold text-gold-400 border-b border-white/5 pb-2 mb-4 flex items-center gap-1.5">
-                        <i class="fa-solid fa-users-gear text-base text-gray-400"></i> Registration Settings
+                <div class="glass-panel rounded-2xl p-6 border border-white/60 shadow-xl">
+                    <h3 class="text-base font-black text-slate-900 border-b border-slate-200 pb-3 mb-4 flex items-center gap-2 uppercase tracking-tight">
+                        <i class="fa-solid fa-users-gear text-amber-600"></i> Registration Settings
                     </h3>
                     <div class="flex items-center justify-between gap-4">
                         <div>
-                            <div class="text-xs font-bold text-white">Public Registration</div>
-                            <p class="text-[10px] text-gray-500 mt-0.5">Toggle open/closed status for new player registrations</p>
+                            <div class="text-xs font-black text-slate-900">Public Registration</div>
+                            <p class="text-[10px] text-slate-600 font-bold mt-0.5">Toggle open/closed status for new player registrations</p>
                         </div>
                         <form action="index.php" method="POST" class="shrink-0">
                             <input type="hidden" name="action" value="toggle_registration">
                             <input type="hidden" name="registration_enabled" value="<?php echo $registrationEnabled ? '0' : '1'; ?>">
                             <button type="submit" 
-                                    class="px-3 py-1.5 rounded-lg text-[10px] uppercase font-extrabold tracking-wider transition <?php echo $registrationEnabled ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' : 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20'; ?>">
+                                    class="px-3.5 py-2 rounded-xl text-xs uppercase font-black tracking-wider transition shadow-sm <?php echo $registrationEnabled ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 hover:bg-emerald-500/25' : 'bg-red-500/15 border border-red-500/30 text-red-800 hover:bg-red-500/25'; ?>">
                                 <?php echo $registrationEnabled ? 'Active / Open' : 'Closed'; ?>
                             </button>
                         </form>
@@ -589,16 +591,16 @@ try {
     </main>
 
     <!-- Footer -->
-    <footer class="w-full glass-panel border-t border-gold-500/10 px-6 py-4 text-center text-xs text-gray-500 mt-6">
-        <p>© 2026 Shamsu Memorial Cricket League. Super Admin Administration.</p>
+    <footer class="w-full glass-panel border-t border-white/60 px-6 py-4 text-center text-xs text-slate-700 font-extrabold mt-6 shadow-md">
+        <p>© 2026 AuctionWala — SaaS League Platform. Super Admin Control.</p>
     </footer>
 
     <!-- Player Edit Modal -->
-    <div id="playerEditModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="max-w-md w-full glass-panel rounded-2xl p-6 border border-gold-500/20 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-white/5 pb-3 mb-4">
-                <h3 class="text-base font-bold text-gold-400 flex items-center gap-1.5"><i class="fa-solid fa-pen text-gold-400"></i> Edit Player Details</h3>
-                <button onclick="closePlayerEditModal()" class="text-gray-400 hover:text-white flex items-center justify-center w-6 h-6 rounded-full hover:bg-white/5"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div id="playerEditModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="max-w-md w-full glass-panel rounded-2xl p-6 border border-white/80 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2 uppercase tracking-tight"><i class="fa-solid fa-pen text-amber-600"></i> Edit Player Details</h3>
+                <button onclick="closePlayerEditModal()" class="text-slate-500 hover:text-slate-900 flex items-center justify-center w-7 h-7 rounded-full hover:bg-slate-100"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
             <form action="index.php" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="action" value="edit_player">
@@ -606,31 +608,31 @@ try {
 
                 <!-- Name -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Full Name</label>
                     <input type="text" name="name" id="edit_player_name" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 shadow-sm">
                 </div>
 
                 <!-- Mobile -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Mobile Number</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Mobile Number</label>
                     <input type="text" name="mobile" id="edit_player_mobile" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 font-mono shadow-sm">
                 </div>
 
                 <!-- Place -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Hometown / Place</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Hometown / Place</label>
                     <input type="text" name="place" id="edit_player_place" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 shadow-sm">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Role -->
                     <div>
-                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Role</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Role</label>
                         <select name="role" id="edit_player_role"
-                                class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-bold">
+                                class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-extrabold shadow-sm">
                             <option value="Batsman">Batsman</option>
                             <option value="Bowler">Bowler</option>
                             <option value="All-Rounder">All-Rounder</option>
@@ -640,18 +642,18 @@ try {
 
                     <!-- Base Price -->
                     <div>
-                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Base Price (₹)</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Base Price (₹)</label>
                         <input type="number" name="base_price" id="edit_player_base_price" min="100" step="100" required
-                               class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono font-bold">
+                               class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-amber-800 focus:outline-none focus:border-amber-500 font-mono font-black shadow-sm">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Auction Status -->
                     <div>
-                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Auction Status</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Auction Status</label>
                         <select name="auction_status" id="edit_player_auction_status"
-                                class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-bold">
+                                class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-extrabold shadow-sm">
                             <option value="Available">Available</option>
                             <option value="Sold">Sold</option>
                             <option value="Unsold">Unsold</option>
@@ -660,17 +662,17 @@ try {
 
                     <!-- Sold Price -->
                     <div>
-                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Sold Price (₹)</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Sold Price (₹)</label>
                         <input type="number" name="sold_price" id="edit_player_sold_price" min="0" step="100"
-                               class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono font-bold">
+                               class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-amber-800 focus:outline-none focus:border-amber-500 font-mono font-black shadow-sm">
                     </div>
                 </div>
 
                 <!-- Assigned Franchise -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Assigned Franchise</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Assigned Franchise</label>
                     <select name="team_id" id="edit_player_team_id"
-                            class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-bold">
+                            class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-extrabold shadow-sm">
                         <option value="">-- None (Available / Unsold) --</option>
                         <?php foreach ($teams as $t): ?>
                             <option value="<?php echo $t['id']; ?>"><?php echo htmlspecialchars($t['team_name']); ?></option>
@@ -680,16 +682,16 @@ try {
 
                 <!-- Registration Reference ID -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Registration Reference ID</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Registration Reference ID</label>
                     <input type="text" name="utr" id="edit_player_utr" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono font-bold">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono font-black shadow-sm">
                 </div>
 
                 <!-- Payment Status -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Payment Status</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Payment Status</label>
                     <select name="payment_status" id="edit_player_status"
-                            class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-bold">
+                            class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-extrabold shadow-sm">
                         <option value="Pending">Pending</option>
                         <option value="Verified">Verified</option>
                         <option value="Rejected">Rejected</option>
@@ -698,19 +700,19 @@ try {
 
                 <!-- Profile Photo -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Update Profile Image (Optional)</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Update Profile Image (Optional)</label>
                     <input type="file" name="profile_image" accept="image/*"
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:uppercase file:bg-gold-500/10 file:text-gold-400 hover:file:bg-gold-500/20 file:cursor-pointer">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-black file:uppercase file:bg-slate-900 file:text-white shadow-sm">
                 </div>
 
                 <!-- Buttons -->
                 <div class="flex gap-3 pt-2">
                     <button type="button" onclick="closePlayerEditModal()"
-                            class="flex-1 bg-zinc-900 border border-white/5 text-gray-400 font-bold uppercase text-[10px] tracking-wider py-3 rounded-xl hover:bg-white/5 transition">
+                            class="flex-1 bg-slate-100 border border-slate-300 text-slate-700 font-extrabold uppercase text-xs tracking-wider py-3 rounded-xl hover:bg-slate-200 transition">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="flex-1 bg-gold-500 text-black font-extrabold uppercase text-[10px] tracking-wider py-3 rounded-xl hover:bg-gold-400 transition">
+                            class="flex-1 bg-slate-900 text-white font-black uppercase text-xs tracking-wider py-3 rounded-xl hover:bg-slate-800 transition shadow-md">
                         Save Changes
                     </button>
                 </div>
@@ -719,11 +721,11 @@ try {
     </div>
 
     <!-- Team Edit Modal -->
-    <div id="teamEditModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="max-w-md w-full glass-panel rounded-2xl p-6 border border-gold-500/20 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-white/5 pb-3 mb-4">
-                <h3 class="text-base font-bold text-gold-400 flex items-center gap-1.5"><i class="fa-solid fa-pen text-gold-400"></i> Edit Franchise Team</h3>
-                <button onclick="closeTeamEditModal()" class="text-gray-400 hover:text-white flex items-center justify-center w-6 h-6 rounded-full hover:bg-white/5"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div id="teamEditModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="max-w-md w-full glass-panel rounded-2xl p-6 border border-white/80 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2 uppercase tracking-tight"><i class="fa-solid fa-pen text-amber-600"></i> Edit Franchise Team</h3>
+                <button onclick="closeTeamEditModal()" class="text-slate-500 hover:text-slate-900 flex items-center justify-center w-7 h-7 rounded-full hover:bg-slate-100"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
             <form action="index.php" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="action" value="edit_team">
@@ -731,63 +733,63 @@ try {
 
                 <!-- Team Name -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Franchise Name</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Franchise Name</label>
                     <input type="text" name="team_name" id="edit_team_name" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 shadow-sm">
                 </div>
 
                 <!-- Manager Username -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Manager Username</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Manager Username</label>
                     <input type="text" name="username" id="edit_team_username" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 font-mono shadow-sm">
                 </div>
 
                 <!-- Manager Password -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">New Password (Leave blank to keep current)</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">New Password (Leave blank to keep current)</label>
                     <input type="password" name="password" placeholder="••••••••"
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 shadow-sm">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Total Purse -->
                     <div>
-                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Total Purse (₹)</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Total Purse (₹)</label>
                         <input type="number" name="purse" id="edit_team_purse" min="1000" step="500" required
-                               class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono font-bold">
+                               class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-amber-800 focus:outline-none focus:border-amber-500 font-mono font-black shadow-sm">
                     </div>
 
                     <!-- Remaining Purse -->
                     <div>
-                        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Remaining Purse (₹)</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Remaining Purse (₹)</label>
                         <input type="number" name="remaining_purse" id="edit_team_remaining_purse" min="0" step="100" required
-                               class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono font-bold">
+                               class="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2.5 text-xs text-amber-800 focus:outline-none focus:border-amber-500 font-mono font-black shadow-sm">
                     </div>
                 </div>
 
                 <!-- Max Squad Size -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Max Squad Size</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Max Squad Size</label>
                     <input type="number" name="max_squad_size" id="edit_team_max_squad" min="5" max="30" required
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition font-mono font-bold">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 font-mono font-black shadow-sm">
                 </div>
 
                 <!-- Franchise Logo Update -->
                 <div>
-                    <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Update Franchise Logo (Leave blank to keep current)</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">Update Franchise Logo (Optional)</label>
                     <input type="file" name="logo" accept="image/*"
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500 transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:uppercase file:bg-gold-500/10 file:text-gold-400 hover:file:bg-gold-500/20 file:cursor-pointer">
+                           class="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-amber-500 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-black file:uppercase file:bg-slate-900 file:text-white cursor-pointer shadow-sm">
                 </div>
 
                 <!-- Buttons -->
                 <div class="flex gap-3 pt-2">
                     <button type="button" onclick="closeTeamEditModal()"
-                            class="flex-1 bg-zinc-900 border border-white/5 text-gray-400 font-bold uppercase text-[10px] tracking-wider py-3 rounded-xl hover:bg-white/5 transition">
+                            class="flex-1 bg-slate-100 border border-slate-300 text-slate-700 font-extrabold uppercase text-xs tracking-wider py-3 rounded-xl hover:bg-slate-200 transition">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="flex-1 bg-gold-500 text-black font-extrabold uppercase text-[10px] tracking-wider py-3 rounded-xl hover:bg-gold-400 transition">
+                            class="flex-1 bg-slate-900 text-white font-black uppercase text-xs tracking-wider py-3 rounded-xl hover:bg-slate-800 transition shadow-md">
                         Save Changes
                     </button>
                 </div>
@@ -796,57 +798,57 @@ try {
     </div>
 
     <!-- Franchise Details Modal -->
-    <div id="franchiseDetailsModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="max-w-2xl w-full glass-panel rounded-2xl p-6 border border-gold-500/20 max-h-[90vh] overflow-y-auto">
+    <div id="franchiseDetailsModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full glass-panel rounded-2xl p-6 border border-white/80 max-h-[90vh] overflow-y-auto shadow-2xl">
             
             <!-- Modal Header -->
-            <div class="flex justify-between items-center border-b border-white/5 pb-4 mb-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-4 mb-4">
                 <div class="flex items-center gap-3">
-                    <img id="view_team_logo" src="<?php echo $uploadPath; ?>team_placeholder.jpg" class="w-10 h-10 rounded object-contain bg-black/40 p-0.5 border border-white/10 shadow-md">
+                    <img id="view_team_logo" src="<?php echo $uploadPath; ?>team_placeholder.jpg" class="w-10 h-10 rounded-lg object-contain bg-white p-0.5 border border-slate-300 shadow-md">
                     <div>
-                        <h3 id="view_team_name" class="text-base font-black uppercase text-gold-400 tracking-tight">Franchise Details</h3>
-                        <p class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Roster & Financial Summary</p>
+                        <h3 id="view_team_name" class="text-base font-black uppercase text-slate-900 tracking-tight">Franchise Details</h3>
+                        <p class="text-[10px] text-slate-600 uppercase tracking-wider font-extrabold">Roster & Financial Summary</p>
                     </div>
                 </div>
-                <button onclick="closeFranchiseDetailsModal()" class="text-gray-400 hover:text-white flex items-center justify-center w-7 h-7 rounded-full hover:bg-white/5 transition">
+                <button onclick="closeFranchiseDetailsModal()" class="text-slate-500 hover:text-slate-900 flex items-center justify-center w-7 h-7 rounded-full hover:bg-slate-100 transition">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
 
             <!-- Team Stats Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                <div class="p-3 bg-white/5 border border-white/5 rounded-xl text-center">
-                    <div class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Purse Budget</div>
-                    <div id="view_team_total_purse" class="text-xs font-black text-white font-mono">₹0</div>
+                <div class="p-3 bg-white/90 border border-slate-300 rounded-xl text-center shadow-sm">
+                    <div class="text-[9px] font-black text-slate-600 uppercase tracking-wider mb-1">Purse Budget</div>
+                    <div id="view_team_total_purse" class="text-sm font-black text-slate-900 font-mono">₹0</div>
                 </div>
-                <div class="p-3 bg-white/5 border border-white/5 rounded-xl text-center">
-                    <div class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Purse Remaining</div>
-                    <div id="view_team_remaining_purse" class="text-xs font-black text-gold-400 font-mono">₹0</div>
+                <div class="p-3 bg-white/90 border border-slate-300 rounded-xl text-center shadow-sm">
+                    <div class="text-[9px] font-black text-slate-600 uppercase tracking-wider mb-1">Purse Remaining</div>
+                    <div id="view_team_remaining_purse" class="text-sm font-black text-amber-800 font-mono">₹0</div>
                 </div>
-                <div class="p-3 bg-white/5 border border-white/5 rounded-xl text-center">
-                    <div class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Squad Size</div>
-                    <div id="view_team_squad_size" class="text-xs font-black text-white">0 / 11</div>
+                <div class="p-3 bg-white/90 border border-slate-300 rounded-xl text-center shadow-sm">
+                    <div class="text-[9px] font-black text-slate-600 uppercase tracking-wider mb-1">Squad Size</div>
+                    <div id="view_team_squad_size" class="text-sm font-black text-slate-900">0 / 11</div>
                 </div>
-                <div class="p-3 bg-white/5 border border-white/5 rounded-xl text-center">
-                    <div class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-1">Manager</div>
-                    <div id="view_team_username" class="text-xs font-black text-gold-500 font-mono">N/A</div>
+                <div class="p-3 bg-white/90 border border-slate-300 rounded-xl text-center shadow-sm">
+                    <div class="text-[9px] font-black text-slate-600 uppercase tracking-wider mb-1">Manager</div>
+                    <div id="view_team_username" class="text-sm font-black text-amber-800 font-mono">N/A</div>
                 </div>
             </div>
 
             <!-- Team Players Roster Section -->
             <div>
-                <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-users text-gray-500"></i> Purchased Roster
+                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-users text-amber-600"></i> Purchased Roster
                 </h4>
 
                 <div class="max-h-80 overflow-y-auto pr-1">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-white/5 text-[9px] uppercase tracking-wider text-gray-500">
-                                <th class="py-2.5 font-bold">Player</th>
-                                <th class="py-2.5 font-bold">Role</th>
-                                <th class="py-2.5 font-bold text-right">Sold Price</th>
-                                <th class="py-2.5 font-bold text-center">Action</th>
+                            <tr class="border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-900 font-black">
+                                <th class="py-2.5">Player</th>
+                                <th class="py-2.5">Role</th>
+                                <th class="py-2.5 text-right">Sold Price</th>
+                                <th class="py-2.5 text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody id="view_team_players_tbody">
@@ -857,8 +859,8 @@ try {
             </div>
 
             <!-- Close Button -->
-            <div class="flex justify-end pt-4 border-t border-white/5 mt-6">
-                <button onclick="closeFranchiseDetailsModal()" class="bg-zinc-900 border border-white/5 text-gray-400 font-bold uppercase text-[10px] tracking-wider py-2.5 px-6 rounded-xl hover:bg-white/5 transition">
+            <div class="flex justify-end pt-4 border-t border-slate-200 mt-6">
+                <button onclick="closeFranchiseDetailsModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-black uppercase text-xs tracking-wider py-2.5 px-6 rounded-xl transition shadow-md">
                     Close Details
                 </button>
             </div>
