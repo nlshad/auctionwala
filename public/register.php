@@ -9,6 +9,7 @@ $tournamentId = get_active_tournament_id($pdo);
 $stmt = $pdo->prepare("SELECT * FROM tournaments WHERE id = ?");
 $stmt->execute([$tournamentId]);
 $tournament = $stmt->fetch();
+$tName = ($tournament && !empty($tournament['name'])) ? $tournament['name'] : 'Official Player Registration';
 
 // Fetch registration status for tournament
 $stmt = $pdo->prepare("SELECT registration_enabled FROM auction_state WHERE tournament_id = ?");
@@ -163,86 +164,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Registration — SMCL 2026</title>
-    <link rel="icon" type="image/png" href="uploads/league_logo.png">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        gold: {
-                            50: '#fdfbeb',
-                            100: '#fbf5c4',
-                            200: '#f7e985',
-                            300: '#f3d744',
-                            400: '#eebf17',
-                            500: '#d4a30c',
-                            600: '#a77c08',
-                            700: '#7e5a07',
-                            800: '#533c07',
-                            900: '#2b1f03',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>Player Registration — <?php echo htmlspecialchars($tName); ?></title>
+    <link rel="icon" type="image/png" href="uploads/auctionwala_logo.png">
+    <?php require_once 'components/ui_head.php'; ?>
     <!-- Cropper.js CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <!-- html2canvas CDN for image download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            color: #0f172a;
-        }
-        h1, h2, h3, h4 {
-            font-family: 'Outfit', sans-serif;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.06);
-        }
-    </style>
 </head>
-<body class="text-slate-800 min-h-screen py-10 px-4 flex items-center justify-center">
-    <div class="max-w-4xl w-full glass-card rounded-2xl border border-slate-200 overflow-hidden shadow-xl">
+<body class="text-slate-800 min-h-screen py-8 px-4 flex items-center justify-center">
+    <div class="max-w-3xl w-full glass-panel rounded-2xl border border-white/60 overflow-hidden shadow-2xl">
         <!-- Top Banner -->
-        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 border-b border-slate-700 text-center relative">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(218,165,32,0.15)_0%,transparent_70%)] pointer-events-none"></div>
+        <div class="bg-slate-900 p-6 sm:p-8 border-b border-slate-800 text-center relative shadow-md">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(218,165,32,0.12)_0%,transparent_70%)] pointer-events-none"></div>
+            
+            <div class="mb-4">
+                <a href="landing.php" class="text-xs uppercase tracking-widest text-amber-400 hover:text-amber-300 font-extrabold inline-flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Startup Portal
+                </a>
+            </div>
+
             <a href="landing.php" class="inline-block mb-3">
                 <img src="uploads/auctionwala_logo.png" alt="AuctionWala Logo" class="h-12 sm:h-14 object-contain mx-auto mix-blend-multiply">
             </a>
-            <div>
-                <a href="landing.php" class="text-xs uppercase tracking-widest text-gold-400 hover:text-gold-300 font-semibold mb-2 inline-flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Startup Portal
-                </a>
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+
+            <h1 class="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight mt-1">
                 <?php echo htmlspecialchars($tName); ?>
             </h1>
-            <p class="text-slate-300 text-xs mt-1 uppercase tracking-widest font-semibold">AuctionWala — Official Player Registration Pool</p>
+            <p class="text-slate-300 text-xs mt-1.5 uppercase tracking-widest font-extrabold">Official Player Registration Pool</p>
         </div>
 
         <!-- Feedback Messages -->
         <?php if (!empty($successMsg)): ?>
-            <div class="mx-6 mt-6 bg-gold-950/20 border border-gold-500/40 text-gold-300 px-5 py-4 rounded-xl text-sm flex items-center gap-3">
-                <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+            <div class="mx-6 mt-6 bg-emerald-500/15 border border-emerald-500/40 text-emerald-900 px-5 py-4 rounded-xl text-sm font-extrabold flex items-center gap-3 shadow-sm">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i>
                 <div><?php echo $successMsg; ?></div>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($errorMsg)): ?>
-            <div class="mx-6 mt-6 bg-red-950/20 border border-red-500/40 text-red-300 px-5 py-4 rounded-xl text-sm flex items-center gap-3">
-                <i class="fa-solid fa-circle-exclamation text-red-400 text-lg"></i>
+            <div class="mx-6 mt-6 bg-red-500/15 border border-red-500/40 text-red-900 px-5 py-4 rounded-xl text-sm font-extrabold flex items-center gap-3 shadow-sm">
+                <i class="fa-solid fa-circle-exclamation text-red-600 text-xl"></i>
                 <div><?php echo $errorMsg; ?></div>
             </div>
         <?php endif; ?>
@@ -250,39 +213,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php if (!$registrationEnabled): ?>
             <!-- Disabled Notice -->
             <div class="p-10 text-center space-y-5">
-                <div class="w-16 h-16 bg-red-950/20 border border-red-500/30 text-red-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <div class="w-16 h-16 bg-red-500/20 border border-red-500/40 text-red-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-sm">
                     <i class="fa-solid fa-ban font-bold"></i>
                 </div>
                 <div class="space-y-2">
-                    <h3 class="text-xl font-bold text-white tracking-tight">Public Registrations Closed</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed max-w-md mx-auto">
-                        Player registrations for the SMCL 2026 Season are currently closed. Please contact the league administrators or your franchise managers for more information.
+                    <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tight">Public Registrations Closed</h3>
+                    <p class="text-xs text-slate-700 font-bold leading-relaxed max-w-md mx-auto">
+                        Player registrations for this league are currently closed. Please contact your league organizer for more details.
                     </p>
                 </div>
                 <div class="pt-2">
-                    <a href="index.php" class="bg-white/5 border border-white/10 hover:border-white/20 text-[10px] font-bold uppercase tracking-wider px-6 py-3 rounded-xl text-gray-300 hover:text-white transition inline-block">
-                        <i class="fa-solid fa-arrow-left mr-1.5 text-[10px]"></i> Back to Live Auction
+                    <a href="index.php" class="bg-slate-900 text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-slate-800 transition inline-block shadow-md">
+                        <i class="fa-solid fa-arrow-left mr-1.5 text-xs"></i> Back to Spectator View
                     </a>
                 </div>
             </div>
         <?php elseif (!empty($registeredPlayer)): ?>
             <!-- REGISTRATION SUCCESS CARD -->
             <div class="p-6 md:p-8 max-w-xl mx-auto space-y-6 text-center">
-                <!-- Gorgeous Sports Card -->
-                <!-- Gorgeous IPL Broadcast Sports Registration Card -->
-                <div class="ipl-card-frame ipl-card-live max-w-[340px] mx-auto p-6 mb-6 shadow-2xl relative text-left" id="registration-card" data-utr="<?php echo htmlspecialchars($registeredPlayer['utr']); ?>">
-                    <!-- Diagonal Watermark Background -->
-                    <div class="ipl-watermark-text">REGISTERED</div>
-
-                    <!-- Top Header: Flag/Location & Verification Tag -->
+                <!-- Gorgeous Broadcast Sports Registration Card -->
+                <div class="ipl-card-frame ipl-card-live max-w-[340px] mx-auto p-6 mb-6 shadow-2xl relative text-left bg-slate-900 border-2 border-amber-500/60 rounded-2xl" id="registration-card" data-utr="<?php echo htmlspecialchars($registeredPlayer['utr']); ?>">
+                    <!-- Top Header: Location & Verification Tag -->
                     <div class="flex items-center justify-between relative z-10 mb-3">
-                        <div class="flex items-center gap-1.5 bg-black/50 border border-white/10 px-2.5 py-1 rounded-lg">
+                        <div class="flex items-center gap-1.5 bg-black/60 border border-white/20 px-2.5 py-1 rounded-lg">
                             <span class="text-xs">🇮🇳</span>
-                            <span class="text-[9px] font-black text-slate-200 uppercase tracking-wider font-mono">
+                            <span class="text-[10px] font-black text-white uppercase tracking-wider font-mono">
                                 <?php echo htmlspecialchars($registeredPlayer['place']); ?>
                             </span>
                         </div>
-                        <span class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                        <span class="bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider">
                             Pending Verification
                         </span>
                     </div>
@@ -294,29 +253,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $pLastName = count($pNames) > 1 ? implode(' ', array_slice($pNames, 1)) : '';
                     ?>
                     <div class="relative z-10 mb-2">
-                        <div class="text-[10px] font-extrabold text-gold-400 uppercase tracking-widest leading-tight"><?php echo htmlspecialchars($pFirstName); ?></div>
+                        <div class="text-[10px] font-black text-amber-400 uppercase tracking-widest leading-tight"><?php echo htmlspecialchars($pFirstName); ?></div>
                         <h3 class="text-2xl font-black text-white uppercase tracking-tight leading-none"><?php echo htmlspecialchars($pLastName ? $pLastName : $pFirstName); ?></h3>
                     </div>
 
                     <!-- Center Stage: Cutout Player Image -->
                     <div class="relative z-10 my-4 flex justify-center">
-                        <div class="w-36 h-40 rounded-2xl overflow-hidden border-2 border-gold-500/40 bg-slate-900/80 shadow-2xl relative">
+                        <div class="w-36 h-40 rounded-2xl overflow-hidden border-2 border-amber-400/60 bg-slate-950 shadow-2xl relative">
                             <img src="uploads/<?php echo htmlspecialchars($registeredPlayer['profile_image']); ?>" alt="Candidate" class="w-full h-full object-cover">
                         </div>
                     </div>
 
                     <!-- Bottom Details Box -->
                     <div class="relative z-10 grid grid-cols-2 gap-2.5 pt-2">
-                        <div class="ipl-badge-container p-2.5 flex flex-col justify-center">
-                            <span class="text-[7.5px] uppercase font-black text-blue-300 tracking-wider mb-0.5">Player Role</span>
+                        <div class="bg-slate-800 border border-slate-700 p-2.5 rounded-xl flex flex-col justify-center">
+                            <span class="text-[8px] uppercase font-black text-cyan-300 tracking-wider mb-0.5">Player Role</span>
                             <span class="text-xs font-black text-white uppercase truncate"><?php echo htmlspecialchars($registeredPlayer['role']); ?></span>
                         </div>
-                        <div class="ipl-price-container p-2.5 flex flex-col justify-center text-center">
-                            <span class="text-[7.5px] uppercase font-black text-red-200 tracking-wider mb-0.5">Base Price</span>
+                        <div class="bg-slate-800 border border-slate-700 p-2.5 rounded-xl flex flex-col justify-center text-center">
+                            <span class="text-[8px] uppercase font-black text-amber-300 tracking-wider mb-0.5">Base Price</span>
                             <span class="text-xs font-black text-white font-mono">₹<?php echo number_format($registeredPlayer['base_price'] ?? 100); ?></span>
                         </div>
-                        <div class="col-span-2 bg-slate-900/80 border border-slate-700/60 rounded-xl p-2 text-center">
-                            <span class="text-[7.5px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Registration UTR Reference</span>
+                        <div class="col-span-2 bg-slate-950 border border-amber-500/40 rounded-xl p-2.5 text-center">
+                            <span class="text-[8px] text-slate-400 font-extrabold uppercase tracking-wider block mb-0.5">Registration UTR Reference</span>
                             <span class="text-xs font-black text-amber-400 font-mono tracking-wider uppercase"><?php echo htmlspecialchars($registeredPlayer['utr']); ?></span>
                         </div>
                     </div>
@@ -325,32 +284,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <!-- Download Card Buttons -->
                 <div class="pt-2 flex flex-col sm:flex-row gap-3 justify-center max-w-sm mx-auto">
                     <button id="download-card-btn" onclick="downloadRegistrationCard()"
-                            class="flex-1 bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold uppercase text-xs tracking-wider py-3.5 px-6 rounded-xl hover:from-gold-400 hover:to-gold-500 transition duration-300 shadow-lg shadow-gold-500/20 active:scale-95 flex items-center justify-center gap-2">
+                            class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black uppercase text-xs tracking-wider py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-download"></i> Download Card Image
                     </button>
                     <a href="register.php"
-                       class="flex-1 bg-white/5 border border-white/10 hover:border-white/20 text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-xl text-gray-300 hover:text-white transition flex items-center justify-center gap-2">
+                       class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                         <i class="fa-solid fa-user-plus"></i> Register Another
                     </a>
                 </div>
 
                 <!-- Important Notice -->
-                <div class="max-w-sm mx-auto bg-gold-950/10 border border-gold-500/25 text-left p-5 rounded-xl text-xs space-y-3 mt-4">
-                    <div class="font-extrabold flex items-center gap-1.5 text-gold-400 uppercase tracking-wider text-[10px] border-b border-gold-500/10 pb-2">
-                        <i class="fa-solid fa-circle-info"></i> Important Instructions
+                <div class="max-w-sm mx-auto bg-white/90 border border-slate-300 text-left p-5 rounded-2xl text-xs space-y-3 mt-4 shadow-sm">
+                    <div class="font-black flex items-center gap-1.5 text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-200 pb-2">
+                        <i class="fa-solid fa-circle-info text-amber-600"></i> Important Instructions
                     </div>
-                    <div class="space-y-3.5 text-gray-400 text-[11px] leading-relaxed">
+                    <div class="space-y-3 text-slate-700 text-[11px] font-bold leading-relaxed">
                         <div>
-                            <span class="font-bold text-gold-400 uppercase tracking-wide block text-[9.5px]">Save your card</span>
-                            Please download and save this card to your device.
+                            <span class="font-black text-amber-800 uppercase tracking-wide block text-[10px]">1. Save your card</span>
+                            Please download and save this card image to your device.
                         </div>
                         <div>
-                            <span class="font-bold text-gold-400 uppercase tracking-wide block text-[9.5px]">Make your payment</span>
-                            Payment is collected manually. Your account will be verified once we receive and confirm your payment.
+                            <span class="font-black text-amber-800 uppercase tracking-wide block text-[10px]">2. Manual Verification</span>
+                            Your account will be verified by the League Organizer once payment is confirmed.
                         </div>
                         <div>
-                            <span class="font-bold text-gold-400 uppercase tracking-wide block text-[9.5px]">Join the auction</span>
-                            Only verified candidates will be listed on the auction dashboard.
+                            <span class="font-black text-amber-800 uppercase tracking-wide block text-[10px]">3. Join the auction</span>
+                            Only verified candidates will be listed in the live auction bidding pool.
                         </div>
                     </div>
                 </div>
@@ -359,62 +318,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Form Container -->
             <form action="register.php" method="POST" enctype="multipart/form-data" class="p-6 md:p-8 max-w-xl mx-auto space-y-6">
             
-            <div class="space-y-6">
-                <h3 class="text-lg font-bold text-gold-400 border-b border-white/5 pb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-baseball-bat-ball text-gold-400 text-lg"></i> Player Registration Details
+            <div class="space-y-5">
+                <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-baseball-bat-ball text-amber-600 text-xl"></i> Player Registration Details
                 </h3>
 
                 <!-- Name Input -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Full Name</label>
                     <input type="text" name="name" required placeholder="e.g. Sanju Samson"
-                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/30 transition placeholder-gray-600"
+                           class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 transition placeholder-slate-400 shadow-sm"
                            value="<?php echo htmlspecialchars($name ?? ''); ?>">
                 </div>
 
                 <!-- Mobile & Place -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Mobile Number</label>
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Mobile Number</label>
                         <input type="tel" name="mobile" required placeholder="10-digit number" pattern="[0-9]{10}"
-                               class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/30 transition placeholder-gray-600"
+                               class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 transition placeholder-slate-400 shadow-sm"
                                value="<?php echo htmlspecialchars($mobile ?? ''); ?>">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Place / Hometown</label>
-                        <input type="text" name="place" required placeholder="e.g. Palamukk"
-                               class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/30 transition placeholder-gray-600"
+                        <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Place / Hometown</label>
+                        <input type="text" name="place" required placeholder="e.g. Mananthavady"
+                               class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 transition placeholder-slate-400 shadow-sm"
                                value="<?php echo htmlspecialchars($place ?? ''); ?>">
                     </div>
                 </div>
 
                 <!-- Playing Role -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Playing Role</label>
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Playing Role</label>
                     <select name="role" required 
-                            class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/30 transition">
-                        <option value="" disabled selected class="bg-zinc-950">Select Playing Role</option>
-                        <option value="Batsman" <?php echo ($role ?? '') === 'Batsman' ? 'selected' : ''; ?> class="bg-zinc-950">Batsman</option>
-                        <option value="Bowler" <?php echo ($role ?? '') === 'Bowler' ? 'selected' : ''; ?> class="bg-zinc-950">Bowler</option>
-                        <option value="All-Rounder" <?php echo ($role ?? '') === 'All-Rounder' ? 'selected' : ''; ?> class="bg-zinc-950">All-Rounder</option>
-                        <option value="Wicket-Keeper" <?php echo ($role ?? '') === 'Wicket-Keeper' ? 'selected' : ''; ?> class="bg-zinc-950">Wicket-Keeper</option>
+                            class="w-full bg-white/95 border-2 border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-extrabold focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 transition shadow-sm cursor-pointer">
+                        <option value="" disabled selected class="bg-white text-slate-500">Select Playing Role</option>
+                        <option value="Batsman" <?php echo ($role ?? '') === 'Batsman' ? 'selected' : ''; ?> class="bg-white text-slate-900 font-bold">Batsman</option>
+                        <option value="Bowler" <?php echo ($role ?? '') === 'Bowler' ? 'selected' : ''; ?> class="bg-white text-slate-900 font-bold">Bowler</option>
+                        <option value="All-Rounder" <?php echo ($role ?? '') === 'All-Rounder' ? 'selected' : ''; ?> class="bg-white text-slate-900 font-bold">All-Rounder</option>
+                        <option value="Wicket-Keeper" <?php echo ($role ?? '') === 'Wicket-Keeper' ? 'selected' : ''; ?> class="bg-white text-slate-900 font-bold">Wicket-Keeper</option>
                     </select>
                 </div>
 
                 <!-- Profile Photo Upload -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Profile Image (Max 2MB, JPG/PNG)</label>
-                    <div class="relative w-full bg-black/40 border border-dashed border-white/10 rounded-xl p-4 text-center hover:border-gold-500/40 transition">
+                    <label class="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">Profile Image (Max 2MB, JPG/PNG)</label>
+                    <div class="relative w-full bg-slate-50 border-2 border-dashed border-slate-300 hover:border-amber-500 rounded-xl p-5 text-center transition cursor-pointer">
                         <input type="file" name="profile_image" id="profile_image" required accept="image/*"
                                class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                         <input type="hidden" name="cropped_image_data" id="cropped_image_data">
                         <div class="space-y-1" id="upload-prompt">
-                            <i class="fa-solid fa-camera text-gold-400 text-2xl block mx-auto"></i>
-                            <p class="text-xs text-gray-300 font-semibold">Click to upload or drag & drop</p>
-                            <p class="text-[10px] text-gray-500">MIME validation will enforce real image files only.</p>
+                            <i class="fa-solid fa-camera text-amber-600 text-3xl block mx-auto mb-1"></i>
+                            <p class="text-xs text-slate-900 font-extrabold">Click to upload or drag & drop</p>
+                            <p class="text-[10px] text-slate-600 font-bold">Supported formats: JPG, JPEG, PNG</p>
                         </div>
-                        <div class="hidden space-y-1 text-gold-400 font-medium text-xs animate-pulse" id="upload-feedback">
-                            <i class="fa-solid fa-star text-gold-400 text-xl block mx-auto"></i>
+                        <div class="hidden space-y-1 text-amber-700 font-extrabold text-xs animate-pulse" id="upload-feedback">
+                            <i class="fa-solid fa-check-circle text-emerald-600 text-2xl block mx-auto"></i>
                             <p id="file-name-display"></p>
                         </div>
                     </div>
@@ -422,7 +381,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <!-- Submit Button -->
                 <button type="submit"
-                        class="w-full bg-gradient-to-r from-gold-500 to-amber-600 text-black font-extrabold uppercase text-xs tracking-wider py-4 px-6 rounded-xl hover:from-gold-400 hover:to-gold-500 transition duration-300 mt-2 shadow-lg shadow-gold-500/10 active:scale-95">
+                        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black uppercase text-xs tracking-wider py-4 px-6 rounded-xl transition duration-200 mt-2 shadow-xl shadow-amber-500/20 active:scale-95">
                     Submit Registration
                 </button>
             </div>
