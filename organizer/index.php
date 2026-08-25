@@ -106,29 +106,37 @@ $specUrl = $baseUrl . '/public/index.php?t=' . ($activeTournament['code'] ?? 'sm
 <body class="text-slate-800 min-h-screen flex flex-col justify-between">
 
     <!-- Header Navigation -->
-    <header class="w-full glass-panel border-b border-slate-200 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-40">
+    <header class="w-full glass-panel border-b border-white/60 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
         <div class="flex items-center gap-3">
-            <a href="../public/landing.php">
-                <img src="../public/uploads/auctionwala_logo.png" alt="AuctionWala Logo" class="h-9 object-contain mix-blend-multiply">
+            <a href="../public/landing.php" class="flex items-center gap-2">
+                <img src="../public/uploads/auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain mix-blend-multiply">
             </a>
-            <div>
-                <h1 class="text-lg font-black uppercase tracking-tight text-slate-900 flex items-center gap-2">
-                    AuctionWala SaaS 
-                    <span class="bg-gold-500/20 text-gold-700 border border-gold-500/30 text-[9px] font-extrabold px-2 py-0.5 rounded-full tracking-widest uppercase">Organizer</span>
-                    <span class="bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-extrabold px-2 py-0.5 rounded-full tracking-widest uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-fire text-amber-600"></i> Firebase Connected
-                    </span>
-                </h1>
-                <p class="text-xs text-slate-500 font-medium">Logged in as <strong class="text-gold-700"><?php echo htmlspecialchars($userName); ?></strong> (<?php echo htmlspecialchars($userEmail); ?>)</p>
+            <div class="h-6 w-px bg-slate-300 hidden sm:block"></div>
+            <div class="hidden sm:block">
+                <h1 class="text-sm font-black uppercase tracking-tight text-slate-900 leading-none">Organizer Portal</h1>
+                <p class="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">Control Center</p>
             </div>
         </div>
 
+        <!-- User Profile Pill & Quick Actions -->
         <div class="flex items-center gap-3">
-            <button onclick="openCreateModal()" class="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-zinc-950 font-extrabold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-md transition flex items-center gap-2">
-                <i class="fa-solid fa-plus text-sm"></i> New Tournament
+            <!-- User Pill -->
+            <div class="flex items-center gap-2.5 bg-white/90 border border-slate-300 px-3 py-1.5 rounded-xl shadow-sm">
+                <div class="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center shadow-sm">
+                    <?php echo strtoupper(substr($userName ?? 'U', 0, 1)); ?>
+                </div>
+                <div class="text-left">
+                    <span class="text-xs font-black text-slate-900 block leading-tight truncate max-w-[120px] sm:max-w-[160px]"><?php echo htmlspecialchars($userName); ?></span>
+                    <span class="text-[8px] uppercase tracking-widest font-black text-amber-800 block">Organizer</span>
+                </div>
+            </div>
+
+            <button onclick="openCreateModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider shadow-sm transition flex items-center gap-1.5">
+                <i class="fa-solid fa-plus text-amber-400 text-xs"></i> <span class="hidden sm:inline">New League</span>
             </button>
-            <a href="../public/logout.php" class="bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-slate-600 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
+
+            <a href="../public/logout.php" class="bg-white/90 hover:bg-red-50 hover:text-red-600 border border-slate-300 text-slate-700 w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
+                <i class="fa-solid fa-power-off text-red-500"></i> <span class="hidden sm:inline">Logout</span>
             </a>
         </div>
     </header>

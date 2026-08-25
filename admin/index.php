@@ -265,27 +265,29 @@ try {
 <body class="text-gray-255 min-h-screen flex flex-col justify-between">
 
     <!-- Header Navigation -->
-    <header class="w-full glass-panel border-b border-gold-500/10 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-40">
-        <div class="flex items-center gap-2 sm:gap-3">
-            <a href="../public/landing.php">
-                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-7 sm:h-8 object-contain mix-blend-multiply">
+    <header class="w-full glass-panel border-b border-white/60 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+        <div class="flex items-center gap-3">
+            <a href="../public/landing.php" class="flex items-center gap-2">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain mix-blend-multiply">
             </a>
-            <div>
-                <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-white leading-none">
-                    Super Admin Console
-                </h1>
-                <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">AuctionWala Control Centre</p>
+            <div class="h-6 w-px bg-slate-300 hidden sm:block"></div>
+            <div class="hidden sm:block">
+                <h1 class="text-sm font-black uppercase tracking-tight text-slate-900 leading-none">Team & Roster Manager</h1>
+                <p class="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">League Operations</p>
             </div>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
             <!-- Link to Live Bidding Desk -->
-            <a href="auction.php" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-gold-500 hover:bg-gold-400 text-black px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg transition font-extrabold shadow-md shadow-gold-500/5 flex items-center gap-1">
-                <i class="fa-solid fa-microphone text-xs text-black"></i> <span class="hidden xs:inline">Live </span>Auction Room
+            <a href="auction.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black px-3.5 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 uppercase tracking-wider">
+                <i class="fa-solid fa-gavel text-xs"></i> <span class="hidden xs:inline">Live </span>Auction Room
+            </a>
+            <a href="../organizer/index.php" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-grid-2 text-xs text-amber-400"></i> <span class="hidden sm:inline">Organizer</span> Dashboard
             </a>
             <!-- Logout -->
-            <a href="../public/logout.php" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-zinc-900 border border-white/5 text-gray-400 hover:bg-white/5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg transition">
-                Logout
+            <a href="../public/logout.php" class="bg-white/90 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-300 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
+                <i class="fa-solid fa-power-off text-red-500"></i> <span class="hidden sm:inline">Logout</span>
             </a>
         </div>
     </header>

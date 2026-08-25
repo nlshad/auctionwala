@@ -79,39 +79,38 @@ try {
     <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-3 pointer-events-none max-w-sm w-full"></div>
 
     <!-- Header Navigation -->
-    <header class="w-full glass-panel border-b border-gold-500/10 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-40">
-        <div class="flex items-center gap-2 sm:gap-3">
-            <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($team['logo'] ? $team['logo'] : 'team_placeholder.jpg'); ?>" alt="Team Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain bg-black/40 p-0.5 rounded border border-white/10">
-            <div>
-                <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-white leading-none">
-                    <?php echo htmlspecialchars($team['team_name']); ?>
-                </h1>
-                <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">AuctionWala Manager Console</p>
+    <header class="w-full glass-panel border-b border-white/60 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+        <div class="flex items-center gap-3">
+            <a href="../public/landing.php" class="flex items-center gap-2">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain mix-blend-multiply">
+            </a>
+            <div class="h-6 w-px bg-slate-300 hidden sm:block"></div>
+            <div class="flex items-center gap-2">
+                <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($team['logo'] ? $team['logo'] : 'team_placeholder.jpg'); ?>" alt="Team Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain bg-white/90 p-0.5 rounded-lg border border-slate-300 shadow-sm">
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-tight text-slate-900 leading-none">
+                        <?php echo htmlspecialchars($team['team_name']); ?>
+                    </h1>
+                    <p class="text-[9px] text-amber-800 font-extrabold uppercase tracking-wider mt-0.5">Manager Console</p>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center gap-2 sm:gap-4">
-            <!-- League Logo Badge -->
-            <div class="hidden sm:flex items-center gap-2 border-r border-white/10 pr-3 mr-1">
-                <a href="../public/landing.php">
-                    <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-6 object-contain mix-blend-multiply">
-                </a>
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Active Bidding Indicator -->
+            <div class="flex items-center gap-1.5 bg-white/90 border border-slate-300 rounded-xl px-2.5 py-1 text-xs shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse" id="status-light"></span>
+                <span class="text-slate-900 font-extrabold tracking-wider uppercase text-[10px]" id="status-text">Arena Idle</span>
             </div>
 
             <!-- Sound Toggle -->
-            <button id="sound-toggle-btn" onclick="toggleMute()" class="flex items-center justify-center bg-black/40 border border-gold-500/10 hover:border-gold-500/35 w-8 h-8 rounded-full text-xs transition duration-200" title="Toggle Sound Effects">
-                <i id="sound-icon" class="fa-solid fa-volume-high text-xs sm:text-sm text-gold-400"></i>
+            <button id="sound-toggle-btn" onclick="toggleMute()" class="flex items-center justify-center bg-white/90 border border-slate-300 hover:bg-slate-100 w-8 h-8 rounded-xl text-xs transition shadow-sm" title="Toggle Sound Effects">
+                <i id="sound-icon" class="fa-solid fa-volume-high text-xs text-amber-700"></i>
             </button>
 
-            <!-- Active Bidding Indicator -->
-            <div class="flex items-center gap-1.5 sm:gap-2 bg-black/40 border border-white/5 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 text-[9px] sm:text-xs">
-                <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 animate-pulse" id="status-light"></span>
-                <span class="text-gray-400 font-semibold tracking-wider uppercase text-[8px] sm:text-[10px]" id="status-text">Arena Idle</span>
-            </div>
-
             <!-- Logout -->
-            <a href="../public/logout.php" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-red-950/20 border border-red-500/20 text-red-400 hover:bg-red-500/10 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg transition">
-                Logout
+            <a href="../public/logout.php" class="bg-white/90 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-300 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
+                <i class="fa-solid fa-power-off text-red-500"></i> <span class="hidden sm:inline">Logout</span>
             </a>
         </div>
     </header>
