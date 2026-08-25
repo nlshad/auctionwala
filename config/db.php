@@ -135,28 +135,174 @@ $options = [
 
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
-     // Auto-upgrade database schema to support registration toggle
+     
+     // Self-healing schema migrations
      try {
-         $pdo->exec("ALTER TABLE auction_state ADD COLUMN registration_enabled TINYINT(1) DEFAULT 1");
-     } catch (\PDOException $ex) {}
-     try {
-         $pdo->exec("ALTER TABLE auction_state ADD COLUMN history_pointer INT DEFAULT 0");
-     } catch (\PDOException $ex) {}
-     try {
-         $pdo->exec("CREATE TABLE IF NOT EXISTS auction_history (
+         $pdo->exec("CREATE TABLE IF NOT EXISTS users (
              id INT AUTO_INCREMENT PRIMARY KEY,
-             state_snapshot LONGTEXT NOT NULL,
-             action_type VARCHAR(50) NOT NULL,
+             google_id VARCHAR(255) NULL UNIQUE,
+             name VARCHAR(100) NOT NULL,
+             email VARCHAR(150) NOT NULL UNIQUE,
+             password VARCHAR(255) NULL,
+             auth_provider ENUM('local', 'google') DEFAULT 'local',
              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-         ) ENGINE=InnoDB");
+         ) ENGINE=InnoDB;");
      } catch (\PDOException $ex) {}
-} catch (\PDOException $e) {
-     // If the database doesn't exist yet, we allow a fallback connection to establish it in setup.php
-     if ($e->getCode() == 1049) { 
-         // Database not found, setup.php will handle creating it.
-         $pdo = null;
-     } else {
-         throw new \PDOException($e->getMessage(), (int)$e->getCode());
+
+     try {
+         $pdo->exec("CREATE TABLE IF NOT EXISTS tournaments (
+             id INT AUTO_INCREMENT PRIMARY KEY,
+             organizer_id INT NOT NULL,
+             name VARCHAR(150) NOT NULL,
+             code VARCHAR(50) NOT NULL UNIQUE,
+             logo VARCHAR(255) NULL,
+             total_purse_default INT DEFAULT 10000,
+             max_squad_size_default INT DEFAULT 11,
+             registration_enabled TINYINT(1) DEFAULT 1,
+             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+         ) ENGINE=InnoDB;");
+     } catch (\PDOException $ex) {}
+
+     // Auto-alter core tables for tournament_id
+     $tablesToMigrate = ['teams', 'players', 'bids', 'auction_state', 'auction_history'];
+     foreach ($tablesToMigrate as $tName) {
+         try {
+             $pdo->exec("ALTER TABLE `$tName` ADD COLUMN tournament_id INT NOT NULL DEFAULT 1");
+         } catch (\PDOException $ex) {}
      }
+
+     // Auto-copy uploaded official AuctionWala logo
+     try {
+         $logoSource = "C:/Users/Nishad/.gemini/antigravity-ide/brain/eafe2e14-cc05-4376-ad3b-909586bddac2/media__1787575464288.png";
+         $destDir = __DIR__ . '/../public/uploads/';
+         if (!is_dir($destDir)) {
+             @mkdir($destDir, 0777, true);
+         }
+         if (file_exists($logoSource)) {
+             @copy($logoSource, $destDir . 'auctionwala_logo.png');
+             @copy($logoSource, $destDir . 'league_logo.png');
+         }
+     } catch (\Exception $ex) {}
+
+     // Ensure default tournament row exists
+     try {
+         $chk = $pdo->query("SELECT COUNT(*) FROM tournaments WHERE id = 1");
+         if ($chk && $chk->fetchColumn() == 0) {
+             $userChk = $pdo->query("SELECT id FROM users LIMIT 1");
+             $uId = $userChk ? $userChk->fetchColumn() : null;
+             if (!$uId) {
+                 $pdo->exec("INSERT INTO users (name, email, password, auth_provider) VALUES ('AuctionWala Admin', 'admin@auctionwala.com', '" . password_hash('AuctionWala@Admin#2026_Secure', PASSWORD_BCRYPT) . "', 'local')");
+                 $uId = $pdo->lastInsertId();
+             }
+             $pdo->exec("INSERT INTO tournaments (id, organizer_id, name, code, total_purse_default, max_squad_size_default) VALUES (1, $uId, 'AuctionWala Premier League 2026', 'auctionwala-2026', 10000, 11)");
+         } else {
+             // Update tournament 1 name to AuctionWala Premier League 2026 if it was SMCL
+             $pdo->exec("UPDATE tournaments SET name = 'AuctionWala Premier League 2026', code = 'auctionwala-2026' WHERE id = 1 AND name LIKE '%SMCL%'");
+         }
+     } catch (\PDOException $ex) {}
+
+     // Ensure default auction_state row exists for tournament 1
+     try {
+         $chkState = $pdo->query("SELECT COUNT(*) FROM auction_state WHERE tournament_id = 1");
+         if ($chkState && $chkState->fetchColumn() == 0) {
+             $pdo->exec("INSERT INTO auction_state (tournament_id, status) VALUES (1, 'Idle')");
+         }
+     } catch (\PDOException $ex) {}
+
+} catch (\PDOException $e) {
+     // Gracefully handle database missing (1049) or MySQL connection refused / server stopped (2002)
+     $pdo = null;
+     $db_error_message = $e->getMessage();
+}
+
+/**
+ * Helper function to fetch tournament details by code.
+ */
+function get_tournament_by_code($pdo, $code) {
+    if (!$pdo || empty($code)) return null;
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM tournaments WHERE code = ?");
+        $stmt->execute([$code]);
+        return $stmt->fetch();
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
+ * Helper function to resolve active tournament ID from session or request parameter.
+ */
+function get_active_tournament_id($pdo = null, $requestParam = null) {
+    if (session_status() === PHP_SESSION_NONE) {
+        @session_start();
+    }
+    
+    // 1. Check request parameter if provided or in $_GET / $_POST
+    $code = $requestParam ?? $_GET['t'] ?? $_POST['tournament_code'] ?? null;
+    if ($code && $pdo) {
+        $tourn = get_tournament_by_code($pdo, $code);
+        if ($tourn) return (int)$tourn['id'];
+    }
+    
+    // 2. Check explicitly provided numerical ID
+    $tId = $_GET['tournament_id'] ?? $_POST['tournament_id'] ?? null;
+    if ($tId && is_numeric($tId)) {
+        return (int)$tId;
+    }
+
+    // 3. Fallback to active session
+    if (isset($_SESSION['tournament_id']) && $_SESSION['tournament_id'] > 0) {
+        return (int)$_SESSION['tournament_id'];
+    }
+
+    // 4. Default to tournament 1
+    return 1;
+}
+
+/**
+ * Helper function to categorize all tournaments into Live, Upcoming, and Completed.
+ */
+function get_categorized_tournaments($pdo) {
+    $result = [
+        'live' => [],
+        'upcoming' => [],
+        'completed' => [],
+        'all' => []
+    ];
+    if (!$pdo) return $result;
+
+    try {
+        $stmt = $pdo->query("
+            SELECT 
+                t.*,
+                COALESCE(ast.status, 'Idle') as auction_status,
+                ast.current_player_id,
+                ast.current_bid_amount,
+                (SELECT COUNT(*) FROM teams tm WHERE tm.tournament_id = t.id) as team_count,
+                (SELECT COUNT(*) FROM players pl WHERE pl.tournament_id = t.id AND pl.payment_status = 'Verified') as player_count,
+                (SELECT COUNT(*) FROM players pl WHERE pl.tournament_id = t.id AND pl.auction_status = 'Sold') as sold_player_count
+            FROM tournaments t
+            LEFT JOIN auction_state ast ON ast.tournament_id = t.id
+            ORDER BY t.id DESC
+        ");
+        $allTournaments = $stmt->fetchAll();
+        $result['all'] = $allTournaments;
+
+        foreach ($allTournaments as $t) {
+            $status = $t['auction_status'];
+            $soldCount = (int)$t['sold_player_count'];
+            $totalCount = (int)$t['player_count'];
+
+            if ($status === 'Bidding' || $status === 'Paused') {
+                $result['live'][] = $t;
+            } elseif ($totalCount > 0 && $soldCount >= $totalCount) {
+                $result['completed'][] = $t;
+            } else {
+                $result['upcoming'][] = $t;
+            }
+        }
+    } catch (Exception $e) {}
+
+    return $result;
 }
 ?>

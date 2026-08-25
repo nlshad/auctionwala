@@ -16,10 +16,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $bidAmount = isset($_POST['bid_amount']) ? (int)$_POST['bid_amount'] : 0;
 
     session_start();
+    $tournamentId = get_active_tournament_id($pdo);
 
-    // Verify authorized actor (either admin or the specific manager for this team)
+    // Verify authorized actor (either admin/organizer or the specific manager for this team)
     $isAuthorized = false;
     if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+        $isAuthorized = true;
+    } elseif (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) {
         $isAuthorized = true;
     } elseif (isset($_SESSION['manager_logged_in']) && $_SESSION['manager_logged_in'] === true && (int)$_SESSION['team_id'] === $teamId) {
         $isAuthorized = true;
@@ -44,9 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Start a database transaction for concurrency control
         $pdo->beginTransaction();
 
-        // 1. Verify that the global auction state is active and matches this player
-        $stmt = $pdo->prepare("SELECT current_player_id, current_bid_amount, current_highest_bidder_id, status FROM auction_state WHERE id = 1 FOR UPDATE");
-        $stmt->execute();
+        // 1. Verify that the global auction state for this tournament is active and matches this player
+        $stmt = $pdo->prepare("SELECT current_player_id, current_bid_amount, current_highest_bidder_id, status FROM auction_state WHERE tournament_id = :t_id FOR UPDATE");
+        $stmt->execute(['t_id' => $tournamentId]);
         $state = $stmt->fetch();
 
         if (!$state || $state['status'] !== 'Bidding') {
@@ -61,20 +64,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        // 2. Prevent team from outbidding itself (optional but highly recommended to prevent budget errors)
+        // 2. Prevent team from outbidding itself
         if ((int)$state['current_highest_bidder_id'] === $teamId) {
             echo json_encode(['success' => false, 'error' => 'Your team already holds the highest bid!']);
             $pdo->rollBack();
             exit;
         }
 
-        // 3. Retrieve Team Data (Check remaining purse and squad limits)
-        $stmt = $pdo->prepare("SELECT team_name, remaining_purse, current_squad_size, max_squad_size FROM teams WHERE id = :team_id FOR UPDATE");
-        $stmt->execute(['team_id' => $teamId]);
+        // 3. Retrieve Team Data (Check remaining purse and squad limits for this tournament)
+        $stmt = $pdo->prepare("SELECT team_name, remaining_purse, current_squad_size, max_squad_size FROM teams WHERE id = :team_id AND tournament_id = :t_id FOR UPDATE");
+        $stmt->execute(['team_id' => $teamId, 't_id' => $tournamentId]);
         $team = $stmt->fetch();
 
         if (!$team) {
-            echo json_encode(['success' => false, 'error' => 'Franchise team not found.']);
+            echo json_encode(['success' => false, 'error' => 'Franchise team not found in this tournament.']);
             $pdo->rollBack();
             exit;
         }
@@ -91,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        // 4. Verify that this bid is higher than the current bid in the auction state
+        // 4. Verify that this bid is higher than current bid
         $currentHighest = (int)$state['current_bid_amount'];
         $isFirstBid = ($state['current_highest_bidder_id'] === null);
 
@@ -109,9 +112,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        // Double check against bids table max (failsafe)
-        $stmt = $pdo->prepare("SELECT MAX(bid_amount) as max_bid FROM bids WHERE player_id = :player_id");
-        $stmt->execute(['player_id' => $playerId]);
+        // Double check against bids table max
+        $stmt = $pdo->prepare("SELECT MAX(bid_amount) as max_bid FROM bids WHERE player_id = :player_id AND tournament_id = :t_id");
+        $stmt->execute(['player_id' => $playerId, 't_id' => $tournamentId]);
         $dbMaxRow = $stmt->fetch();
         $dbMax = $dbMaxRow['max_bid'] !== null ? (int)$dbMaxRow['max_bid'] : null;
 
@@ -124,25 +127,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // 5. Insert bid log row
-        $stmt = $pdo->prepare("INSERT INTO bids (player_id, team_id, bid_amount) VALUES (:player_id, :team_id, :bid_amount)");
+        $stmt = $pdo->prepare("INSERT INTO bids (tournament_id, player_id, team_id, bid_amount) VALUES (:t_id, :player_id, :team_id, :bid_amount)");
         $stmt->execute([
-            'player_id' => $playerId,
-            'team_id' => $teamId,
+            't_id'       => $tournamentId,
+            'player_id'  => $playerId,
+            'team_id'    => $teamId,
             'bid_amount' => $bidAmount
         ]);
 
         // 6. Update the central auction state row
-        $stmt = $pdo->prepare("UPDATE auction_state SET current_bid_amount = :bid_amount, current_highest_bidder_id = :team_id, last_update = CURRENT_TIMESTAMP WHERE id = 1");
+        $stmt = $pdo->prepare("UPDATE auction_state SET current_bid_amount = :bid_amount, current_highest_bidder_id = :team_id, last_update = CURRENT_TIMESTAMP WHERE tournament_id = :t_id");
         $stmt->execute([
             'bid_amount' => $bidAmount,
-            'team_id' => $teamId
+            'team_id'    => $teamId,
+            't_id'       => $tournamentId
         ]);
 
         // Commit transaction
         $pdo->commit();
         
         // Record step in history
-        record_auction_history_step($pdo, 'bid');
+        record_auction_history_step($pdo, 'bid', $tournamentId);
         
         echo json_encode(['success' => true]);
 

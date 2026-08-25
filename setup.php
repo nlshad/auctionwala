@@ -33,7 +33,7 @@ try {
 
     // 4. Create Tables
     
-    // Admins Table
+    // Admins Table (Legacy System Superadmins)
     $pdo->exec("CREATE TABLE IF NOT EXISTS admins (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL UNIQUE,
@@ -42,30 +42,60 @@ try {
     ) ENGINE=InnoDB;");
     $message[] = "🟢 Table 'admins' created.";
 
+    // Users Table (SaaS League Organizers)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        google_id VARCHAR(255) NULL UNIQUE,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(150) NOT NULL UNIQUE,
+        password VARCHAR(255) NULL,
+        auth_provider ENUM('local', 'google') DEFAULT 'local',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;");
+    $message[] = "🟢 Table 'users' (SaaS Organizers) created.";
+
+    // Tournaments Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS tournaments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        organizer_id INT NOT NULL,
+        name VARCHAR(150) NOT NULL,
+        code VARCHAR(50) NOT NULL UNIQUE,
+        logo VARCHAR(255) NULL,
+        total_purse_default INT DEFAULT 10000,
+        max_squad_size_default INT DEFAULT 11,
+        registration_enabled TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB;");
+    $message[] = "🟢 Table 'tournaments' created.";
+
     // Teams Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS teams (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        tournament_id INT NOT NULL DEFAULT 1,
         team_name VARCHAR(100) NOT NULL,
         logo VARCHAR(255) NULL,
-        manager_username VARCHAR(50) NOT NULL UNIQUE,
+        manager_username VARCHAR(50) NOT NULL,
         manager_password VARCHAR(255) NOT NULL,
         total_purse INT DEFAULT 10000,
         remaining_purse INT DEFAULT 10000,
         current_squad_size INT DEFAULT 0,
         max_squad_size INT DEFAULT 11,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_team_manager (tournament_id, manager_username)
     ) ENGINE=InnoDB;");
     $message[] = "🟢 Table 'teams' created.";
 
     // Players Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS players (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        tournament_id INT NOT NULL DEFAULT 1,
         name VARCHAR(100) NOT NULL,
         mobile VARCHAR(15) NOT NULL,
         place VARCHAR(100) NOT NULL,
         role ENUM('Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper') NOT NULL,
         profile_image VARCHAR(255) NOT NULL,
-        payment_utr VARCHAR(20) NOT NULL UNIQUE,
+        payment_utr VARCHAR(30) NOT NULL,
         payment_status ENUM('Pending', 'Verified', 'Rejected') DEFAULT 'Pending',
         base_price INT DEFAULT 100,
         sold_price INT DEFAULT NULL,
@@ -79,6 +109,7 @@ try {
     // Bids Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS bids (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        tournament_id INT NOT NULL DEFAULT 1,
         player_id INT NOT NULL,
         team_id INT NOT NULL,
         bid_amount INT NOT NULL,
@@ -88,22 +119,10 @@ try {
     ) ENGINE=InnoDB;");
     $message[] = "🟢 Table 'bids' created.";
 
-    // Create Index on bids table for fast querying (Wrapped in a try-catch for safe page-reloads!)
-    try {
-        $pdo->exec("CREATE INDEX idx_player_bid ON bids(player_id, bid_amount DESC);");
-        $message[] = "🟢 Index 'idx_player_bid' created on 'bids' table.";
-    } catch (PDOException $e) {
-        // If it's a duplicate index error (1061), we can safely ignore it and continue!
-        if (str_contains($e->getMessage(), '1061')) {
-            $message[] = "🟢 Index 'idx_player_bid' already verified.";
-        } else {
-            throw $e;
-        }
-    }
-
     // Auction State Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS auction_state (
-        id INT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        tournament_id INT NOT NULL DEFAULT 1 UNIQUE,
         current_player_id INT NULL,
         current_bid_amount INT DEFAULT 0,
         current_highest_bidder_id INT NULL,
@@ -119,13 +138,54 @@ try {
     // Auction History Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS auction_history (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        tournament_id INT NOT NULL DEFAULT 1,
         state_snapshot LONGTEXT NOT NULL,
         action_type VARCHAR(50) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;");
     $message[] = "🟢 Table 'auction_history' created.";
 
+    // Auto-migrate tournament_id column if tables already existed
+    $tablesToMigrate = ['teams', 'players', 'bids', 'auction_state', 'auction_history'];
+    foreach ($tablesToMigrate as $tName) {
+        try {
+            $pdo->exec("ALTER TABLE `$tName` ADD COLUMN tournament_id INT NOT NULL DEFAULT 1");
+        } catch (\PDOException $ex) {}
+    }
+
+    // Create Index on bids table for fast querying
+    try {
+        $pdo->exec("CREATE INDEX idx_player_bid ON bids(tournament_id, player_id, bid_amount DESC);");
+        $message[] = "🟢 Index 'idx_player_bid' created on 'bids' table.";
+    } catch (PDOException $e) {
+        if (str_contains($e->getMessage(), '1061')) {
+            $message[] = "🟢 Index 'idx_player_bid' already verified.";
+        }
+    }
+
     // 5. Seed Initial Data
+    
+    // Seed SaaS Organizer Account
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = 'admin@auctionwala.com'");
+    $stmt->execute();
+    $organizerId = $stmt->fetchColumn();
+    if (!$organizerId) {
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, auth_provider) VALUES ('AuctionWala Admin', 'admin@auctionwala.com', ?, 'local')");
+        $stmt->execute([password_hash('AuctionWala@Admin#2026_Secure', PASSWORD_BCRYPT)]);
+        $organizerId = $pdo->lastInsertId();
+        $message[] = "👤 Seeded SaaS Organizer: <strong>admin@auctionwala.com</strong>";
+    }
+
+    // Seed Default Tournament
+    $stmt = $pdo->prepare("SELECT id FROM tournaments WHERE code = 'auctionwala-2026'");
+    $stmt->execute();
+    $defaultTournamentId = $stmt->fetchColumn();
+    if (!$defaultTournamentId) {
+        $stmt = $pdo->prepare("INSERT INTO tournaments (id, organizer_id, name, code, total_purse_default, max_squad_size_default) VALUES (1, ?, 'AuctionWala Premier League 2026', 'auctionwala-2026', 10000, 11)");
+        $stmt->execute([$organizerId]);
+        $defaultTournamentId = 1;
+        $message[] = "🏆 Seeded Default Tournament: <strong>AuctionWala Premier League 2026 (Code: auctionwala-2026)</strong>";
+    }
     
     // Seed Admins (Upsert secure passwords dynamically)
     $adminsToSeed = [
@@ -160,10 +220,10 @@ try {
     ];
 
     foreach ($defaultTeams as $team) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM teams WHERE manager_username = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM teams WHERE tournament_id = 1 AND manager_username = ?");
         $stmt->execute([$team[2]]);
         if ($stmt->fetchColumn() == 0) {
-            $stmt = $pdo->prepare("INSERT INTO teams (team_name, logo, manager_username, manager_password, total_purse, remaining_purse) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO teams (tournament_id, team_name, logo, manager_username, manager_password, total_purse, remaining_purse) VALUES (1, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$team[0], $team[1], $team[2], $team[3], $team[4], $team[4]]);
             $message[] = "🏆 Seeded Franchise Team: <strong>{$team[0]}</strong> (Manager: <strong>{$team[2]}</strong> / <strong>{$team[2]}123</strong>, Purse: ₹{$team[4]})";
         }
@@ -180,20 +240,20 @@ try {
     ];
 
     foreach ($defaultPlayers as $player) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM players WHERE payment_utr = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM players WHERE tournament_id = 1 AND payment_utr = ?");
         $stmt->execute([$player[5]]);
         if ($stmt->fetchColumn() == 0) {
-            $stmt = $pdo->prepare("INSERT INTO players (name, mobile, place, role, profile_image, payment_utr, payment_status, base_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO players (tournament_id, name, mobile, place, role, profile_image, payment_utr, payment_status, base_price) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute($player);
             $message[] = "🏏 Seeded Player Pool: <strong>{$player[0]}</strong> ({$player[3]}, UTR: {$player[5]}, Status: {$player[6]})";
         }
     }
 
     // Seed active auction state
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM auction_state WHERE id = 1");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM auction_state WHERE tournament_id = 1");
     $stmt->execute();
     if ($stmt->fetchColumn() == 0) {
-        $pdo->exec("INSERT INTO auction_state (id, current_player_id, current_bid_amount, current_highest_bidder_id, status) VALUES (1, NULL, 0, NULL, 'Idle')");
+        $pdo->exec("INSERT INTO auction_state (id, tournament_id, current_player_id, current_bid_amount, current_highest_bidder_id, status) VALUES (1, 1, NULL, 0, NULL, 'Idle')");
         $message[] = "⚡ Initialized Auction State Row successfully.";
     }
 

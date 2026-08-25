@@ -3,32 +3,55 @@
 session_start();
 require_once '../config/db.php';
 
-// Fetch registration status
-$stmt = $pdo->prepare("SELECT registration_enabled FROM auction_state WHERE id = 1");
-$stmt->execute();
-$regStatus = $stmt->fetch();
-$registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : true;
+$tournamentId = get_active_tournament_id($pdo);
+$tournament = null;
+$registrationEnabled = true;
+$tCode = 'auctionwala-2026';
+$tName = 'AuctionWala Live Arena';
+
+try {
+    if ($pdo) {
+        $stmt = $pdo->prepare("SELECT * FROM tournaments WHERE id = ?");
+        $stmt->execute([$tournamentId]);
+        $tournament = $stmt->fetch();
+
+        $stmt = $pdo->prepare("SELECT registration_enabled FROM auction_state WHERE tournament_id = ?");
+        $stmt->execute([$tournamentId]);
+        $regStatus = $stmt->fetch();
+
+        $registrationEnabled = $tournament ? (bool)$tournament['registration_enabled'] : ($regStatus ? (bool)$regStatus['registration_enabled'] : true);
+        if ($tournament) {
+            $tCode = $tournament['code'];
+            $tName = $tournament['name'];
+        }
+    }
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMCL 2026 — Live Auction Arena</title>
+    <title><?php echo htmlspecialchars($tName); ?> — Live Auction Arena</title>
     <?php require_once 'components/ui_head.php'; ?>
+    <script>
+        window.activeTournamentCode = "<?php echo htmlspecialchars($tCode); ?>";
+        window.activeTournamentId = <?php echo (int)$tournamentId; ?>;
+    </script>
 </head>
-<body class="text-gray-150 min-h-screen flex flex-col justify-between">
+<body class="text-gray-200 min-h-screen flex flex-col justify-between selection:bg-gold-500 selection:text-black">
     
-    <!-- Top Navigation Bar -->
-    <header class="w-full glass-panel border-b border-gold-500/10 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between z-10 sticky top-0">
-        <!-- Logo -->
-        <div class="flex items-center gap-2 sm:gap-3">
-            <img src="uploads/league_logo.png" alt="SMCL Logo" class="w-8 h-8 sm:w-9 sm:h-9 object-contain">
+    <!-- Header / Brand Bar -->
+    <header class="w-full glass-panel border-b border-gold-500/10 px-3 py-2.5 sm:px-6 sm:py-3 flex items-center justify-between sticky top-0 z-40">
+        <div class="flex items-center gap-2.5 sm:gap-3">
+            <a href="landing.php">
+                <img src="uploads/auctionwala_logo.png" alt="AuctionWala Logo" class="h-7 sm:h-9 object-contain mix-blend-multiply">
+            </a>
             <div>
-                <h1 class="text-lg sm:text-xl font-black uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-400 to-amber-600 leading-none">
-                    SMCL 2026
+                <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-400 to-amber-600 leading-none">
+                    <?php echo htmlspecialchars($tName); ?>
                 </h1>
-                <p class="text-[8px] sm:text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">Panamaram Turf</p>
+                <p class="text-[8px] sm:text-[9px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">Live Bidding Arena</p>
             </div>
         </div>
 
@@ -73,74 +96,73 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
         <div class="col-span-12 lg:col-span-8 grid grid-cols-12 gap-6" id="auction-grid">
             
             <!-- Standard Standby Box (Will show when current_player is NULL) -->
-            <div id="standby-box" class="col-span-12 glass-panel rounded-2xl p-10 text-center flex flex-col items-center justify-center border border-gold-500/10 min-h-[450px]">
-                <i class="fa-solid fa-baseball-bat-ball text-6xl text-gold-400 animate-bounce mb-4 block"></i>
-                <h2 class="text-2xl font-extrabold text-gold-400">SMCL Live Auction Desk</h2>
-                <p class="text-gray-400 max-w-md mt-2 text-sm">
-                    Welcome to the Shamsu Memorial Cricket League Franchise Auction. Bidding will commence shortly as the Auctioneer brings the next player to the block.
+            <div id="standby-box" class="col-span-12 glass-panel rounded-2xl p-10 text-center flex flex-col items-center justify-center border border-slate-200 min-h-[450px] bg-white">
+                <i class="fa-solid fa-gavel text-6xl text-gold-600 animate-bounce mb-4 block"></i>
+                <h2 class="text-2xl font-extrabold text-slate-900">AuctionWala Live Bidding Arena</h2>
+                <p class="text-slate-600 max-w-md mt-2 text-sm">
+                    Welcome to the AuctionWala Live Bidding Arena. Bidding will commence as the Auctioneer brings the next player to the block.
                 </p>
                 <div class="mt-6 flex gap-4">
-                    <span class="text-xs text-gray-500 uppercase tracking-widest bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg">
-                        Venue: Panamaram Turf
+                    <span class="text-xs text-slate-500 uppercase tracking-widest bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg">
+                        Real-Time Concurrency Active
                     </span>
-                    <span class="text-xs text-gray-500 uppercase tracking-widest bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg">
-                        Date: 29 May 2026
+                    <span class="text-xs text-slate-500 uppercase tracking-widest bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg">
+                        Season 2026
                     </span>
                 </div>
             </div>
 
             <!-- Completed Stats Box -->
-            <div id="completed-stats-box" class="hidden col-span-12 glass-panel rounded-2xl p-6 border border-gold-500/15 flex flex-col gap-6 relative overflow-hidden">
-                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(218,165,32,0.03)_0%,transparent_70%)] pointer-events-none"></div>
+            <div id="completed-stats-box" class="hidden col-span-12 glass-panel rounded-2xl p-6 border border-white/60 flex flex-col gap-6 relative overflow-hidden shadow-2xl">
                 <!-- Header -->
-                <div class="flex items-center justify-between pb-4 border-b border-white/5 relative z-10">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-900/10 relative z-10">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400">
-                            <i class="fa-solid fa-trophy text-lg animate-pulse-glow"></i>
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-700">
+                            <i class="fa-solid fa-trophy text-lg"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-black text-white uppercase tracking-tight">Auction Completed</h2>
-                            <p class="text-[9px] text-gray-400 uppercase tracking-wider font-semibold">Final Stats & Leaderboards</p>
+                            <h2 class="text-base font-black text-slate-900 uppercase tracking-tight">Auction Completed</h2>
+                            <p class="text-[9px] text-slate-600 uppercase tracking-wider font-bold">Final Stats & Leaderboards</p>
                         </div>
                     </div>
-                    <span class="px-2.5 py-1 rounded bg-gold-950/60 border border-gold-500/30 text-gold-400 text-[9px] uppercase tracking-wider font-extrabold flex items-center gap-1.5 shadow-sm shadow-gold-500/5">
-                        <i class="fa-solid fa-circle text-[6px] text-gold-500 animate-pulse"></i> Final Summary
+                    <span class="px-2.5 py-1 rounded-full bg-gold-500/15 border border-gold-500/30 text-gold-800 text-[9px] uppercase tracking-wider font-extrabold flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-circle text-[6px] text-gold-600 animate-pulse"></i> Final Summary
                     </span>
                 </div>
 
                 <!-- Stats Cards Grid -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Total Purse Spent</span>
-                        <span class="text-lg font-black text-gold-400 font-mono mt-1 block" id="stats-total-spent">₹0</span>
+                    <div class="glass-card-subtle rounded-xl p-4 text-center shadow-sm hover:border-gold-500/40 transition duration-300">
+                        <span class="text-[9px] text-slate-600 uppercase tracking-wider block font-extrabold">Total Purse Spent</span>
+                        <span class="text-xl font-black text-gold-700 font-mono mt-1 block" id="stats-total-spent">₹0</span>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Avg. Player Bid</span>
-                        <span class="text-lg font-black text-white font-mono mt-1 block" id="stats-avg-price">₹0</span>
+                    <div class="glass-card-subtle rounded-xl p-4 text-center shadow-sm hover:border-gold-500/40 transition duration-300">
+                        <span class="text-[9px] text-slate-600 uppercase tracking-wider block font-extrabold">Avg. Player Bid</span>
+                        <span class="text-xl font-black text-slate-900 font-mono mt-1 block" id="stats-avg-price">₹0</span>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Players Sold</span>
-                        <span class="text-lg font-black text-emerald-400 font-mono mt-1 block" id="stats-sold-count">0</span>
+                    <div class="glass-card-subtle rounded-xl p-4 text-center shadow-sm hover:border-gold-500/40 transition duration-300">
+                        <span class="text-[9px] text-slate-600 uppercase tracking-wider block font-extrabold">Players Sold</span>
+                        <span class="text-xl font-black text-emerald-700 font-mono mt-1 block" id="stats-sold-count">0</span>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Unsold Players</span>
-                        <span class="text-lg font-black text-red-400 font-mono mt-1 block" id="stats-unsold-count">0</span>
+                    <div class="glass-card-subtle rounded-xl p-4 text-center shadow-sm hover:border-gold-500/40 transition duration-300">
+                        <span class="text-[9px] text-slate-600 uppercase tracking-wider block font-extrabold">Unsold Players</span>
+                        <span class="text-xl font-black text-red-600 font-mono mt-1 block" id="stats-unsold-count">0</span>
                     </div>
                 </div>
 
                 <!-- Double Columns -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10 mt-2">
                     <div class="md:col-span-7 space-y-3.5">
-                        <h3 class="text-[11px] font-extrabold text-gold-400 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-white/5">
-                            <i class="fa-solid fa-crown text-amber-500"></i> Top Valued Players
+                        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-slate-900/10">
+                            <i class="fa-solid fa-crown text-amber-600"></i> Top Valued Players
                         </h3>
                         <div class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1" id="stats-top-players">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
                     <div class="md:col-span-5 space-y-3.5">
-                        <h3 class="text-[11px] font-extrabold text-gold-400 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-white/5">
-                            <i class="fa-solid fa-chart-line text-amber-500"></i> Franchise Pursetracker
+                        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-slate-900/10">
+                            <i class="fa-solid fa-chart-line text-amber-600"></i> Franchise Pursetracker
                         </h3>
                         <div class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1" id="stats-teams-spent">
                             <!-- Populated dynamically -->
@@ -150,32 +172,43 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
             </div>
 
             <!-- Active Player Profile Bento (5 Cols) -->
-            <div id="player-card" class="hidden col-span-12 md:col-span-5 glass-panel rounded-2xl overflow-hidden border border-gold-500/15 flex flex-col justify-between relative group">
-                <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-gold-500/10 to-transparent pointer-events-none"></div>
-                <!-- Profile Image -->
-                <div class="p-5 flex-grow flex flex-col items-center justify-center">
-                    <div class="w-36 h-40 rounded-xl overflow-hidden border-2 border-gold-500/30 bg-black/60 shadow-lg relative flex items-center justify-center cursor-zoom-in" onclick="openImageLightbox(document.getElementById('player-image').src, document.getElementById('player-name').innerText);">
+            <div id="player-card" class="hidden col-span-12 md:col-span-5 ipl-card-frame ipl-card-live p-5 flex flex-col justify-between relative group shadow-2xl">
+                <!-- Diagonal Watermark Background & Stage Spotlight -->
+                <div class="ipl-watermark-text">LIVE BID</div>
+                <div class="ipl-card-stage-glow"></div>
+
+                <!-- Top Header: Country/Location & Role -->
+                <div class="flex items-center justify-between relative z-10 mb-3">
+                    <div class="flex items-center gap-1.5 bg-black/60 border border-white/20 px-3 py-1 rounded-lg backdrop-blur-md">
+                        <span class="text-xs">🇮🇳</span>
+                        <span class="text-[9px] font-black text-white uppercase tracking-wider font-mono" id="player-place">
+                            Wayanad
+                        </span>
+                    </div>
+                    <span class="bg-amber-400 border border-amber-300 text-slate-950 text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-wider shadow-md" id="player-role">
+                        ALL-ROUNDER
+                    </span>
+                </div>
+
+                <!-- Stacked Player Name -->
+                <div class="relative z-10 mb-2 text-center">
+                    <h2 class="text-2xl font-black text-white uppercase tracking-tight leading-none drop-shadow-md" id="player-name">---</h2>
+                </div>
+
+                <!-- Center Stage: Cutout Player Image -->
+                <div class="relative z-10 my-3 flex justify-center">
+                    <div class="w-36 h-40 rounded-2xl overflow-hidden border-2 border-white/60 bg-slate-900/60 shadow-2xl relative cursor-zoom-in group-hover:scale-105 transition duration-300" onclick="openImageLightbox(document.getElementById('player-image').src, document.getElementById('player-name').innerText);">
                         <img src="uploads/player_placeholder.jpg" id="player-image" alt="Player Image" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='uploads/player_placeholder.jpg';">
-                        <div class="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded text-[8px] border border-white/10 uppercase tracking-wider text-gold-400" id="player-status-tag">
+                        <div class="absolute top-2 right-2 bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-[8px] uppercase tracking-wider shadow-md" id="player-status-tag">
                             Bidding
                         </div>
                     </div>
-                    <!-- Player Name and Origin -->
-                    <div class="text-center mt-4">
-                        <span class="text-[9px] uppercase tracking-widest text-gold-400 font-bold bg-gold-950/50 border border-gold-500/20 px-2.5 py-1 rounded-md" id="player-role">
-                            ALL-ROUNDER
-                        </span>
-                        <h2 class="text-2xl font-black text-white mt-2 tracking-tight" id="player-name">---</h2>
-                        <p class="text-xs text-gray-400 mt-1 flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-location-dot text-gray-500"></i>
-                            <span id="player-place">Wayanad</span>
-                        </p>
-                    </div>
                 </div>
-                <!-- Bottom Stats -->
-                <div class="bg-black/40 border-t border-white/5 px-5 py-3.5 flex justify-between items-center text-xs">
-                    <span class="text-gray-500 font-semibold uppercase tracking-wider">Base Price</span>
-                    <span class="text-gold-400 font-extrabold text-base" id="player-base-price">₹100</span>
+
+                <!-- Bottom Stats Bar: Base Price -->
+                <div class="relative z-10 ipl-price-container px-4 py-3 flex justify-between items-center text-xs">
+                    <span class="text-slate-200 font-extrabold uppercase tracking-wider text-[10px]">Base Price</span>
+                    <span class="text-white font-black text-lg font-mono drop-shadow-md" id="player-base-price">₹100</span>
                 </div>
             </div>
 
@@ -220,12 +253,12 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
         </div>
 
         <!-- RIGHT SIDE: Franchise Standings Leaderboard (4 Cols) -->
-        <aside class="col-span-12 lg:col-span-4 glass-panel rounded-2xl p-5 border border-gold-500/15 flex flex-col">
-            <div class="border-b border-white/5 pb-3 mb-4">
-                <h3 class="text-base font-bold text-gold-400 flex items-center gap-2">
-                    <i class="fa-solid fa-wallet text-base text-gray-400"></i> Franchise Purses
+        <aside class="col-span-12 lg:col-span-4 glass-panel rounded-2xl p-5 border border-white/60 flex flex-col shadow-2xl">
+            <div class="border-b border-slate-900/10 pb-3 mb-4">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2 uppercase tracking-tight">
+                    <i class="fa-solid fa-wallet text-base text-amber-600"></i> Franchise Purses
                 </h3>
-                <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-widest font-semibold">Live Budget & Squad Sizes</p>
+                <p class="text-[10px] text-slate-700 mt-1 uppercase tracking-widest font-extrabold">Live Budget & Squad Sizes</p>
             </div>
 
             <!-- Team Leaderboard Grid -->
@@ -235,30 +268,30 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
         </aside>
 
         <!-- COMPLETED PLAYERS SECTION -->
-        <section class="col-span-12 glass-panel rounded-2xl p-6 border border-gold-500/10 mt-2 relative overflow-hidden">
+        <section class="col-span-12 glass-panel rounded-2xl p-6 border border-white/60 mt-2 relative overflow-hidden shadow-2xl">
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(212,163,12,0.02)_0%,transparent_70%)] pointer-events-none"></div>
             
-            <div class="border-b border-white/5 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="border-b border-slate-900/10 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h3 class="text-base font-black text-gold-400 flex items-center gap-2 uppercase tracking-tight">
-                        <i class="fa-solid fa-clipboard-list text-base text-gray-400"></i> Player Auctions Status
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2 uppercase tracking-tight">
+                        <i class="fa-solid fa-clipboard-list text-base text-amber-600"></i> Player Auctions Status
                     </h3>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Real-time status of all verified player auctions</p>
+                    <p class="text-[10px] text-slate-700 mt-0.5 font-bold uppercase tracking-wider">Real-time status of all verified player auctions</p>
                 </div>
                 <!-- Search and Filters Container -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3.5 w-full sm:w-auto">
                     <!-- Filter Chips -->
                     <div class="flex items-center gap-1.5 overflow-x-auto pb-1 shrink-0 scrollbar-none" id="public-status-filter-container">
-                        <button onclick="setStatusFilter('all')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition bg-gold-500/10 border-gold-500 text-gold-400" data-filter="all">ALL</button>
-                        <button onclick="setStatusFilter('Sold')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition border-white/5 bg-zinc-900 text-gray-400 hover:border-white/10 hover:text-white" data-filter="Sold">SOLD</button>
-                        <button onclick="setStatusFilter('Unsold')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition border-white/5 bg-zinc-900 text-gray-400 hover:border-white/10 hover:text-white" data-filter="Unsold">UNSOLD</button>
-                        <button onclick="setStatusFilter('Available')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition border-white/5 bg-zinc-900 text-gray-400 hover:border-white/10 hover:text-white" data-filter="Available">AVAILABLE</button>
+                        <button onclick="setStatusFilter('all')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-black tracking-wider transition bg-slate-900 border-slate-900 text-white shadow-sm" data-filter="all">ALL</button>
+                        <button onclick="setStatusFilter('Sold')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-extrabold tracking-wider transition border-slate-300 bg-white/90 text-slate-800 hover:bg-slate-900 hover:text-white" data-filter="Sold">SOLD</button>
+                        <button onclick="setStatusFilter('Unsold')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-extrabold tracking-wider transition border-slate-300 bg-white/90 text-slate-800 hover:bg-slate-900 hover:text-white" data-filter="Unsold">UNSOLD</button>
+                        <button onclick="setStatusFilter('Available')" class="status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-extrabold tracking-wider transition border-slate-300 bg-white/90 text-slate-800 hover:bg-slate-900 hover:text-white" data-filter="Available">AVAILABLE</button>
                     </div>
                     <!-- Search Input -->
                     <div class="relative w-full sm:w-56">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]"></i>
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
                         <input type="text" id="player-search-input" oninput="renderCompletedPlayers()" placeholder="Search players, roles, places..."
-                               class="w-full bg-black/60 border border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/25 transition placeholder-gray-600">
+                               class="w-full bg-white/90 border border-slate-300 rounded-xl pl-8 pr-3 py-1.5 text-[11px] text-slate-900 font-medium focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition placeholder-slate-500 shadow-sm">
                     </div>
                 </div>
             </div>
@@ -561,33 +594,37 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
                         const isLeading = (data.leading_team_id && data.leading_team_id === parseInt(team.id));
 
                         const div = document.createElement('div');
-                        div.className = `p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
+                        div.className = `p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between shadow-sm ${
                             isLeading 
-                                ? 'bg-gold-500/10 border-gold-500 shadow-md shadow-gold-500/5 hover:bg-gold-500/20' 
-                                : 'bg-black/30 border-white/5 hover:border-white/10 hover:bg-white/5'
+                                ? 'bg-amber-100/90 border-amber-500 shadow-md hover:bg-amber-100' 
+                                : 'bg-white/90 border-slate-200 hover:border-amber-500/50 hover:bg-white'
                         }`;
                         div.onclick = () => openTeamDetailsModal(team.id);
                         const logoSrc = team.logo ? "uploads/" + team.logo : "uploads/team_placeholder.jpg";
                         div.innerHTML = `
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2.5">
-                                    <img src="${logoSrc}" class="w-7 h-7 rounded object-contain bg-black/40 p-0.5 border border-white/10 shadow-md">
-                                    <span class="text-sm font-bold text-white">${team.team_name}</span>
-                                    ${isLeading ? '<span class="text-[8px] uppercase tracking-widest font-extrabold text-gold-400 bg-gold-950/60 px-1.5 py-0.5 rounded border border-gold-500/20 animate-pulse">High Bidder</span>' : ''}
+                                    <img src="${logoSrc}" class="w-7 h-7 rounded object-contain bg-white p-0.5 border border-slate-200 shadow-sm">
+                                    <span class="text-sm font-black text-slate-900">${team.team_name}</span>
+                                    ${isLeading ? '<span class="text-[8px] uppercase tracking-widest font-black text-amber-900 bg-amber-200 px-1.5 py-0.5 rounded border border-amber-400 animate-pulse">High Bidder</span>' : ''}
                                 </div>
-                                <span class="text-xs font-mono font-bold text-gold-400">₹${team.remaining_purse} left</span>
+                                <span class="text-xs font-mono font-black text-amber-800">₹${Number(team.remaining_purse).toLocaleString('en-IN')} left</span>
                             </div>
-                            <div class="flex items-center justify-between mt-2.5 text-[10px] text-gray-400">
-                                <span>Squad: <strong class="text-gray-300 font-bold">${team.current_squad_size}/${team.max_squad_size} players</strong></span>
-                                <span>Spent: <strong class="text-gray-300 font-mono font-bold">₹${spent}</strong></span>
+                            <div class="flex items-center justify-between mt-2.5 text-[10px] text-slate-700 font-bold">
+                                <span>Squad: <strong class="text-slate-900 font-extrabold">${team.current_squad_size}/${team.max_squad_size} players</strong></span>
+                                <span>Spent: <strong class="text-slate-900 font-mono font-extrabold">₹${Number(spent).toLocaleString('en-IN')}</strong></span>
                             </div>
                         `;
                         leaderboard.appendChild(div);
                     });
                 } else {
+                    const emptyMsg = (data && data.error) 
+                        ? 'MySQL server is stopped. Please start MySQL in XAMPP Control Panel.' 
+                        : 'No franchise teams registered yet.';
                     leaderboard.innerHTML = `
-                        <div class="text-center text-xs text-gray-500 py-6">
-                            No teams registered yet.
+                        <div class="text-center text-xs text-slate-500 py-8 px-4 font-medium flex flex-col items-center gap-2">
+                            <i class="fa-solid fa-database text-gold-600 text-xl opacity-60"></i>
+                            <span>${emptyMsg}</span>
                         </div>
                     `;
                 }
@@ -609,13 +646,110 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
             const chips = document.querySelectorAll('#public-status-filter-container .status-chip');
             chips.forEach(chip => {
                 if (chip.getAttribute('data-filter') === filterValue) {
-                    chip.className = "status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition bg-gold-500/10 border-gold-500 text-gold-400";
+                    chip.className = "status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-black tracking-wider transition bg-slate-900 border-slate-900 text-white shadow-sm";
                 } else {
-                    chip.className = "status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-bold tracking-wider transition border-white/5 bg-zinc-900 text-gray-400 hover:border-white/10 hover:text-white";
+                    chip.className = "status-chip px-3 py-1.5 rounded-lg border text-[10px] uppercase font-extrabold tracking-wider transition border-slate-300 bg-white/90 text-slate-800 hover:bg-slate-900 hover:text-white";
                 }
             });
 
             renderCompletedPlayers();
+        }
+
+        // Dynamic Team & Status Color Palette Engine
+        function getPlayerCardTheme(p) {
+            const isSold = (p.auction_status === 'Sold');
+            const isUnsold = (p.auction_status === 'Unsold');
+
+            if (isUnsold) {
+                return {
+                    bg: 'linear-gradient(135deg, #334155 0%, #1e293b 40%, #7f1d1d 80%, #450a0a 100%)',
+                    watermark: 'UNSOLD',
+                    watermarkColor: 'rgba(239, 68, 68, 0.28)',
+                    badgeBg: 'linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.95) 100%)',
+                    badgeBorder: 'rgba(239, 68, 68, 0.4)',
+                    priceBg: 'linear-gradient(145deg, rgba(153, 27, 27, 0.9) 0%, rgba(185, 28, 28, 0.95) 100%)',
+                    priceBorder: 'rgba(239, 68, 68, 0.5)',
+                    roleBadge: 'bg-red-500/30 border border-red-400/40 text-red-200 font-black'
+                };
+            }
+
+            if (!isSold) {
+                // Available
+                return {
+                    bg: 'linear-gradient(135deg, #0f766e 0%, #115e59 40%, #1e3a8a 80%, #0f172a 100%)',
+                    watermark: 'AVAILABLE',
+                    watermarkColor: 'rgba(45, 212, 191, 0.28)',
+                    badgeBg: 'linear-gradient(145deg, rgba(15, 118, 110, 0.9) 0%, rgba(17, 94, 89, 0.95) 100%)',
+                    badgeBorder: 'rgba(45, 212, 191, 0.5)',
+                    priceBg: 'linear-gradient(145deg, rgba(30, 58, 138, 0.9) 0%, rgba(30, 27, 75, 0.95) 100%)',
+                    priceBorder: 'rgba(129, 140, 248, 0.5)',
+                    roleBadge: 'bg-teal-400 text-slate-950 font-black'
+                };
+            }
+
+            // Sold Player: Calculate team-specific color palette based on team_id or team_name
+            const teamPalettes = [
+                // 0: Royal Blue & Crimson Red (Delhi / Mumbai IPL style)
+                {
+                    bg: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 35%, #dc2626 70%, #991b1b 100%)',
+                    badgeBg: 'linear-gradient(145deg, rgba(30, 58, 138, 0.95) 0%, rgba(29, 78, 216, 0.95) 100%)',
+                    badgeBorder: 'rgba(147, 197, 253, 0.6)',
+                    priceBg: 'linear-gradient(145deg, rgba(153, 27, 27, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%)',
+                    priceBorder: 'rgba(252, 165, 165, 0.6)',
+                    roleBadge: 'bg-amber-400 text-slate-950 font-black'
+                },
+                // 1: Emerald Green & Dark Teal (Calicut Warriors style)
+                {
+                    bg: 'linear-gradient(135deg, #065f46 0%, #059669 35%, #10b981 70%, #047857 100%)',
+                    badgeBg: 'linear-gradient(145deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 120, 87, 0.95) 100%)',
+                    badgeBorder: 'rgba(110, 231, 183, 0.6)',
+                    priceBg: 'linear-gradient(145deg, rgba(6, 95, 70, 0.95) 0%, rgba(16, 185, 129, 0.95) 100%)',
+                    priceBorder: 'rgba(167, 243, 208, 0.6)',
+                    roleBadge: 'bg-emerald-300 text-slate-950 font-black'
+                },
+                // 2: Royal Purple & Amber Gold (Kochi Kings style)
+                {
+                    bg: 'linear-gradient(135deg, #581c87 0%, #7e22ce 35%, #d97706 70%, #b45309 100%)',
+                    badgeBg: 'linear-gradient(145deg, rgba(88, 28, 135, 0.95) 0%, rgba(126, 34, 206, 0.95) 100%)',
+                    badgeBorder: 'rgba(216, 180, 254, 0.6)',
+                    priceBg: 'linear-gradient(145deg, rgba(180, 83, 9, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%)',
+                    priceBorder: 'rgba(253, 230, 138, 0.6)',
+                    roleBadge: 'bg-amber-300 text-slate-950 font-black'
+                },
+                // 3: Ocean Cyan & Deep Navy (Trivandrum Titans style)
+                {
+                    bg: 'linear-gradient(135deg, #0e7490 0%, #0284c7 35%, #1e3a8a 70%, #1e1b4b 100%)',
+                    badgeBg: 'linear-gradient(145deg, rgba(14, 116, 144, 0.95) 0%, rgba(2, 132, 199, 0.95) 100%)',
+                    badgeBorder: 'rgba(165, 243, 252, 0.6)',
+                    priceBg: 'linear-gradient(145deg, rgba(30, 58, 138, 0.95) 0%, rgba(30, 27, 75, 0.95) 100%)',
+                    priceBorder: 'rgba(199, 210, 254, 0.6)',
+                    roleBadge: 'bg-cyan-300 text-slate-950 font-black'
+                },
+                // 4: Flame Orange & Crimson Amber (Malabar Mavericks style)
+                {
+                    bg: 'linear-gradient(135deg, #c2410c 0%, #ea580c 35%, #b91c1c 70%, #881337 100%)',
+                    badgeBg: 'linear-gradient(145deg, rgba(194, 65, 12, 0.95) 0%, rgba(234, 88, 12, 0.95) 100%)',
+                    badgeBorder: 'rgba(253, 186, 116, 0.6)',
+                    priceBg: 'linear-gradient(145deg, rgba(136, 19, 55, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%)',
+                    priceBorder: 'rgba(254, 205, 211, 0.6)',
+                    roleBadge: 'bg-orange-300 text-slate-950 font-black'
+                }
+            ];
+
+            const teamIdNum = parseInt(p.team_id) || 0;
+            const themeIndex = teamIdNum % teamPalettes.length;
+            const theme = teamPalettes[themeIndex];
+
+            return {
+                bg: theme.bg,
+                watermark: 'SOLD SOLD SOLD',
+                watermarkColor: 'rgba(255, 255, 255, 0.28)',
+                badgeBg: theme.badgeBg,
+                badgeBorder: theme.badgeBorder,
+                priceBg: theme.priceBg,
+                priceBorder: theme.priceBorder,
+                roleBadge: theme.roleBadge
+            };
         }
 
         // Render completed players list dynamically (supports real-time search filtering)
@@ -673,57 +807,80 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
 
                 filteredPlayers.forEach(p => {
                     const card = document.createElement('div');
-                    card.className = "glass-panel rounded-2xl p-5 border border-gold-500/10 hover:border-gold-500/20 cursor-pointer transition-all duration-300 relative group flex flex-col justify-between overflow-hidden shadow-lg shadow-black/40";
+                    
+                    const isSold = (p.auction_status === 'Sold');
+                    const isUnsold = (p.auction_status === 'Unsold');
+                    
+                    const theme = getPlayerCardTheme(p);
+
+                    card.className = `ipl-card-frame p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 relative group overflow-hidden shadow-2xl`;
+                    card.style.background = theme.bg;
                     card.onclick = () => openPlayerDetailsModal(p.id);
                     
+                    const nameParts = p.name.trim().split(' ');
+                    const firstName = nameParts[0] || p.name;
+                    const lastName = nameParts.slice(1).join(' ') || '';
+                    
+                    const profileImg = p.profile_image ? p.profile_image : 'player_placeholder.jpg';
+                    const teamLogo = p.team_logo ? p.team_logo : 'team_placeholder.jpg';
+                    const teamName = p.team_name || 'No Team';
+
                     card.innerHTML = `
-                        <!-- Top Info Row -->
-                        <div class="flex items-center justify-between pb-4 border-b border-white/5">
-                            <div class="flex items-center gap-3.5">
-                                <!-- Player Profile Picture -->
-                                <div class="w-12 h-12 rounded-xl overflow-hidden border border-gold-500/25 bg-black/60 shadow-md cursor-zoom-in" onclick="event.stopPropagation(); openImageLightbox('uploads/' + (p.profile_image ? p.profile_image : 'player_placeholder.jpg'), '${p.name.replace(/'/g, "\\\'")}');">
-                                    <img src="uploads/${p.profile_image ? p.profile_image : 'player_placeholder.jpg'}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='uploads/player_placeholder.jpg';">
-                                </div>
-                                <!-- Name & Details -->
-                                <div>
-                                    <h4 class="text-sm font-extrabold text-white group-hover:text-gold-400 transition-colors">${p.name}</h4>
-                                    <p class="text-[9px] text-gray-400 mt-0.5">${p.role} &bull; ${p.place}</p>
+                        <!-- Diagonal Watermark Background -->
+                        <div class="ipl-watermark-text" style="color: ${theme.watermarkColor}">${theme.watermark}</div>
+                        <div class="ipl-card-stage-glow"></div>
+
+                        <!-- Top Header: Country/Location & Role -->
+                        <div class="flex items-center justify-between relative z-10 mb-3">
+                            <div class="flex items-center gap-1.5 bg-black/50 border border-white/20 px-2.5 py-1 rounded-lg backdrop-blur-md">
+                                <span class="text-xs">🇮🇳</span>
+                                <div class="text-[9px] font-black text-white uppercase tracking-wider font-mono">
+                                    ${p.place}
                                 </div>
                             </div>
-                            <!-- Pill Badge -->
-                            <span class="px-2 py-0.5 rounded text-[8px] uppercase tracking-wider font-extrabold ${
-                                p.auction_status === 'Sold' 
-                                    ? 'bg-emerald-500/10 border border-emerald-500/25 text-emerald-400' 
-                                    : (p.auction_status === 'Unsold' 
-                                        ? 'bg-red-500/10 border border-red-500/25 text-red-400' 
-                                        : 'bg-blue-500/10 border border-blue-500/25 text-blue-400')
-                            }">
-                                ${p.auction_status}
+                            <span class="px-2.5 py-1 rounded-lg text-[8px] uppercase tracking-wider shadow-md ${theme.roleBadge}">
+                                ${p.role}
                             </span>
                         </div>
 
-                        <!-- Bottom Price and Team Grid -->
-                        <div class="grid grid-cols-3 gap-2 pt-3.5 text-center items-center">
-                            <!-- Base Price -->
-                            <div class="border-r border-white/5 flex flex-col">
-                                <span class="text-[8px] uppercase tracking-wider text-gray-500 font-bold">Base Price</span>
-                                <span class="text-xs font-black text-gray-200 mt-1 font-mono">₹${p.base_price}</span>
+                        <!-- Stacked Player Name -->
+                        <div class="relative z-10 mb-2">
+                            <div class="text-[10px] font-extrabold text-gold-300 uppercase tracking-widest leading-tight drop-shadow-sm">${firstName}</div>
+                            <h4 class="text-xl font-black text-white uppercase tracking-tight leading-none drop-shadow-md">${lastName ? lastName : firstName}</h4>
+                        </div>
+
+                        <!-- Center Stage: Cutout Player Image -->
+                        <div class="relative z-10 my-3 flex justify-center">
+                            <div class="w-32 h-36 rounded-2xl overflow-hidden border-2 border-white/50 bg-slate-900/60 shadow-2xl relative cursor-zoom-in group-hover:scale-105 transition duration-300" onclick="event.stopPropagation(); openImageLightbox('uploads/${profileImg}', '${p.name.replace(/'/g, "\\\'")}');">
+                                <img src="uploads/${profileImg}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='uploads/player_placeholder.jpg';">
                             </div>
-                            <!-- Final Price -->
-                            <div class="border-r border-white/5 flex flex-col">
-                                <span class="text-[8px] uppercase tracking-wider text-gray-500 font-bold">Final Price</span>
-                                <span class="text-xs font-black text-gold-400 mt-1 font-mono">${p.auction_status === 'Sold' ? '₹' + p.sold_price : '—'}</span>
-                            </div>
-                            <!-- Team -->
-                            <div class="flex flex-col items-center justify-center ${p.auction_status === 'Sold' ? 'cursor-pointer hover:bg-white/5 p-1 rounded transition' : ''}" ${p.auction_status === 'Sold' ? `onclick="event.stopPropagation(); openTeamDetailsModal(${p.team_id})"` : ''}>
-                                <span class="text-[8px] uppercase tracking-wider text-gray-500 font-bold">Team</span>
-                                ${p.auction_status === 'Sold' 
-                                    ? `<div class="flex items-center gap-1.5 mt-1 justify-center max-w-[90px]">
-                                         <img src="uploads/${p.team_logo ? p.team_logo : 'team_placeholder.jpg'}" class="w-4 h-4 rounded object-contain bg-black/40 p-0.5 border border-white/10">
-                                         <span class="text-[10px] font-extrabold text-white tracking-tight truncate">${p.team_name}</span>
+                        </div>
+
+                        <!-- Bottom Broadcast Grid (Sold To & Price) -->
+                        <div class="grid grid-cols-2 gap-2.5 relative z-10 pt-2">
+                            <!-- Left: Sold To / Team -->
+                            <div class="p-2.5 flex flex-col items-center justify-center text-center rounded-xl shadow-lg transition ${isSold ? 'cursor-pointer hover:opacity-90' : ''}" style="background: ${theme.badgeBg}; border: 1.5px solid ${theme.badgeBorder};" ${isSold ? `onclick="event.stopPropagation(); openTeamDetailsModal(${p.team_id})"` : ''}>
+                                <span class="text-[7.5px] uppercase font-black text-white/90 tracking-wider bg-black/40 px-2 py-0.5 rounded border border-white/20 mb-1">
+                                    ${isSold ? 'SOLD TO' : 'STATUS'}
+                                </span>
+                                ${isSold 
+                                    ? `<div class="flex items-center gap-1.5 mt-0.5 justify-center max-w-[100px]">
+                                         <img src="uploads/${teamLogo}" class="w-5 h-5 rounded object-contain bg-white/20 p-0.5 border border-white/30">
+                                         <span class="text-[10px] font-extrabold text-white tracking-tight truncate">${teamName}</span>
                                        </div>` 
-                                    : '<span class="text-xs font-bold text-gray-600 mt-1">—</span>'
+                                    : `<span class="text-xs font-black text-white mt-0.5">${p.auction_status}</span>`
                                 }
+                            </div>
+
+                            <!-- Right: Price & Base Price -->
+                            <div class="p-2.5 flex flex-col items-center justify-center text-center rounded-xl shadow-lg" style="background: ${theme.priceBg}; border: 1.5px solid ${theme.priceBorder};">
+                                <span class="text-[7.5px] uppercase font-black text-white/90 tracking-wider mb-0.5">
+                                    ${isSold ? 'FINAL PRICE' : 'BASE PRICE'}
+                                </span>
+                                <span class="text-sm font-black text-white font-mono tracking-tight drop-shadow-md">
+                                    ${isSold ? '₹' + Number(p.sold_price).toLocaleString('en-IN') : '₹' + Number(p.base_price).toLocaleString('en-IN')}
+                                </span>
+                                ${isSold ? `<span class="text-[7px] text-white/80 font-semibold uppercase mt-0.5">BASE: ₹${Number(p.base_price).toLocaleString('en-IN')}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -781,27 +938,31 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
                 .slice(0, 5);
 
             if (topSold.length === 0) {
+            const topPlayers = [...soldPlayers]
+                .sort((a, b) => (parseInt(b.sold_price) || 0) - (parseInt(a.sold_price) || 0));
+
+            if (topPlayers.length === 0) {
                 topPlayersEl.innerHTML = `
                     <div class="text-center text-[10px] text-gray-500 py-8 uppercase font-semibold">
                         No players sold yet.
                     </div>
                 `;
             } else {
-                topSold.forEach((p, idx) => {
+                topPlayers.slice(0, 5).forEach((p, idx) => {
                     const row = document.createElement('div');
-                    row.className = "flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 text-xs hover:bg-white/10 transition cursor-pointer relative overflow-hidden group";
+                    row.className = "p-3 rounded-xl bg-white/90 border border-slate-200 text-xs flex items-center justify-between hover:bg-white transition cursor-pointer relative group shadow-sm";
                     row.onclick = () => openPlayerDetailsModal(p.id);
 
                     // Rank indicator badge
                     let rankBadge = '';
                     if (idx === 0) {
-                        rankBadge = '<span class="w-6 h-6 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center font-extrabold text-[10px] flex-shrink-0"><i class="fa-solid fa-crown"></i></span>';
+                        rankBadge = '<span class="w-6 h-6 rounded-lg bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center font-black text-[10px] flex-shrink-0"><i class="fa-solid fa-crown"></i></span>';
                     } else if (idx === 1) {
-                        rankBadge = '<span class="w-6 h-6 rounded-lg bg-slate-300/20 border border-slate-300/30 text-slate-300 flex items-center justify-center font-extrabold text-[10px] flex-shrink-0">2</span>';
+                        rankBadge = '<span class="w-6 h-6 rounded-lg bg-slate-200 border border-slate-300 text-slate-900 flex items-center justify-center font-black text-[10px] flex-shrink-0">2</span>';
                     } else if (idx === 2) {
-                        rankBadge = '<span class="w-6 h-6 rounded-lg bg-amber-700/20 border border-amber-700/30 text-amber-600 flex items-center justify-center font-extrabold text-[10px] flex-shrink-0">3</span>';
+                        rankBadge = '<span class="w-6 h-6 rounded-lg bg-amber-200/60 border border-amber-300 text-amber-900 flex items-center justify-center font-black text-[10px] flex-shrink-0">3</span>';
                     } else {
-                        rankBadge = `<span class="w-6 h-6 rounded-lg bg-white/5 border border-white/10 text-gray-400 flex items-center justify-center font-extrabold text-[10px] flex-shrink-0">${idx + 1}</span>`;
+                        rankBadge = `<span class="w-6 h-6 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center font-extrabold text-[10px] flex-shrink-0">${idx + 1}</span>`;
                     }
 
                     const profileImg = p.profile_image ? p.profile_image : 'player_placeholder.jpg';
@@ -810,20 +971,20 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
                     row.innerHTML = `
                         <div class="flex items-center gap-3 min-w-0">
                             ${rankBadge}
-                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-white/10 bg-black/40 flex-shrink-0 cursor-zoom-in" onclick="event.stopPropagation(); openImageLightbox('uploads/${profileImg}', '${p.name.replace(/'/g, "\\\'")}');">
+                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 cursor-zoom-in shadow-sm" onclick="event.stopPropagation(); openImageLightbox('uploads/${profileImg}', '${p.name.replace(/'/g, "\\\'")}');">
                                 <img src="uploads/${profileImg}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='uploads/player_placeholder.jpg';">
                             </div>
                             <div class="min-w-0">
-                                <span class="text-white font-extrabold block truncate group-hover:text-gold-400 transition">${p.name}</span>
-                                <span class="text-[9px] text-gray-500 uppercase tracking-widest block truncate mt-0.5">${p.role} &bull; ${p.place}</span>
+                                <span class="text-slate-900 font-black block truncate group-hover:text-amber-700 transition">${p.name}</span>
+                                <span class="text-[9px] text-slate-700 font-bold uppercase tracking-widest block truncate mt-0.5">${p.role} &bull; ${p.place}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 flex-shrink-0">
-                            <div class="flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded-lg border border-white/5 max-w-[120px] truncate" onclick="event.stopPropagation(); openTeamDetailsModal(${p.team_id});">
-                                <img src="uploads/${teamLogo}" class="w-4 h-4 rounded object-contain bg-black/40 p-0.5 border border-white/10">
-                                <span class="text-[9px] font-extrabold text-white truncate max-w-[80px]">${p.team_name}</span>
+                            <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200 max-w-[120px] truncate" onclick="event.stopPropagation(); openTeamDetailsModal(${p.team_id});">
+                                <img src="uploads/${teamLogo}" class="w-4 h-4 rounded object-contain bg-white p-0.5 border border-slate-200">
+                                <span class="text-[9px] font-extrabold text-slate-900 truncate max-w-[80px]">${p.team_name}</span>
                             </div>
-                            <span class="text-gold-400 font-black font-mono text-sm min-w-[65px] text-right">₹${Number(p.sold_price).toLocaleString('en-IN')}</span>
+                            <span class="text-amber-800 font-black font-mono text-sm min-w-[65px] text-right">₹${Number(p.sold_price).toLocaleString('en-IN')}</span>
                         </div>
                     `;
                     topPlayersEl.appendChild(row);
@@ -853,19 +1014,19 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
 
             teamSpendData.forEach(t => {
                 const row = document.createElement('div');
-                row.className = "p-3 rounded-xl bg-white/5 border border-white/5 text-xs hover:bg-white/10 transition cursor-pointer relative group flex flex-col gap-2";
+                row.className = "p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs hover:bg-slate-100 transition cursor-pointer relative group flex flex-col gap-2 shadow-sm";
                 row.onclick = () => openTeamDetailsModal(t.id);
 
                 const logoSrc = t.logo ? "uploads/" + t.logo : "uploads/team_placeholder.jpg";
                 const spentPct = Math.round((t.spent / t.total_purse) * 100);
 
-                let topBuyHtml = '<span class="text-[9px] text-gray-500 font-semibold uppercase">Top Buy: None</span>';
+                let topBuyHtml = '<span class="text-[9px] text-slate-500 font-semibold uppercase">Top Buy: None</span>';
                 if (t.topBuy) {
                     topBuyHtml = `
-                        <div class="flex items-center justify-between text-[9px] border-t border-white/5 pt-1.5 mt-0.5">
-                            <span class="text-gray-500 uppercase font-semibold">Top Buy</span>
-                            <span class="text-gray-300 font-bold max-w-[120px] truncate">${t.topBuy.name}</span>
-                            <span class="text-gold-400 font-bold font-mono">₹${Number(t.topBuy.sold_price).toLocaleString('en-IN')}</span>
+                        <div class="flex items-center justify-between text-[9px] border-t border-slate-200 pt-1.5 mt-0.5">
+                            <span class="text-slate-500 uppercase font-semibold">Top Buy</span>
+                            <span class="text-slate-900 font-bold max-w-[120px] truncate">${t.topBuy.name}</span>
+                            <span class="text-gold-700 font-bold font-mono">₹${Number(t.topBuy.sold_price).toLocaleString('en-IN')}</span>
                         </div>
                     `;
                 }
@@ -873,25 +1034,25 @@ $registrationEnabled = $regStatus ? (bool)$regStatus['registration_enabled'] : t
                 row.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            <img src="${logoSrc}" class="w-8 h-8 rounded object-contain bg-black/40 p-0.5 border border-gold-500/20 shadow-md">
+                            <img src="${logoSrc}" class="w-8 h-8 rounded object-contain bg-white p-0.5 border border-slate-200 shadow-sm">
                             <div class="min-w-0">
-                                <span class="text-white font-extrabold block truncate group-hover:text-gold-400 transition">${t.team_name}</span>
-                                <span class="text-[9px] text-gray-500 uppercase tracking-widest font-semibold">Purse Spent: ${spentPct}%</span>
+                                <span class="text-slate-900 font-black block truncate group-hover:text-gold-700 transition">${t.team_name}</span>
+                                <span class="text-[9px] text-slate-500 uppercase tracking-widest font-semibold">Purse Spent: ${spentPct}%</span>
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="text-gold-400 font-black font-mono block text-sm">₹${Number(t.spent).toLocaleString('en-IN')}</span>
-                            <span class="text-[9px] text-gray-500 font-semibold uppercase tracking-wider block mt-0.5">Purse Left: ₹${Number(t.remaining_purse).toLocaleString('en-IN')}</span>
+                            <span class="text-gold-700 font-black font-mono block text-sm">₹${Number(t.spent).toLocaleString('en-IN')}</span>
+                            <span class="text-[9px] text-slate-600 font-bold uppercase tracking-wider block mt-0.5">Purse Left: ₹${Number(t.remaining_purse).toLocaleString('en-IN')}</span>
                         </div>
                     </div>
 
                     <!-- Squad Limit Progress Bar -->
                     <div class="space-y-1">
-                        <div class="flex justify-between items-center text-[9px] text-gray-400">
+                        <div class="flex justify-between items-center text-[9px] text-slate-600 font-semibold">
                             <span>Squad size</span>
-                            <span class="font-bold">${t.current_squad_size} / ${t.max_squad_size}</span>
+                            <span class="font-bold text-slate-900">${t.current_squad_size} / ${t.max_squad_size}</span>
                         </div>
-                        <div class="w-full bg-white/5 rounded-full h-1 border border-white/5 overflow-hidden">
+                        <div class="w-full bg-slate-200 rounded-full h-1 border border-slate-300 overflow-hidden">
                             <div class="bg-gold-500 h-full rounded-full transition-all duration-300" style="width: ${(t.current_squad_size / t.max_squad_size) * 100}%"></div>
                         </div>
                     </div>

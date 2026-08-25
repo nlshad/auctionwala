@@ -11,12 +11,13 @@ if (!$pdo) {
     exit;
 }
 
-// Enforce admin login check for API security
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+// Enforce admin/organizer login check for API security
+if (!isset($_SESSION['admin_logged_in']) && !isset($_SESSION['user_logged_in'])) {
     echo json_encode(['success' => false, 'error' => 'Unauthorized access. Session expired or admin not logged in.']);
     exit;
 }
 
+$tournamentId = get_active_tournament_id($pdo);
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 
 try {
@@ -35,13 +36,13 @@ try {
                 exit;
             }
 
-            // Verify player is Verified and Available
-            $stmt = $pdo->prepare("SELECT id, name, payment_status, auction_status FROM players WHERE id = :player_id");
-            $stmt->execute(['player_id' => $playerId]);
+            // Verify player is Verified and Available in this tournament
+            $stmt = $pdo->prepare("SELECT id, name, payment_status, auction_status FROM players WHERE id = :player_id AND tournament_id = :t_id");
+            $stmt->execute(['player_id' => $playerId, 't_id' => $tournamentId]);
             $player = $stmt->fetch();
 
             if (!$player) {
-                echo json_encode(['success' => false, 'error' => 'Player not found.']);
+                echo json_encode(['success' => false, 'error' => 'Player not found in this tournament.']);
                 exit;
             }
             if ($player['payment_status'] !== 'Verified') {
@@ -55,26 +56,28 @@ try {
 
             $pdo->beginTransaction();
 
-            // Clear old bids for this player to prevent conflicts
-            $stmt = $pdo->prepare("DELETE FROM bids WHERE player_id = :player_id");
-            $stmt->execute(['player_id' => $playerId]);
+            // Clear old bids for this player in this tournament
+            $stmt = $pdo->prepare("DELETE FROM bids WHERE player_id = :player_id AND tournament_id = :t_id");
+            $stmt->execute(['player_id' => $playerId, 't_id' => $tournamentId]);
 
             // Update player base price and state
-            $stmt = $pdo->prepare("UPDATE players SET base_price = :base_price, auction_status = 'Bidding' WHERE id = :player_id");
+            $stmt = $pdo->prepare("UPDATE players SET base_price = :base_price, auction_status = 'Bidding' WHERE id = :player_id AND tournament_id = :t_id");
             $stmt->execute([
                 'base_price' => $basePrice,
-                'player_id' => $playerId
+                'player_id'  => $playerId,
+                't_id'       => $tournamentId
             ]);
 
-            // Set global auction state to Bidding
-            $stmt = $pdo->prepare("UPDATE auction_state SET current_player_id = :player_id, current_bid_amount = :base_price, current_highest_bidder_id = NULL, status = 'Bidding', last_update = CURRENT_TIMESTAMP WHERE id = 1");
+            // Set tournament auction state to Bidding
+            $stmt = $pdo->prepare("UPDATE auction_state SET current_player_id = :player_id, current_bid_amount = :base_price, current_highest_bidder_id = NULL, status = 'Bidding', last_update = CURRENT_TIMESTAMP WHERE tournament_id = :t_id");
             $stmt->execute([
                 'player_id' => $playerId,
-                'base_price' => $basePrice
+                'base_price' => $basePrice,
+                't_id'       => $tournamentId
             ]);
 
             $pdo->commit();
-            record_auction_history_step($pdo, 'start');
+            record_auction_history_step($pdo, 'start', $tournamentId);
             
             echo json_encode(['success' => true, 'message' => "Bidding started for {$player['name']} at ₹{$basePrice}."]);
             break;
@@ -84,8 +87,8 @@ try {
             $pdo->beginTransaction();
 
             // Fetch current state
-            $stmt = $pdo->prepare("SELECT current_player_id, current_bid_amount, current_highest_bidder_id FROM auction_state WHERE id = 1 FOR UPDATE");
-            $stmt->execute();
+            $stmt = $pdo->prepare("SELECT current_player_id, current_bid_amount, current_highest_bidder_id FROM auction_state WHERE tournament_id = :t_id FOR UPDATE");
+            $stmt->execute(['t_id' => $tournamentId]);
             $state = $stmt->fetch();
 
             if (!$state || !$state['current_player_id']) {
@@ -105,8 +108,8 @@ try {
             }
 
             // Verify team exists, has enough purse and space
-            $stmt = $pdo->prepare("SELECT team_name, remaining_purse, current_squad_size, max_squad_size FROM teams WHERE id = :team_id FOR UPDATE");
-            $stmt->execute(['team_id' => $teamId]);
+            $stmt = $pdo->prepare("SELECT team_name, remaining_purse, current_squad_size, max_squad_size FROM teams WHERE id = :team_id AND tournament_id = :t_id FOR UPDATE");
+            $stmt->execute(['team_id' => $teamId, 't_id' => $tournamentId]);
             $team = $stmt->fetch();
 
             if (!$team) {
@@ -128,26 +131,28 @@ try {
             }
 
             // 1. Update Player table: sold price, team_id, and mark as Sold
-            $stmt = $pdo->prepare("UPDATE players SET sold_price = :sold_price, team_id = :team_id, auction_status = 'Sold' WHERE id = :player_id");
+            $stmt = $pdo->prepare("UPDATE players SET sold_price = :sold_price, team_id = :team_id, auction_status = 'Sold' WHERE id = :player_id AND tournament_id = :t_id");
             $stmt->execute([
                 'sold_price' => $bidAmount,
-                'team_id' => $teamId,
-                'player_id' => $playerId
+                'team_id'    => $teamId,
+                'player_id'  => $playerId,
+                't_id'       => $tournamentId
             ]);
 
             // 2. Deduct Purse & Increment Squad Size in Teams table
-            $stmt = $pdo->prepare("UPDATE teams SET remaining_purse = remaining_purse - :bid_amount, current_squad_size = current_squad_size + 1 WHERE id = :team_id");
+            $stmt = $pdo->prepare("UPDATE teams SET remaining_purse = remaining_purse - :bid_amount, current_squad_size = current_squad_size + 1 WHERE id = :team_id AND tournament_id = :t_id");
             $stmt->execute([
                 'bid_amount' => $bidAmount,
-                'team_id' => $teamId
+                'team_id'    => $teamId,
+                't_id'       => $tournamentId
             ]);
 
-            // 3. Reset Global Auction State
-            $stmt = $pdo->prepare("UPDATE auction_state SET current_player_id = NULL, current_bid_amount = 0, current_highest_bidder_id = NULL, status = 'Idle', last_update = CURRENT_TIMESTAMP WHERE id = 1");
-            $stmt->execute();
+            // 3. Reset Global Auction State for tournament
+            $stmt = $pdo->prepare("UPDATE auction_state SET current_player_id = NULL, current_bid_amount = 0, current_highest_bidder_id = NULL, status = 'Idle', last_update = CURRENT_TIMESTAMP WHERE tournament_id = :t_id");
+            $stmt->execute(['t_id' => $tournamentId]);
 
             $pdo->commit();
-            record_auction_history_step($pdo, 'sold');
+            record_auction_history_step($pdo, 'sold', $tournamentId);
 
             echo json_encode(['success' => true, 'message' => "Player sold successfully to {$team['team_name']} for ₹{$bidAmount}!"]);
             break;
@@ -156,8 +161,8 @@ try {
             // Finalize current bidding player as UNSOLD
             $pdo->beginTransaction();
 
-            $stmt = $pdo->prepare("SELECT current_player_id FROM auction_state WHERE id = 1 FOR UPDATE");
-            $stmt->execute();
+            $stmt = $pdo->prepare("SELECT current_player_id FROM auction_state WHERE tournament_id = :t_id FOR UPDATE");
+            $stmt->execute(['t_id' => $tournamentId]);
             $state = $stmt->fetch();
 
             if (!$state || !$state['current_player_id']) {
@@ -169,15 +174,15 @@ try {
             $playerId = (int)$state['current_player_id'];
 
             // 1. Update Player Table to Unsold
-            $stmt = $pdo->prepare("UPDATE players SET auction_status = 'Unsold' WHERE id = :player_id");
-            $stmt->execute(['player_id' => $playerId]);
+            $stmt = $pdo->prepare("UPDATE players SET auction_status = 'Unsold' WHERE id = :player_id AND tournament_id = :t_id");
+            $stmt->execute(['player_id' => $playerId, 't_id' => $tournamentId]);
 
-            // 2. Reset Global Auction State
-            $stmt = $pdo->prepare("UPDATE auction_state SET current_player_id = NULL, current_bid_amount = 0, current_highest_bidder_id = NULL, status = 'Idle', last_update = CURRENT_TIMESTAMP WHERE id = 1");
-            $stmt->execute();
+            // 2. Reset Auction State
+            $stmt = $pdo->prepare("UPDATE auction_state SET current_player_id = NULL, current_bid_amount = 0, current_highest_bidder_id = NULL, status = 'Idle', last_update = CURRENT_TIMESTAMP WHERE tournament_id = :t_id");
+            $stmt->execute(['t_id' => $tournamentId]);
 
             $pdo->commit();
-            record_auction_history_step($pdo, 'unsold');
+            record_auction_history_step($pdo, 'unsold', $tournamentId);
 
             echo json_encode(['success' => true, 'message' => 'Player marked as Unsold. Returning to pool.']);
             break;
@@ -186,8 +191,8 @@ try {
             // Toggle bidding status between Bidding and Paused
             $pdo->beginTransaction();
 
-            $stmt = $pdo->prepare("SELECT status FROM auction_state WHERE id = 1 FOR UPDATE");
-            $stmt->execute();
+            $stmt = $pdo->prepare("SELECT status FROM auction_state WHERE tournament_id = :t_id FOR UPDATE");
+            $stmt->execute(['t_id' => $tournamentId]);
             $currentStatus = $stmt->fetchColumn();
 
             if ($currentStatus === 'Idle') {
@@ -198,21 +203,21 @@ try {
 
             $newStatus = ($currentStatus === 'Bidding') ? 'Paused' : 'Bidding';
 
-            $stmt = $pdo->prepare("UPDATE auction_state SET status = :status, last_update = CURRENT_TIMESTAMP WHERE id = 1");
-            $stmt->execute(['status' => $newStatus]);
+            $stmt = $pdo->prepare("UPDATE auction_state SET status = :status, last_update = CURRENT_TIMESTAMP WHERE tournament_id = :t_id");
+            $stmt->execute(['status' => $newStatus, 't_id' => $tournamentId]);
 
             $pdo->commit();
-            record_auction_history_step($pdo, 'toggle_pause');
+            record_auction_history_step($pdo, 'toggle_pause', $tournamentId);
 
             echo json_encode(['success' => true, 'status' => $newStatus, 'message' => "Auction has been " . ($newStatus === 'Paused' ? 'PAUSED' : 'RESUMED') . "."]);
             break;
 
         case 'undo':
-            $pointer = ensure_history_baseline($pdo);
+            $pointer = ensure_history_baseline($pdo, $tournamentId);
 
             // Find previous state in history
-            $stmt = $pdo->prepare("SELECT id, state_snapshot FROM auction_history WHERE id < ? ORDER BY id DESC LIMIT 1");
-            $stmt->execute([$pointer]);
+            $stmt = $pdo->prepare("SELECT id, state_snapshot FROM auction_history WHERE tournament_id = ? AND id < ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$tournamentId, $pointer]);
             $prevStep = $stmt->fetch();
 
             if (!$prevStep) {
@@ -222,21 +227,21 @@ try {
 
             // Restore state
             $prevSnapshot = json_decode($prevStep['state_snapshot'], true);
-            restore_auction_state_snapshot($pdo, $prevSnapshot);
+            restore_auction_state_snapshot($pdo, $prevSnapshot, $tournamentId);
 
             // Update history pointer
-            $stmt = $pdo->prepare("UPDATE auction_state SET history_pointer = ? WHERE id = 1");
-            $stmt->execute([$prevStep['id']]);
+            $stmt = $pdo->prepare("UPDATE auction_state SET history_pointer = ? WHERE tournament_id = ?");
+            $stmt->execute([$prevStep['id'], $tournamentId]);
 
             echo json_encode(['success' => true, 'message' => 'Action undone successfully.']);
             break;
 
         case 'redo':
-            $pointer = ensure_history_baseline($pdo);
+            $pointer = ensure_history_baseline($pdo, $tournamentId);
 
             // Find next state in history
-            $stmt = $pdo->prepare("SELECT id, state_snapshot FROM auction_history WHERE id > ? ORDER BY id ASC LIMIT 1");
-            $stmt->execute([$pointer]);
+            $stmt = $pdo->prepare("SELECT id, state_snapshot FROM auction_history WHERE tournament_id = ? AND id > ? ORDER BY id ASC LIMIT 1");
+            $stmt->execute([$tournamentId, $pointer]);
             $nextStep = $stmt->fetch();
 
             if (!$nextStep) {
@@ -246,11 +251,11 @@ try {
 
             // Restore state
             $nextSnapshot = json_decode($nextStep['state_snapshot'], true);
-            restore_auction_state_snapshot($pdo, $nextSnapshot);
+            restore_auction_state_snapshot($pdo, $nextSnapshot, $tournamentId);
 
             // Update history pointer
-            $stmt = $pdo->prepare("UPDATE auction_state SET history_pointer = ? WHERE id = 1");
-            $stmt->execute([$nextStep['id']]);
+            $stmt = $pdo->prepare("UPDATE auction_state SET history_pointer = ? WHERE tournament_id = ?");
+            $stmt->execute([$nextStep['id'], $tournamentId]);
 
             echo json_encode(['success' => true, 'message' => 'Action redone successfully.']);
             break;

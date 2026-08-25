@@ -1,0 +1,17 @@
+// public/js/firebase-config.js
+// Firebase Web App Credentials & Initialization
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC6-WVioI8crk0wabaX7PzEHQ8EPflF6RU",
+    authDomain: "player-auction-31d1e.firebaseapp.com",
+    projectId: "player-auction-31d1e",
+    storageBucket: "player-auction-31d1e.firebasestorage.app",
+    messagingSenderId: "135416654629",
+    appId: "1:135416654629:web:ff73b77ebf99e08d8b08cc",
+    measurementId: "G-5E7SZ9TJDM"
+};
+
+// Global Firebase initialization helper
+window.getFirebaseConfig = function() {
+    return firebaseConfig;
+};

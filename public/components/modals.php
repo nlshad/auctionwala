@@ -52,10 +52,9 @@ if (!isset($uploadPath)) {
             
             const statusTag = document.getElementById('modal-player-status-tag');
             statusTag.innerText = p.auction_status;
-            
-            if (p.auction_status === 'Sold') {
-                statusTag.className = "px-2.5 py-0.5 rounded text-[8px] uppercase tracking-wider font-extrabold bg-emerald-500/10 border border-emerald-500/25 text-emerald-400";
-                document.getElementById('modal-sold-price').innerText = "₹" + p.sold_price;
+                       if (p.auction_status === 'Sold') {
+                statusTag.className = "px-2.5 py-0.5 rounded text-[8px] uppercase tracking-wider font-extrabold bg-emerald-50 border border-emerald-200 text-emerald-700";
+                document.getElementById('modal-sold-price').innerText = "₹" + Number(p.sold_price).toLocaleString('en-IN');
                 document.getElementById('modal-team-name').innerText = p.team_name;
                 document.getElementById('modal-bid-history-section').style.display = 'block';
                 
@@ -74,21 +73,21 @@ if (!isset($uploadPath)) {
                 if (data.bids && data.bids.length > 0) {
                     data.bids.forEach(b => {
                         const row = document.createElement('div');
-                        row.className = "flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs transition hover:bg-white/10";
+                        row.className = "flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs transition hover:bg-slate-100 shadow-sm";
                         row.innerHTML = `
                             <div class="flex items-center gap-2">
-                                <span class="text-gold-400 font-extrabold">₹${b.bid_amount}</span>
-                                <span class="text-gray-300 font-medium">${b.team_name}</span>
+                                <span class="text-gold-700 font-black font-mono">₹${Number(b.bid_amount).toLocaleString('en-IN')}</span>
+                                <span class="text-slate-800 font-extrabold">${b.team_name}</span>
                             </div>
                         `;
                         listEl.appendChild(row);
                     });
                 } else {
-                    listEl.innerHTML = `<div class="text-center text-[10px] text-gray-500 py-4 uppercase font-semibold">Opening bid placed at base price of ₹${p.base_price}</div>`;
+                    listEl.innerHTML = `<div class="text-center text-[10px] text-slate-500 py-4 uppercase font-semibold">Opening bid placed at base price of ₹${p.base_price}</div>`;
                 }
             } else {
                 // Unsold
-                statusTag.className = "px-2.5 py-0.5 rounded text-[8px] uppercase tracking-wider font-extrabold bg-red-500/10 border border-red-500/25 text-red-400";
+                statusTag.className = "px-2.5 py-0.5 rounded text-[8px] uppercase tracking-wider font-extrabold bg-red-50 border border-red-200 text-red-700";
                 document.getElementById('modal-sold-price').innerText = "—";
                 document.getElementById('modal-team-name').innerText = "—";
                 document.getElementById('modal-bid-history-section').style.display = 'none';
@@ -198,34 +197,28 @@ if (!isset($uploadPath)) {
             // Render Players List
             const listEl = document.getElementById('modal-team-players-list');
             listEl.innerHTML = '';
-            
+
             if (data.players && data.players.length > 0) {
                 data.players.forEach(p => {
                     const row = document.createElement('div');
-                    row.className = "flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/5 text-xs transition hover:bg-white/10 cursor-pointer";
-                    row.onclick = () => { closeTeamModal(); setTimeout(() => openPlayerDetailsModal(p.id), 200); };
+                    row.className = "flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs shadow-sm";
                     row.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <img src="<?php echo $uploadPath; ?>${p.profile_image ? p.profile_image : 'player_placeholder.jpg'}" class="w-8 h-8 rounded-md object-cover border border-gold-500/20 shadow-md cursor-zoom-in" onclick="event.stopPropagation(); openImageLightbox(this.src, '${p.name.replace(/'/g, "\\\'")}');" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>player_placeholder.jpg';">
-                            <div>
-                                <span class="text-white font-extrabold block group-hover:text-gold-400">${p.name}</span>
-                                <span class="text-[9px] text-gray-400 uppercase tracking-wider">${p.role}</span>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-900 font-extrabold">${p.name}</span>
+                            <span class="text-[9px] text-slate-500 font-semibold uppercase">(${p.role})</span>
                         </div>
-                        <span class="text-gold-400 font-mono font-bold">₹${p.sold_price}</span>
+                        <span class="text-gold-700 font-black font-mono">₹${Number(p.sold_price).toLocaleString('en-IN')}</span>
                     `;
                     listEl.appendChild(row);
                 });
             } else {
-                listEl.innerHTML = `<div class="text-center text-[10px] text-gray-500 py-6 uppercase font-semibold">No players purchased yet.</div>`;
+                listEl.innerHTML = `<div class="text-center text-[10px] text-slate-500 py-4 uppercase font-semibold">No players purchased yet</div>`;
             }
 
-            // Animate opening
             modal.classList.remove('hidden');
             setTimeout(() => {
                 content.classList.remove('scale-95');
             }, 50);
-
         } catch (e) {
             console.error("Failed to load team details modal:", e);
         }
@@ -242,14 +235,14 @@ if (!isset($uploadPath)) {
 </script>
 
 <!-- PLAYER DETAILS & BID HISTORY MODAL -->
-<div id="player-details-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300">
-    <div class="glass-panel w-full max-w-lg rounded-2xl border border-gold-500/20 shadow-2xl overflow-hidden relative transform scale-95 transition-all duration-300" id="modal-content">
+<div id="player-details-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-md hidden transition-all duration-300">
+    <div class="bg-white/80 backdrop-blur-2xl w-full max-w-lg rounded-2xl border border-white/70 shadow-2xl overflow-hidden relative transform scale-95 transition-all duration-300" id="modal-content">
         <!-- Modal Header -->
-        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/40">
-            <h3 class="text-sm font-black text-gold-400 uppercase tracking-tight flex items-center gap-2">
-                <i class="fa-solid fa-baseball-bat-ball text-base text-gold-400"></i> Player Auction Summary
+        <div class="px-6 py-4 border-b border-slate-900/10 flex items-center justify-between bg-white/40">
+            <h3 class="text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-gavel text-base text-gold-600"></i> Player Auction Summary
             </h3>
-            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:border-white/20 text-gray-400 hover:text-white flex items-center justify-center transition">
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/60 border border-slate-200 hover:bg-white text-slate-500 hover:text-slate-900 flex items-center justify-center transition shadow-sm">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </button>
         </div>
@@ -258,44 +251,43 @@ if (!isset($uploadPath)) {
         <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
             
             <!-- Player Banner Info -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-5 pb-5 border-b border-white/5">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-5 pb-5 border-b border-slate-900/10">
                 <div class="flex flex-col sm:flex-row items-center gap-5">
-                    <div class="w-20 h-24 rounded-xl overflow-hidden border border-gold-500/30 bg-black/60 shadow-md cursor-zoom-in" onclick="openImageLightbox(document.getElementById('modal-player-image').src, document.getElementById('modal-player-name').innerText);">
+                    <div class="w-20 h-24 rounded-xl overflow-hidden border border-slate-200 bg-white/60 shadow-sm cursor-zoom-in" onclick="openImageLightbox(document.getElementById('modal-player-image').src, document.getElementById('modal-player-name').innerText);">
                         <img src="" id="modal-player-image" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>player_placeholder.jpg';">
                     </div>
                     <div class="text-center sm:text-left space-y-1.5">
-                        <span class="px-2 py-0.5 rounded text-[7px] uppercase tracking-wider font-extrabold" id="modal-player-status-tag">Status</span>
-                        <h4 class="text-lg font-black text-white tracking-tight" id="modal-player-name">Player Name</h4>
-                        <p class="text-[10px] text-gray-400" id="modal-player-details">Role &bull; Place</p>
+                        <span class="px-2.5 py-0.5 rounded text-[8px] uppercase tracking-wider font-extrabold" id="modal-player-status-tag">Status</span>
+                        <h4 class="text-xl font-black text-slate-900 tracking-tight" id="modal-player-name">Player Name</h4>
+                        <p class="text-xs font-medium text-slate-600" id="modal-player-details">Role &bull; Place</p>
                     </div>
                 </div>
                 <!-- Franchise Logo for Sold Players -->
-                <div id="modal-player-team-logo-container" class="w-16 h-16 rounded bg-black/40 border border-gold-500/20 flex items-center justify-center p-1 overflow-hidden" style="display: none;">
+                <div id="modal-player-team-logo-container" class="w-16 h-16 rounded bg-white/60 border border-slate-200 flex items-center justify-center p-1 overflow-hidden shadow-sm" style="display: none;">
                     <img src="" id="modal-player-team-logo" class="max-w-full max-h-full object-contain rounded" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>team_placeholder.jpg';">
                 </div>
             </div>
 
             <!-- Price and Team Statistics Grid -->
             <div class="grid grid-cols-3 gap-3">
-                <div class="bg-white/5 border border-white/5 rounded-xl p-3 text-center">
-                    <span class="text-[8px] uppercase tracking-widest text-gray-500 font-bold">Base Price</span>
-                    <span class="block text-xs font-black text-gray-200 mt-1 font-mono" id="modal-base-price">₹0</span>
+                <div class="glass-card-subtle rounded-xl p-3 text-center">
+                    <span class="text-[8px] uppercase tracking-widest text-slate-600 font-extrabold">Base Price</span>
+                    <span class="block text-sm font-black text-slate-900 mt-1 font-mono" id="modal-base-price">₹0</span>
                 </div>
-                <div class="bg-gradient-to-b from-gold-500/15 to-transparent border border-gold-500/40 rounded-xl p-3 text-center relative overflow-hidden shadow-inner flex flex-col justify-center min-h-[76px]">
-                    <div class="absolute -right-3 -top-3 w-10 h-10 bg-gold-500/20 rounded-full blur-md animate-pulse-glow"></div>
-                    <span class="text-[8px] uppercase tracking-widest text-gold-400 font-bold">Final Price</span>
-                    <span class="block text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gold-200 via-amber-400 to-gold-500 animate-gold-shine gold-glow-text mt-0.5 font-mono tracking-tighter" id="modal-sold-price">₹0</span>
+                <div class="bg-amber-500/15 border border-gold-500/40 rounded-xl p-3 text-center relative overflow-hidden shadow-sm flex flex-col justify-center min-h-[76px]">
+                    <span class="text-[8px] uppercase tracking-widest text-gold-800 font-extrabold">Final Price</span>
+                    <span class="block text-2xl font-black text-gold-700 mt-0.5 font-mono tracking-tight" id="modal-sold-price">₹0</span>
                 </div>
-                <div class="bg-white/5 border border-white/5 rounded-xl p-3 text-center">
-                    <span class="text-[8px] uppercase tracking-widest text-gray-500 font-bold">Winning Team</span>
-                    <span class="block text-[10px] font-black text-white mt-1.5 truncate" id="modal-team-name">—</span>
+                <div class="glass-card-subtle rounded-xl p-3 text-center">
+                    <span class="text-[8px] uppercase tracking-widest text-slate-600 font-extrabold">Winning Team</span>
+                    <span class="block text-xs font-extrabold text-slate-900 mt-1.5 truncate" id="modal-team-name">—</span>
                 </div>
             </div>
 
             <!-- Bid History Section -->
             <div id="modal-bid-history-section" class="space-y-3">
-                <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2 border-b border-white/5 pb-2">
-                    <i class="fa-solid fa-chart-line text-xs text-gray-400"></i> Complete Bidding Timeline
+                <h5 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-900/10 pb-2">
+                    <i class="fa-solid fa-chart-line text-xs text-gold-600"></i> Complete Bidding Timeline
                 </h5>
                 <div class="space-y-2 max-h-48 overflow-y-auto pr-1" id="modal-bid-history-list">
                     <!-- populated dynamically -->
@@ -307,14 +299,14 @@ if (!isset($uploadPath)) {
 </div>
 
 <!-- TEAM DETAILS MODAL -->
-<div id="team-details-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300">
-    <div class="glass-panel w-full max-w-lg rounded-2xl border border-gold-500/20 shadow-2xl overflow-hidden relative transform scale-95 transition-all duration-300" id="team-modal-content">
+<div id="team-details-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-md hidden transition-all duration-300">
+    <div class="bg-white/80 backdrop-blur-2xl w-full max-w-lg rounded-2xl border border-white/70 shadow-2xl overflow-hidden relative transform scale-95 transition-all duration-300" id="team-modal-content">
         <!-- Modal Header -->
-        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/40">
-            <h3 class="text-sm font-black text-gold-400 uppercase tracking-tight flex items-center gap-2">
-                <i class="fa-solid fa-crown text-base text-gold-400"></i> Franchise HQ Profile
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <h3 class="text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-crown text-base text-gold-600"></i> Franchise HQ Profile
             </h3>
-            <button onclick="closeTeamModal()" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:border-white/20 text-gray-400 hover:text-white flex items-center justify-center transition">
+            <button onclick="closeTeamModal()" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </button>
         </div>
@@ -323,40 +315,40 @@ if (!isset($uploadPath)) {
         <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
             
             <!-- Team Banner Info -->
-            <div class="flex flex-col sm:flex-row items-center gap-5 pb-5 border-b border-white/5">
-                <div class="w-20 h-20 rounded-xl overflow-hidden border border-gold-500/30 bg-white shadow-md p-1 flex items-center justify-center">
+            <div class="flex flex-col sm:flex-row items-center gap-5 pb-5 border-b border-slate-200">
+                <div class="w-20 h-20 rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm p-1 flex items-center justify-center">
                     <img src="" id="modal-team-logo" class="max-w-full max-h-full object-contain rounded" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>team_placeholder.jpg';">
                 </div>
                 <div class="text-center sm:text-left flex-grow space-y-1.5">
-                    <h4 class="text-xl font-black text-white tracking-tight uppercase" id="modal-team-title">Team Name</h4>
-                    <p class="text-[10px] text-gold-500 uppercase tracking-widest font-extrabold" id="modal-team-owner">Owner: Name</p>
+                    <h4 class="text-xl font-black text-slate-900 tracking-tight uppercase" id="modal-team-title">Team Name</h4>
+                    <p class="text-xs text-gold-700 uppercase tracking-widest font-extrabold" id="modal-team-owner">Owner: Name</p>
                 </div>
             </div>
 
             <!-- Financial Statistics Grid -->
             <div class="grid grid-cols-2 gap-3">
-                <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center shadow-lg shadow-emerald-500/5">
-                    <span class="text-[8px] uppercase tracking-widest text-emerald-500 font-bold">Available Purse</span>
-                    <span class="block text-sm font-black text-emerald-400 mt-1 font-mono" id="modal-team-remaining">₹0</span>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center shadow-sm">
+                    <span class="text-[8px] uppercase tracking-widest text-emerald-800 font-extrabold">Available Purse</span>
+                    <span class="block text-sm font-black text-emerald-700 mt-1 font-mono" id="modal-team-remaining">₹0</span>
                 </div>
-                <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
-                    <span class="text-[8px] uppercase tracking-widest text-red-400 font-bold">Amount Spent</span>
-                    <span class="block text-sm font-black text-red-300 mt-1 font-mono" id="modal-team-spent">₹0</span>
+                <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
+                    <span class="text-[8px] uppercase tracking-widest text-red-800 font-extrabold">Amount Spent</span>
+                    <span class="block text-sm font-black text-red-600 mt-1 font-mono" id="modal-team-spent">₹0</span>
                 </div>
-                <div class="bg-white/5 border border-white/5 rounded-xl p-3 text-center">
-                    <span class="text-[8px] uppercase tracking-widest text-gray-500 font-bold">Total Budget</span>
-                    <span class="block text-xs font-black text-gray-400 mt-1 font-mono" id="modal-team-total">₹0</span>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                    <span class="text-[8px] uppercase tracking-widest text-slate-500 font-extrabold">Total Budget</span>
+                    <span class="block text-xs font-black text-slate-900 mt-1 font-mono" id="modal-team-total">₹0</span>
                 </div>
-                <div class="bg-white/5 border border-white/5 rounded-xl p-3 text-center">
-                    <span class="text-[8px] uppercase tracking-widest text-gray-500 font-bold">Squad Filled</span>
-                    <span class="block text-xs font-black text-gray-200 mt-1" id="modal-team-squad-count">0 / 0</span>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                    <span class="text-[8px] uppercase tracking-widest text-slate-500 font-extrabold">Squad Filled</span>
+                    <span class="block text-xs font-black text-slate-900 mt-1" id="modal-team-squad-count">0 / 0</span>
                 </div>
             </div>
 
             <!-- Purchased Players List -->
             <div class="space-y-3">
-                <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2 border-b border-white/5 pb-2">
-                    <i class="fa-solid fa-baseball-bat-ball text-xs text-gray-400"></i> Franchise Roster
+                <h5 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
+                    <i class="fa-solid fa-users text-xs text-gold-600"></i> Franchise Roster
                 </h5>
                 <div class="space-y-2 max-h-48 overflow-y-auto pr-1" id="modal-team-players-list">
                     <!-- populated dynamically -->

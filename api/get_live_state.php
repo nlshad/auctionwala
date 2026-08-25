@@ -9,21 +9,32 @@ if (!$pdo) {
 }
 
 try {
-    // 1. Get current auction state
-    $stmt = $pdo->prepare("SELECT * FROM auction_state WHERE id = 1");
-    $stmt->execute();
+    $tournamentId = get_active_tournament_id($pdo);
+
+    // Fetch tournament details
+    $stmt = $pdo->prepare("SELECT id, name, code, logo, total_purse_default, max_squad_size_default, registration_enabled FROM tournaments WHERE id = :t_id");
+    $stmt->execute(['t_id' => $tournamentId]);
+    $tournamentInfo = $stmt->fetch();
+
+    if (!$tournamentInfo) {
+        // Fallback to default tournament 1
+        $tournamentId = 1;
+        $stmt = $pdo->prepare("SELECT id, name, code, logo, total_purse_default, max_squad_size_default, registration_enabled FROM tournaments WHERE id = 1");
+        $stmt->execute();
+        $tournamentInfo = $stmt->fetch();
+    }
+
+    // 1. Get current auction state for this tournament
+    $stmt = $pdo->prepare("SELECT * FROM auction_state WHERE tournament_id = :t_id");
+    $stmt->execute(['t_id' => $tournamentId]);
     $state = $stmt->fetch();
 
     if (!$state) {
-        echo json_encode([
-            'status' => 'Idle',
-            'current_player' => null,
-            'highest_bid' => 0,
-            'leading_team_name' => null,
-            'leading_team_id' => null,
-            'teams' => []
-        ]);
-        exit;
+        // Auto-create auction state row for this tournament if missing
+        $pdo->exec("INSERT INTO auction_state (tournament_id, status) VALUES ($tournamentId, 'Idle')");
+        $stmt = $pdo->prepare("SELECT * FROM auction_state WHERE tournament_id = :t_id");
+        $stmt->execute(['t_id' => $tournamentId]);
+        $state = $stmt->fetch();
     }
 
     $currentPlayer = null;
@@ -35,18 +46,18 @@ try {
 
     // 2. Fetch active player info if a player is on the block
     if ($state['current_player_id']) {
-        $stmt = $pdo->prepare("SELECT id, name, place, role, profile_image, base_price, auction_status FROM players WHERE id = :player_id");
-        $stmt->execute(['player_id' => $state['current_player_id']]);
+        $stmt = $pdo->prepare("SELECT id, name, place, role, profile_image, base_price, auction_status FROM players WHERE id = :player_id AND tournament_id = :t_id");
+        $stmt->execute(['player_id' => $state['current_player_id'], 't_id' => $tournamentId]);
         $currentPlayer = $stmt->fetch();
 
         if ($currentPlayer) {
-            // Fetch bids history for this player
+            // Fetch bids history for this player in this tournament
             $stmt = $pdo->prepare("SELECT b.bid_amount, t.team_name, t.id as team_id, t.logo as team_logo, DATE_FORMAT(b.created_at, '%h:%i:%s %p') as bid_time 
                                    FROM bids b 
                                    JOIN teams t ON b.team_id = t.id 
-                                   WHERE b.player_id = :player_id 
+                                   WHERE b.player_id = :player_id AND b.tournament_id = :t_id 
                                    ORDER BY b.bid_amount DESC");
-            $stmt->execute(['player_id' => $state['current_player_id']]);
+            $stmt->execute(['player_id' => $state['current_player_id'], 't_id' => $tournamentId]);
             $bidHistory = $stmt->fetchAll();
 
             if (!empty($bidHistory)) {
@@ -60,41 +71,45 @@ try {
         }
     }
 
-    // 3. Fetch all teams (for leaderboards / sidebar purses)
-    $stmt = $pdo->prepare("SELECT id, team_name, logo, total_purse, remaining_purse, current_squad_size, max_squad_size FROM teams ORDER BY remaining_purse DESC");
-    $stmt->execute();
+    // 3. Fetch all teams for this tournament
+    $stmt = $pdo->prepare("SELECT id, team_name, logo, total_purse, remaining_purse, current_squad_size, max_squad_size FROM teams WHERE tournament_id = :t_id ORDER BY remaining_purse DESC");
+    $stmt->execute(['t_id' => $tournamentId]);
     $teams = $stmt->fetchAll();
 
-    // 4. Fetch completed players (Sold & Unsold) sorted by recent updates
+    // 4. Fetch completed players (Sold & Unsold) for this tournament
     $stmt = $pdo->prepare("SELECT p.id, p.name, p.mobile, p.place, p.role, p.profile_image, p.base_price, p.sold_price, p.auction_status, t.team_name, t.id as team_id, t.logo as team_logo 
                            FROM players p 
                            LEFT JOIN teams t ON p.team_id = t.id 
-                           WHERE p.auction_status IN ('Sold', 'Unsold') 
+                           WHERE p.tournament_id = :t_id AND p.auction_status IN ('Sold', 'Unsold') 
                            ORDER BY p.id DESC");
-    $stmt->execute();
+    $stmt->execute(['t_id' => $tournamentId]);
     $completedPlayers = $stmt->fetchAll();
 
-    // 5. Fetch all verified players (Available, Sold, Unsold) sorted by id DESC
+    // 5. Fetch all verified players for this tournament
     $stmt = $pdo->prepare("SELECT p.id, p.name, p.mobile, p.place, p.role, p.profile_image, p.base_price, p.sold_price, p.auction_status, t.team_name, t.id as team_id, t.logo as team_logo 
                            FROM players p 
                            LEFT JOIN teams t ON p.team_id = t.id 
-                           WHERE p.payment_status = 'Verified' 
+                           WHERE p.tournament_id = :t_id AND p.payment_status = 'Verified' 
                            ORDER BY p.id DESC");
-    $stmt->execute();
+    $stmt->execute(['t_id' => $tournamentId]);
     $allPlayers = $stmt->fetchAll();
 
     echo json_encode([
-        'status' => $state['status'],
+        'tournament_id'     => $tournamentId,
+        'tournament_name'   => $tournamentInfo['name'] ?? 'SMCL Tournament',
+        'tournament_code'   => $tournamentInfo['code'] ?? 'smcl-2026',
+        'registration_enabled' => (int)($tournamentInfo['registration_enabled'] ?? 1),
+        'status'            => $state['status'] ?? 'Idle',
         'current_player_id' => $state['current_player_id'] ? (int)$state['current_player_id'] : null,
-        'current_player' => $currentPlayer,
-        'highest_bid' => $highestBid,
+        'current_player'    => $currentPlayer,
+        'highest_bid'       => $highestBid,
         'leading_team_name' => $leadingTeamName,
-        'leading_team_id' => $leadingTeamId,
+        'leading_team_id'   => $leadingTeamId,
         'leading_team_logo' => $leadingTeamLogo,
-        'bid_history' => $bidHistory,
-        'teams' => $teams,
+        'bid_history'       => $bidHistory,
+        'teams'             => $teams,
         'completed_players' => $completedPlayers,
-        'all_players' => $allPlayers
+        'all_players'       => $allPlayers
     ]);
 
 } catch (Exception $e) {

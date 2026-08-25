@@ -1,7 +1,7 @@
 <?php
 // index.php (Root Redirection)
-// Automatically forwards visitors from https://ppllive.online/ to the live spectator dashboard!
+// Automatically forwards visitors to the Startup Landing Page!
 
-header("Location: public/index.php");
+header("Location: public/landing.php");
 exit;
 ?>

@@ -3,13 +3,13 @@
 require_once '../config/db.php';
 header('Content-Type: application/json');
 
-// Check if database was successfully connected
 if (!$pdo) {
     echo json_encode(['error' => 'Database connection failed. Please run setup.php first.']);
     exit;
 }
 
 $playerId = isset($_GET['player_id']) ? (int)$_GET['player_id'] : 0;
+$tournamentId = get_active_tournament_id($pdo);
 
 if ($playerId === 0) {
     echo json_encode(['error' => 'Invalid Player ID']);
@@ -17,15 +17,15 @@ if ($playerId === 0) {
 }
 
 try {
-    // Fetch the highest bid and the team name for the current player
+    // Fetch the highest bid and the team name for the current player in this tournament
     $sql = "SELECT b.bid_amount, t.team_name 
             FROM bids b
             JOIN teams t ON b.team_id = t.id
-            WHERE b.player_id = :player_id 
+            WHERE b.player_id = :player_id AND b.tournament_id = :t_id 
             ORDER BY b.bid_amount DESC LIMIT 1";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['player_id' => $playerId]);
+    $stmt->execute(['player_id' => $playerId, 't_id' => $tournamentId]);
     $bidData = $stmt->fetch();
 
     if ($bidData) {
@@ -35,8 +35,8 @@ try {
         ]);
     } else {
         // If no bids yet, return the player's base price
-        $stmt = $pdo->prepare("SELECT base_price FROM players WHERE id = :player_id");
-        $stmt->execute(['player_id' => $playerId]);
+        $stmt = $pdo->prepare("SELECT base_price FROM players WHERE id = :player_id AND tournament_id = :t_id");
+        $stmt->execute(['player_id' => $playerId, 't_id' => $tournamentId]);
         $player = $stmt->fetch();
         
         echo json_encode([

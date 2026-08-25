@@ -3,11 +3,13 @@
 session_start();
 require_once '../config/db.php';
 
-// Session protection
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+// Session protection (SaaS Organizers & System Admins)
+if (!isset($_SESSION['admin_logged_in']) && !isset($_SESSION['user_logged_in'])) {
     header("Location: ../public/login.php");
     exit;
 }
+
+$tournamentId = get_active_tournament_id($pdo);
 
 // Self-healing uploads path checker
 $uploadPath = is_dir('../public/uploads') ? '../public/uploads/' : '../uploads/';
@@ -28,20 +30,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $errorMsg = "❌ Base price must be a multiple of 100.";
             } else {
                 // Update player status
-                $stmt = $pdo->prepare("UPDATE players SET payment_status = 'Verified', auction_status = 'Available', base_price = :base_price WHERE id = :id");
-                $stmt->execute(['base_price' => $basePrice, 'id' => $playerId]);
+                $stmt = $pdo->prepare("UPDATE players SET payment_status = 'Verified', auction_status = 'Available', base_price = :base_price WHERE id = :id AND tournament_id = :t_id");
+                $stmt->execute(['base_price' => $basePrice, 'id' => $playerId, 't_id' => $tournamentId]);
                 $successMsg = "🟢 Player payment verified. Player added to auction pool at base price of ₹$basePrice!";
             }
         } elseif ($action === 'reject_player') {
             $playerId = (int)$_POST['player_id'];
             
-            $stmt = $pdo->prepare("UPDATE players SET payment_status = 'Rejected', auction_status = 'Available' WHERE id = :id");
-            $stmt->execute(['id' => $playerId]);
+            $stmt = $pdo->prepare("UPDATE players SET payment_status = 'Rejected', auction_status = 'Available' WHERE id = :id AND tournament_id = :t_id");
+            $stmt->execute(['id' => $playerId, 't_id' => $tournamentId]);
             $successMsg = "🔴 Player registration rejected.";
         } elseif ($action === 'toggle_registration') {
             $enabled = (int)$_POST['registration_enabled'];
-            $stmt = $pdo->prepare("UPDATE auction_state SET registration_enabled = ? WHERE id = 1");
-            $stmt->execute([$enabled]);
+            $stmt = $pdo->prepare("UPDATE auction_state SET registration_enabled = ? WHERE tournament_id = ?");
+            $stmt->execute([$enabled, $tournamentId]);
+            $stmt = $pdo->prepare("UPDATE tournaments SET registration_enabled = ? WHERE id = ?");
+            $stmt->execute([$enabled, $tournamentId]);
             $successMsg = $enabled ? "🟢 Public player registration is now ENABLED." : "🔴 Public player registration is now DISABLED.";
         } elseif ($action === 'create_team') {
             $teamName = trim($_POST['team_name'] ?? '');
@@ -52,13 +56,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (empty($teamName) || empty($username) || empty($password)) {
                 $errorMsg = "❌ All team setup fields are required.";
             } else {
-                // Check if username is taken
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM teams WHERE manager_username = ?");
-                $stmt->execute([$username]);
+                // Check if username is taken in this tournament
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM teams WHERE tournament_id = ? AND manager_username = ?");
+                $stmt->execute([$tournamentId, $username]);
                 if ($stmt->fetchColumn() > 0) {
-                    $errorMsg = "❌ Manager username already taken.";
+                    $errorMsg = "❌ Manager username already taken in this tournament.";
                 } else {
-                    // Handle file upload
                     $logoName = 'team_placeholder.jpg';
                     if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
                         $fileTmpPath = $_FILES['logo']['tmp_name'];
@@ -75,8 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
 
                     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-                    $stmt = $pdo->prepare("INSERT INTO teams (team_name, logo, manager_username, manager_password, total_purse, remaining_purse, current_squad_size, max_squad_size) VALUES (?, ?, ?, ?, ?, ?, 0, 11)");
-                    $stmt->execute([$teamName, $logoName, $username, $hashedPassword, $purse, $purse]);
+                    $stmt = $pdo->prepare("INSERT INTO teams (tournament_id, team_name, logo, manager_username, manager_password, total_purse, remaining_purse, current_squad_size, max_squad_size) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 11)");
+                    $stmt->execute([$tournamentId, $teamName, $logoName, $username, $hashedPassword, $purse, $purse]);
                     $successMsg = "🎉 Franchise Team '$teamName' created successfully! Manager can log in with username '$username'.";
                 }
             }
@@ -84,19 +87,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $playerId = (int)$_POST['player_id'];
             
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("DELETE FROM players WHERE id = ?");
-            $stmt->execute([$playerId]);
+            $stmt = $pdo->prepare("DELETE FROM players WHERE id = ? AND tournament_id = ?");
+            $stmt->execute([$playerId, $tournamentId]);
 
-            // Auto-recalculate: dynamically sync all franchise remaining purses and squad sizes
-            $pdo->exec("
+            // Sync all franchise remaining purses and squad sizes
+            $stmt = $pdo->prepare("
                 UPDATE teams t 
                 SET 
-                    current_squad_size = (SELECT COUNT(id) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold'),
-                    remaining_purse = total_purse - COALESCE((SELECT SUM(sold_price) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold'), 0)
+                    current_squad_size = (SELECT COUNT(id) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold' AND p.tournament_id = ?),
+                    remaining_purse = total_purse - COALESCE((SELECT SUM(sold_price) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold' AND p.tournament_id = ?), 0)
+                WHERE t.tournament_id = ?
             ");
+            $stmt->execute([$tournamentId, $tournamentId, $tournamentId]);
             $pdo->commit();
             
-            $successMsg = "🗑️ Player details deleted successfully, and franchise rosters/budgets were adjusted!";
+            $successMsg = "🗑️ Player details deleted successfully!";
         } elseif ($action === 'edit_player') {
             $playerId = (int)$_POST['player_id'];
             $name = trim($_POST['name'] ?? '');
@@ -107,7 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $status = $_POST['payment_status'] ?? 'Pending';
             $basePrice = (int)($_POST['base_price'] ?? 100);
             
-            // New Auction Management Fields
             $teamId = !empty($_POST['team_id']) ? (int)$_POST['team_id'] : null;
             $auctionStatus = $_POST['auction_status'] ?? 'Available';
             $soldPrice = !empty($_POST['sold_price']) ? (int)$_POST['sold_price'] : null;
@@ -119,7 +123,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif ($soldPrice !== null && $soldPrice % 100 !== 0) {
                 $errorMsg = "❌ Sold price must be a multiple of 100.";
             } else {
-                // Optional profile image upload handling
                 $uploadedImage = false;
                 if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
                     $fileTmpPath = $_FILES['profile_image']['tmp_name'];
@@ -138,51 +141,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 if ($uploadedImage !== false) {
-                    $stmt = $pdo->prepare("UPDATE players SET name = ?, mobile = ?, place = ?, role = ?, payment_utr = ?, payment_status = ?, base_price = ?, team_id = ?, auction_status = ?, sold_price = ?, profile_image = ? WHERE id = ?");
-                    $stmt->execute([$name, $mobile, $place, $role, $utr, $status, $basePrice, $teamId, $auctionStatus, $soldPrice, $uploadedImage, $playerId]);
+                    $stmt = $pdo->prepare("UPDATE players SET name = ?, mobile = ?, place = ?, role = ?, payment_utr = ?, payment_status = ?, base_price = ?, team_id = ?, auction_status = ?, sold_price = ?, profile_image = ? WHERE id = ? AND tournament_id = ?");
+                    $stmt->execute([$name, $mobile, $place, $role, $utr, $status, $basePrice, $teamId, $auctionStatus, $soldPrice, $uploadedImage, $playerId, $tournamentId]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE players SET name = ?, mobile = ?, place = ?, role = ?, payment_utr = ?, payment_status = ?, base_price = ?, team_id = ?, auction_status = ?, sold_price = ? WHERE id = ?");
-                    $stmt->execute([$name, $mobile, $place, $role, $utr, $status, $basePrice, $teamId, $auctionStatus, $soldPrice, $playerId]);
+                    $stmt = $pdo->prepare("UPDATE players SET name = ?, mobile = ?, place = ?, role = ?, payment_utr = ?, payment_status = ?, base_price = ?, team_id = ?, auction_status = ?, sold_price = ? WHERE id = ? AND tournament_id = ?");
+                    $stmt->execute([$name, $mobile, $place, $role, $utr, $status, $basePrice, $teamId, $auctionStatus, $soldPrice, $playerId, $tournamentId]);
                 }
                 
-                // CRITICAL AUTO-RECALCULATION: 
-                // Instantly sync all franchise purses and squad sizes based on the new reality of the players table!
-                $pdo->exec("
+                $stmt = $pdo->prepare("
                     UPDATE teams t 
                     SET 
-                        current_squad_size = (SELECT COUNT(id) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold'),
-                        remaining_purse = total_purse - COALESCE((SELECT SUM(sold_price) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold'), 0)
+                        current_squad_size = (SELECT COUNT(id) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold' AND p.tournament_id = ?),
+                        remaining_purse = total_purse - COALESCE((SELECT SUM(sold_price) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold' AND p.tournament_id = ?), 0)
+                    WHERE t.tournament_id = ?
                 ");
+                $stmt->execute([$tournamentId, $tournamentId, $tournamentId]);
 
                 $successMsg = "✏️ Player details and Franchise allocations updated securely!";
             }
         } elseif ($action === 'delete_team') {
             $teamId = (int)$_POST['team_id'];
             
-            // Security: Check if team has players before deleting
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM players WHERE team_id = ? AND auction_status = 'Sold'");
-            $stmt->execute([$teamId]);
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM players WHERE team_id = ? AND auction_status = 'Sold' AND tournament_id = ?");
+            $stmt->execute([$teamId, $tournamentId]);
             if ($stmt->fetchColumn() > 0) {
                 $errorMsg = "❌ Cannot delete Franchise. Please release all players first.";
             } else {
-                $stmt = $pdo->prepare("DELETE FROM teams WHERE id = ?");
-                $stmt->execute([$teamId]);
+                $stmt = $pdo->prepare("DELETE FROM teams WHERE id = ? AND tournament_id = ?");
+                $stmt->execute([$teamId, $tournamentId]);
                 $successMsg = "🗑️ Franchise Team deleted successfully!";
             }
         } elseif ($action === 'release_player') {
             $playerId = (int)$_POST['player_id'];
             
-            // Release player
-            $stmt = $pdo->prepare("UPDATE players SET team_id = NULL, auction_status = 'Available', sold_price = NULL WHERE id = ?");
-            $stmt->execute([$playerId]);
+            $stmt = $pdo->prepare("UPDATE players SET team_id = NULL, auction_status = 'Available', sold_price = NULL WHERE id = ? AND tournament_id = ?");
+            $stmt->execute([$playerId, $tournamentId]);
             
-            // Recalculate squad sizes and purses
-            $pdo->exec("
+            $stmt = $pdo->prepare("
                 UPDATE teams t 
                 SET 
-                    current_squad_size = (SELECT COUNT(id) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold'),
-                    remaining_purse = total_purse - COALESCE((SELECT SUM(sold_price) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold'), 0)
+                    current_squad_size = (SELECT COUNT(id) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold' AND p.tournament_id = ?),
+                    remaining_purse = total_purse - COALESCE((SELECT SUM(sold_price) FROM players p WHERE p.team_id = t.id AND p.auction_status = 'Sold' AND p.tournament_id = ?), 0)
+                WHERE t.tournament_id = ?
             ");
+            $stmt->execute([$tournamentId, $tournamentId, $tournamentId]);
             
             $successMsg = "🟢 Player released from Franchise successfully!";
         } elseif ($action === 'edit_team') {
@@ -196,13 +198,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (empty($teamName) || empty($username)) {
                 $errorMsg = "❌ All team edit fields are required.";
             } else {
-                // Fetch current logo
-                $stmt = $pdo->prepare("SELECT logo FROM teams WHERE id = ?");
-                $stmt->execute([$teamId]);
+                $stmt = $pdo->prepare("SELECT logo FROM teams WHERE id = ? AND tournament_id = ?");
+                $stmt->execute([$teamId, $tournamentId]);
                 $currTeam = $stmt->fetch();
                 $logoName = $currTeam['logo'] ?? 'team_placeholder.jpg';
 
-                // Handle file upload
                 if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
                     $fileTmpPath = $_FILES['logo']['tmp_name'];
                     $fileName = $_FILES['logo']['name'];
@@ -219,11 +219,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 if (!empty($_POST['password'])) {
                     $hashedPassword = password_hash($_POST['password'], PASSWORD_BCRYPT);
-                    $stmt = $pdo->prepare("UPDATE teams SET team_name = ?, manager_username = ?, manager_password = ?, total_purse = ?, remaining_purse = ?, max_squad_size = ?, logo = ? WHERE id = ?");
-                    $stmt->execute([$teamName, $username, $hashedPassword, $purse, $remPurse, $maxSquad, $logoName, $teamId]);
+                    $stmt = $pdo->prepare("UPDATE teams SET team_name = ?, manager_username = ?, manager_password = ?, total_purse = ?, remaining_purse = ?, max_squad_size = ?, logo = ? WHERE id = ? AND tournament_id = ?");
+                    $stmt->execute([$teamName, $username, $hashedPassword, $purse, $remPurse, $maxSquad, $logoName, $teamId, $tournamentId]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE teams SET team_name = ?, manager_username = ?, total_purse = ?, remaining_purse = ?, max_squad_size = ?, logo = ? WHERE id = ?");
-                    $stmt->execute([$teamName, $username, $purse, $remPurse, $maxSquad, $logoName, $teamId]);
+                    $stmt = $pdo->prepare("UPDATE teams SET team_name = ?, manager_username = ?, total_purse = ?, remaining_purse = ?, max_squad_size = ?, logo = ? WHERE id = ? AND tournament_id = ?");
+                    $stmt->execute([$teamName, $username, $purse, $remPurse, $maxSquad, $logoName, $teamId, $tournamentId]);
                 }
                 $successMsg = "✏️ Franchise Team details updated successfully!";
             }
@@ -233,21 +233,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fetch Data for Render
+// Fetch Data for Render (Scoped by active tournament_id)
 try {
-    // 1. Fetch Registered Players
-    $stmt = $pdo->prepare("SELECT * FROM players ORDER BY payment_status DESC, id DESC");
-    $stmt->execute();
+    // 1. Fetch Registered Players for this tournament
+    $stmt = $pdo->prepare("SELECT * FROM players WHERE tournament_id = ? ORDER BY payment_status DESC, id DESC");
+    $stmt->execute([$tournamentId]);
     $players = $stmt->fetchAll();
 
-    // 2. Fetch Franchise Teams
-    $stmt = $pdo->prepare("SELECT * FROM teams ORDER BY id DESC");
-    $stmt->execute();
+    // 2. Fetch Franchise Teams for this tournament
+    $stmt = $pdo->prepare("SELECT * FROM teams WHERE tournament_id = ? ORDER BY id DESC");
+    $stmt->execute([$tournamentId]);
     $teams = $stmt->fetchAll();
 
-    // 3. Fetch Registration status
-    $stmt = $pdo->prepare("SELECT registration_enabled FROM auction_state WHERE id = 1");
-    $stmt->execute();
+    // 3. Fetch Registration status for this tournament
+    $stmt = $pdo->prepare("SELECT registration_enabled FROM auction_state WHERE tournament_id = ?");
+    $stmt->execute([$tournamentId]);
     $regState = $stmt->fetch();
     $registrationEnabled = $regState ? (bool)$regState['registration_enabled'] : true;
 } catch (Exception $e) {
@@ -259,7 +259,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMCL Admin Dashboard</title>
+    <title>AuctionWala Admin Dashboard</title>
     <?php require_once '../public/components/ui_head.php'; ?>
 </head>
 <body class="text-gray-255 min-h-screen flex flex-col justify-between">
@@ -267,12 +267,14 @@ try {
     <!-- Header Navigation -->
     <header class="w-full glass-panel border-b border-gold-500/10 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center gap-2 sm:gap-3">
-            <img src="<?php echo $uploadPath; ?>league_logo.png" alt="SMCL Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain">
+            <a href="../public/landing.php">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-7 sm:h-8 object-contain mix-blend-multiply">
+            </a>
             <div>
                 <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-white leading-none">
                     Super Admin Console
                 </h1>
-                <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">SMCL Tournament Control Centre</p>
+                <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">AuctionWala Control Centre</p>
             </div>
         </div>
 

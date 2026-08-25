@@ -4,18 +4,20 @@ session_start();
 require_once '../config/db.php';
 
 // Session protection
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if (!isset($_SESSION['admin_logged_in']) && !isset($_SESSION['user_logged_in'])) {
     header("Location: ../public/login.php");
     exit;
 }
 
+$tournamentId = get_active_tournament_id($pdo);
+
 // Self-healing uploads path checker
 $uploadPath = is_dir('../public/uploads') ? '../public/uploads/' : '../uploads/';
 
-// Fetch verified and available players for the side menu list
+// Fetch verified and available players for the active tournament
 try {
-    $stmt = $pdo->prepare("SELECT * FROM players WHERE payment_status = 'Verified' AND auction_status IN ('Available', 'Unsold') ORDER BY id ASC");
-    $stmt->execute();
+    $stmt = $pdo->prepare("SELECT * FROM players WHERE payment_status = 'Verified' AND auction_status IN ('Available', 'Unsold') AND tournament_id = ? ORDER BY id ASC");
+    $stmt->execute([$tournamentId]);
     $availablePlayers = $stmt->fetchAll();
 } catch (Exception $e) {
     die("Database Error: " . $e->getMessage());
@@ -26,7 +28,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMCL — Live Auctioneer Room</title>
+    <title>AuctionWala — Live Auctioneer Room</title>
     <?php require_once '../public/components/ui_head.php'; ?>
 </head>
 <body class="text-gray-250 min-h-screen flex flex-col justify-between">
@@ -37,10 +39,12 @@ try {
     <!-- Header Navigation -->
     <header class="w-full glass-panel border-b border-gold-500/10 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center gap-2 sm:gap-3">
-            <img src="<?php echo $uploadPath; ?>league_logo.png" alt="SMCL Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain">
+            <a href="../public/landing.php">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-7 sm:h-8 object-contain mix-blend-multiply">
+            </a>
             <div>
                 <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-white flex items-center gap-1.5 leading-none">
-                    SMCL Auctioneer Desk <span class="bg-red-600 text-white text-[7px] sm:text-[8px] font-extrabold px-1 sm:px-1.5 py-0.5 rounded tracking-widest uppercase animate-pulse">Live</span>
+                    AuctionWala Desk <span class="bg-red-600 text-white text-[7px] sm:text-[8px] font-extrabold px-1 sm:px-1.5 py-0.5 rounded tracking-widest uppercase animate-pulse">Live</span>
                 </h1>
                 <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">Manage Active Bidding Flow</p>
             </div>
@@ -149,26 +153,40 @@ try {
             </div>
 
             <!-- Active Player Card (5 Cols) -->
-            <div id="player-card" class="hidden col-span-12 md:col-span-5 glass-panel rounded-2xl p-5 border border-gold-500/15 flex flex-col justify-between">
-                <div class="flex-grow flex flex-col items-center justify-center">
-                    <div class="w-32 h-36 rounded-xl overflow-hidden border border-gold-500/20 bg-black/60 relative cursor-zoom-in" onclick="openImageLightbox(document.getElementById('player-image').src, document.getElementById('player-name').innerText);">
+            <div id="player-card" class="hidden col-span-12 md:col-span-5 ipl-card-frame ipl-card-live p-5 flex flex-col justify-between relative group shadow-2xl">
+                <!-- Diagonal Watermark Background & Stage Spotlight -->
+                <div class="ipl-watermark-text">ON BLOCK</div>
+                <div class="ipl-card-stage-glow"></div>
+
+                <!-- Top Header: Country/Location & Role -->
+                <div class="flex items-center justify-between relative z-10 mb-3">
+                    <div class="flex items-center gap-1.5 bg-black/60 border border-white/20 px-3 py-1 rounded-lg backdrop-blur-md">
+                        <span class="text-xs">🇮🇳</span>
+                        <span class="text-[9px] font-black text-white uppercase tracking-wider font-mono" id="player-place">
+                            Hometown
+                        </span>
+                    </div>
+                    <span class="bg-amber-400 border border-amber-300 text-slate-950 text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-wider shadow-md" id="player-role">
+                        ROLE
+                    </span>
+                </div>
+
+                <!-- Stacked Player Name -->
+                <div class="relative z-10 mb-2 text-center">
+                    <h2 class="text-2xl font-black text-white uppercase tracking-tight leading-none drop-shadow-md" id="player-name">---</h2>
+                </div>
+
+                <!-- Center Stage: Cutout Player Image -->
+                <div class="relative z-10 my-3 flex justify-center">
+                    <div class="w-36 h-40 rounded-2xl overflow-hidden border-2 border-white/60 bg-slate-900/60 shadow-2xl relative cursor-zoom-in group-hover:scale-105 transition duration-300" onclick="openImageLightbox(document.getElementById('player-image').src, document.getElementById('player-name').innerText);">
                         <img src="" id="player-image" alt="Player Image" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>player_placeholder.jpg';">
                     </div>
-                    <div class="text-center mt-4">
-                        <span class="text-[8px] uppercase tracking-widest text-gold-400 font-bold bg-gold-950/60 border border-gold-500/20 px-2 py-0.5 rounded" id="player-role">
-                            ROLE
-                        </span>
-                        <h2 class="text-xl font-bold text-white mt-1.5 tracking-tight" id="player-name">---</h2>
-                        <p class="text-xs text-gray-400 mt-1 flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-location-dot text-gray-500"></i>
-                            <span id="player-place">Hometown</span>
-                        </p>
-                    </div>
                 </div>
-                <!-- Base Price -->
-                <div class="border-t border-white/5 pt-3 mt-4 flex justify-between items-center text-xs">
-                    <span class="text-gray-500 font-semibold uppercase tracking-wider">Base Price</span>
-                    <span class="text-gold-400 font-extrabold" id="player-base-price">₹100</span>
+
+                <!-- Bottom Stats Bar: Base Price -->
+                <div class="relative z-10 ipl-price-container px-4 py-3 flex justify-between items-center text-xs">
+                    <span class="text-slate-200 font-extrabold uppercase tracking-wider text-[10px]">Base Price</span>
+                    <span class="text-white font-black text-lg font-mono drop-shadow-md" id="player-base-price">₹100</span>
                 </div>
             </div>
 

@@ -12,19 +12,30 @@ if (!isset($_SESSION['manager_logged_in']) || $_SESSION['manager_logged_in'] !==
 // Self-healing uploads path checker
 $uploadPath = is_dir('../public/uploads') ? '../public/uploads/' : '../uploads/';
 
-$teamId = $_SESSION['team_id'];
+$teamId = (int)$_SESSION['team_id'];
 $managerUser = $_SESSION['manager_username'];
+$tournamentId = get_active_tournament_id($pdo);
 
 try {
-    // Fetch latest manager team data
-    $stmt = $pdo->prepare("SELECT * FROM teams WHERE id = :id");
-    $stmt->execute(['id' => $teamId]);
+    // Fetch latest manager team data for active tournament
+    $stmt = $pdo->prepare("SELECT * FROM teams WHERE id = :id AND tournament_id = :t_id");
+    $stmt->execute(['id' => $teamId, 't_id' => $tournamentId]);
     $team = $stmt->fetch();
     
     if (!$team) {
-        session_destroy();
-        header("Location: ../public/login.php");
-        exit;
+        // Fallback search without t_id lock if session was transferred
+        $stmt = $pdo->prepare("SELECT * FROM teams WHERE id = :id");
+        $stmt->execute(['id' => $teamId]);
+        $team = $stmt->fetch();
+        if ($team) {
+            $_SESSION['tournament_id'] = (int)$team['tournament_id'];
+        } else {
+            session_destroy();
+            header("Location: ../public/login.php");
+            exit;
+        }
+    } else {
+        $_SESSION['tournament_id'] = (int)$team['tournament_id'];
     }
 
 
@@ -46,7 +57,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMCL 2026 — Franchise Dashboard</title>
+    <title>AuctionWala — Franchise Bidding Dashboard</title>
     <?php require_once '../public/components/ui_head.php'; ?>
     <style>
         /* Custom UI transitions */
@@ -75,15 +86,16 @@ try {
                 <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-white leading-none">
                     <?php echo htmlspecialchars($team['team_name']); ?>
                 </h1>
-                <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">SMCL Franchise Manager Room</p>
+                <p class="text-[8px] sm:text-[9px] text-gold-500 uppercase tracking-widest font-bold mt-0.5">AuctionWala Manager Console</p>
             </div>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-4">
             <!-- League Logo Badge -->
             <div class="hidden sm:flex items-center gap-2 border-r border-white/10 pr-3 mr-1">
-                <img src="<?php echo $uploadPath; ?>league_logo.png" alt="SMCL Logo" class="w-7 h-7 object-contain">
-                <span class="text-gold-400 text-[10px] font-black uppercase tracking-wider">SMCL 2026</span>
+                <a href="../public/landing.php">
+                    <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-6 object-contain mix-blend-multiply">
+                </a>
             </div>
 
             <!-- Sound Toggle -->
@@ -158,57 +170,56 @@ try {
             </div>
 
             <!-- Completed Stats Box -->
-            <div id="completed-stats-box" class="hidden col-span-12 glass-panel rounded-2xl p-6 border border-gold-500/15 flex flex-col gap-6 relative overflow-hidden">
-                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(218,165,32,0.03)_0%,transparent_70%)] pointer-events-none"></div>
+            <div id="completed-stats-box" class="hidden col-span-12 glass-panel rounded-2xl p-6 border border-slate-200 flex flex-col gap-6 relative overflow-hidden bg-white shadow-lg">
                 <!-- Header -->
-                <div class="flex items-center justify-between pb-4 border-b border-white/5 relative z-10">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-200 relative z-10">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400">
-                            <i class="fa-solid fa-trophy text-lg animate-pulse-glow"></i>
+                        <div class="w-10 h-10 rounded-xl bg-gold-50 border border-gold-200 flex items-center justify-center text-gold-600">
+                            <i class="fa-solid fa-trophy text-lg"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-black text-white uppercase tracking-tight">Auction Completed</h2>
-                            <p class="text-[9px] text-gray-400 uppercase tracking-wider font-semibold">Final Stats & Leaderboards</p>
+                            <h2 class="text-base font-black text-slate-900 uppercase tracking-tight">Auction Completed</h2>
+                            <p class="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Final Stats & Leaderboards</p>
                         </div>
                     </div>
-                    <span class="px-2.5 py-1 rounded bg-gold-950/60 border border-gold-500/30 text-gold-400 text-[9px] uppercase tracking-wider font-extrabold flex items-center gap-1.5 shadow-sm shadow-gold-500/5">
-                        <i class="fa-solid fa-circle text-[6px] text-gold-500 animate-pulse"></i> Final Summary
+                    <span class="px-2.5 py-1 rounded-full bg-gold-50 border border-gold-200 text-gold-700 text-[9px] uppercase tracking-wider font-extrabold flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-circle text-[6px] text-gold-600 animate-pulse"></i> Final Summary
                     </span>
                 </div>
 
                 <!-- Stats Cards Grid -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Total Purse Spent</span>
-                        <span class="text-lg font-black text-gold-400 font-mono mt-1 block" id="stats-total-spent">₹0</span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center shadow-sm hover:border-gold-500/30 transition duration-300">
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider block font-extrabold">Total Purse Spent</span>
+                        <span class="text-xl font-black text-gold-700 font-mono mt-1 block" id="stats-total-spent">₹0</span>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Avg. Player Bid</span>
-                        <span class="text-lg font-black text-white font-mono mt-1 block" id="stats-avg-price">₹0</span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center shadow-sm hover:border-gold-500/30 transition duration-300">
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider block font-extrabold">Avg. Player Bid</span>
+                        <span class="text-xl font-black text-slate-900 font-mono mt-1 block" id="stats-avg-price">₹0</span>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Players Sold</span>
-                        <span class="text-lg font-black text-emerald-400 font-mono mt-1 block" id="stats-sold-count">0</span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center shadow-sm hover:border-gold-500/30 transition duration-300">
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider block font-extrabold">Players Sold</span>
+                        <span class="text-xl font-black text-emerald-700 font-mono mt-1 block" id="stats-sold-count">0</span>
                     </div>
-                    <div class="bg-white/5 border border-white/5 rounded-xl p-4 text-center shadow-inner hover:border-gold-500/20 transition duration-300">
-                        <span class="text-[9px] text-gray-500 uppercase tracking-wider block font-bold">Unsold Players</span>
-                        <span class="text-lg font-black text-red-400 font-mono mt-1 block" id="stats-unsold-count">0</span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center shadow-sm hover:border-gold-500/30 transition duration-300">
+                        <span class="text-[9px] text-slate-500 uppercase tracking-wider block font-extrabold">Unsold Players</span>
+                        <span class="text-xl font-black text-red-600 font-mono mt-1 block" id="stats-unsold-count">0</span>
                     </div>
                 </div>
 
                 <!-- Double Columns -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10 mt-2">
                     <div class="md:col-span-7 space-y-3.5">
-                        <h3 class="text-[11px] font-extrabold text-gold-400 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-white/5">
-                            <i class="fa-solid fa-crown text-amber-500"></i> Top Valued Players
+                        <h3 class="text-xs font-extrabold text-gold-700 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-slate-200">
+                            <i class="fa-solid fa-crown text-amber-600"></i> Top Valued Players
                         </h3>
                         <div class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1" id="stats-top-players">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
                     <div class="md:col-span-5 space-y-3.5">
-                        <h3 class="text-[11px] font-extrabold text-gold-400 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-white/5">
-                            <i class="fa-solid fa-chart-line text-amber-500"></i> Franchise Pursetracker
+                        <h3 class="text-xs font-extrabold text-gold-700 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-slate-200">
+                            <i class="fa-solid fa-chart-line text-amber-600"></i> Franchise Pursetracker
                         </h3>
                         <div class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1" id="stats-teams-spent">
                             <!-- Populated dynamically -->
@@ -218,25 +229,39 @@ try {
             </div>
 
             <!-- Player Profile (4 Cols) -->
-            <div id="player-card" class="hidden col-span-12 md:col-span-4 glass-panel rounded-2xl p-5 border border-gold-500/15 flex flex-col justify-between">
-                <div class="flex-grow flex flex-col items-center justify-center">
-                    <div class="w-32 h-36 rounded-xl overflow-hidden border border-gold-500/20 bg-black/60 relative cursor-zoom-in" onclick="openImageLightbox(document.getElementById('player-image').src, document.getElementById('player-name').innerText);">
+            <div id="player-card" class="hidden col-span-12 md:col-span-4 ipl-card-frame ipl-card-live p-5 flex flex-col justify-between relative group shadow-2xl">
+                <!-- Diagonal Watermark Background -->
+                <div class="ipl-watermark-text">ON BLOCK</div>
+
+                <!-- Top Header: Country/Location & Role -->
+                <div class="flex items-center justify-between relative z-10 mb-3">
+                    <div class="flex items-center gap-1.5 bg-black/50 border border-white/10 px-2.5 py-1 rounded-lg">
+                        <span class="text-xs">🇮🇳</span>
+                        <span class="text-[9px] font-black text-slate-200 uppercase tracking-wider font-mono" id="player-place">
+                            Wayanad
+                        </span>
+                    </div>
+                    <span class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider" id="player-role">
+                        ROLE
+                    </span>
+                </div>
+
+                <!-- Stacked Player Name -->
+                <div class="relative z-10 mb-2 text-center">
+                    <h2 class="text-xl font-black text-white uppercase tracking-tight leading-none" id="player-name">Player Name</h2>
+                </div>
+
+                <!-- Center Stage: Cutout Player Image -->
+                <div class="relative z-10 my-3 flex justify-center">
+                    <div class="w-32 h-36 rounded-2xl overflow-hidden border-2 border-gold-500/40 bg-slate-900/80 shadow-2xl relative cursor-zoom-in group-hover:scale-105 transition duration-300" onclick="openImageLightbox(document.getElementById('player-image').src, document.getElementById('player-name').innerText);">
                         <img src="" id="player-image" alt="Player" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='<?php echo $uploadPath; ?>player_placeholder.jpg';">
                     </div>
-                    <div class="text-center mt-4">
-                        <span class="text-[8px] uppercase tracking-widest text-gold-400 font-bold bg-gold-950/60 border border-gold-500/20 px-2 py-0.5 rounded" id="player-role">
-                            ROLE
-                        </span>
-                        <h2 class="text-xl font-bold text-white mt-1.5 tracking-tight" id="player-name">Player Name</h2>
-                        <p class="text-xs text-gray-400 mt-1 flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-location-dot text-gray-500"></i>
-                            <span id="player-place">Wayanad</span>
-                        </p>
-                    </div>
                 </div>
-                <div class="border-t border-white/5 pt-3 mt-4 flex justify-between items-center text-xs">
-                    <span class="text-gray-500 font-semibold uppercase tracking-wider">Base Price</span>
-                    <span class="text-gold-400 font-extrabold" id="player-base-price">₹100</span>
+
+                <!-- Bottom Stats Bar: Base Price -->
+                <div class="relative z-10 bg-slate-900/80 border border-slate-700/60 rounded-xl px-4 py-2.5 flex justify-between items-center text-xs">
+                    <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Base Price</span>
+                    <span class="text-amber-400 font-black text-sm font-mono" id="player-base-price">₹100</span>
                 </div>
             </div>
 

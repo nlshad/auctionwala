@@ -1,14 +1,23 @@
 // public/js/auction.js
 
-const playerIdOnBlock = 1; // Dynamically set this to the ID of the player currently being auctioned
-const teamId = 5; // Dynamically set this to the logged-in manager's Team ID
+const playerIdOnBlock = 1; 
+const teamId = 5; 
+
+function getTournamentQuery() {
+    if (window.activeTournamentCode) {
+        return `&t=${encodeURIComponent(window.activeTournamentCode)}`;
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const t = urlParams.get('t');
+    return t ? `&t=${encodeURIComponent(t)}` : '';
+}
 
 // 1. Fetch live auction data every 1.5 seconds
 setInterval(fetchLiveAuctionData, 1500);
 
 async function fetchLiveAuctionData() {
     try {
-        const response = await fetch(`../api/get_live_bid.php?player_id=${playerIdOnBlock}`);
+        const response = await fetch(`../api/get_live_bid.php?player_id=${playerIdOnBlock}${getTournamentQuery()}`);
         const data = await response.json();
 
         // Update the UI with the fetched data
@@ -32,6 +41,9 @@ async function placeBid(bidAmount) {
     formData.append('player_id', playerIdOnBlock);
     formData.append('team_id', teamId);
     formData.append('bid_amount', bidAmount);
+    if (window.activeTournamentCode) {
+        formData.append('t', window.activeTournamentCode);
+    }
 
     try {
         const response = await fetch('../api/place_bid.php', {
@@ -42,11 +54,9 @@ async function placeBid(bidAmount) {
         const result = await response.json();
         
         if (result.success) {
-            // Instantly update UI or trigger a success sound/animation
             console.log("Bid placed successfully!");
-            fetchLiveAuctionData(); // Immediately fetch the new data
+            fetchLiveAuctionData();
         } else {
-            // Show error (e.g., "Not enough purse" or "Squad full")
             alert("Bid Failed: " + result.error);
         }
     } catch (error) {
