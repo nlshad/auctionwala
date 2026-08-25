@@ -168,10 +168,9 @@ $isPlaceholderKey = str_contains($fbConfig['apiKey'], 'EXAMPLE');
             <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mt-1 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-fire text-amber-600 text-lg"></i> AUCTION WALA SAAS
             </h1>
-            <p class="text-xs text-slate-500 uppercase tracking-widest font-semibold mt-1">Google Firebase Authentication</p>
         </div>
 
-        <!-- Google Firebase Sign-In Button -->
+        <!-- Google Sign-In Button -->
         <div class="mb-6">
             <button type="button" onclick="window.loginWithFirebaseGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-900 font-extrabold py-3.5 px-4 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-3 shadow-md border border-slate-300 active:scale-95">
                 <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -180,15 +179,9 @@ $isPlaceholderKey = str_contains($fbConfig['apiKey'], 'EXAMPLE');
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                 </svg>
-                Sign In with Google Firebase
+                Sign In with Google
             </button>
             <div id="firebase-status" class="text-[11px] text-amber-600 font-semibold text-center font-mono mt-2 hidden animate-pulse"></div>
-
-            <div class="mt-2 text-center">
-                <button type="button" onclick="openFirebaseConfigModal()" class="text-[11px] text-gold-600 hover:text-gold-700 font-bold underline flex items-center justify-center gap-1 mx-auto">
-                    <i class="fa-solid fa-gear text-[10px]"></i> Configure Firebase API Keys
-                </button>
-            </div>
         </div>
 
         <div class="flex items-center gap-3 mb-6">
