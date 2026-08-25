@@ -1,13 +1,13 @@
 <?php
 // public/today_auctions.php — Dedicated Page for Today's Live Player Auctions
-require_once '../config/db.php';
-require_once '../config/auth.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/auth.php';
 
 // Fetch categorized tournaments
 $categorized = get_categorized_tournaments($pdo);
 $liveAuctions = $categorized['live'];
 
-$uploadPath = "../public/uploads/";
+$uploadPath = "uploads/";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@ $uploadPath = "../public/uploads/";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Today's Live Player Auctions — AuctionWala</title>
     <meta name="description" content="Watch Today's Live Cricket & Sports Player Auctions in real time on AuctionWala with live bidding, franchise purses, and instant squad updates.">
-    <?php require_once 'components/ui_head.php'; ?>
+    <?php require_once __DIR__ . '/components/ui_head.php'; ?>
 </head>
 <body class="text-slate-900 min-h-screen flex flex-col justify-between selection:bg-red-500 selection:text-white">
 

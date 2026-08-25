@@ -1,3 +1,4 @@
 <?php
-// Root entry wrapper for Today's Live Auctions
-require_once __DIR__ . '/public/today_auctions.php';
+// today_auctions.php (Root Redirection)
+header("Location: public/today_auctions.php");
+exit;

@@ -1,13 +1,13 @@
 <?php
 // public/upcoming_auctions.php — Dedicated Page for Upcoming Player Auctions
-require_once '../config/db.php';
-require_once '../config/auth.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/auth.php';
 
 // Fetch categorized tournaments
 $categorized = get_categorized_tournaments($pdo);
 $upcomingAuctions = $categorized['upcoming'];
 
-$uploadPath = "../public/uploads/";
+$uploadPath = "uploads/";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@ $uploadPath = "../public/uploads/";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upcoming Player Auctions — AuctionWala</title>
     <meta name="description" content="Explore upcoming cricket league player auctions, player registration portals, franchise purse allocations, and squad limits on AuctionWala.">
-    <?php require_once 'components/ui_head.php'; ?>
+    <?php require_once __DIR__ . '/components/ui_head.php'; ?>
 </head>
 <body class="text-slate-900 min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
 
