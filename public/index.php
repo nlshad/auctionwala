@@ -4,6 +4,9 @@ session_start();
 require_once '../config/db.php';
 
 $tournamentId = get_active_tournament_id($pdo);
+if ($tournamentId > 0) {
+    $_SESSION['tournament_id'] = $tournamentId;
+}
 $tournament = null;
 $registrationEnabled = true;
 $tCode = 'auctionwala-2026';

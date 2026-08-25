@@ -256,8 +256,8 @@ function get_active_tournament_id($pdo = null, $requestParam = null) {
         if ($tourn) return (int)$tourn['id'];
     }
     
-    // 2. Check explicitly provided numerical ID
-    $tId = $_GET['tournament_id'] ?? $_POST['tournament_id'] ?? null;
+    // 2. Check explicitly provided numerical ID (supports t_id, tournament_id)
+    $tId = $_GET['t_id'] ?? $_GET['tournament_id'] ?? $_POST['tournament_id'] ?? null;
     if ($tId && is_numeric($tId)) {
         return (int)$tId;
     }
