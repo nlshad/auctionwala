@@ -136,164 +136,158 @@ $specUrl = $baseUrl . '/public/index.php?t=' . ($activeTournament['code'] ?? 'sm
     <!-- Main Bento Grid Container -->
     <main class="w-full max-w-7xl mx-auto px-4 py-8 flex-1 space-y-6">
 
-        <!-- Active Tournament Banner & Selector Bento Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Active Tournament Hero Card (2 cols) -->
-            <div class="lg:col-span-2 bento-card p-6 border border-slate-200 relative overflow-hidden flex flex-col justify-between shadow-sm bg-white">
-                <div class="absolute -right-10 -bottom-10 opacity-5 pointer-events-none">
-                    <i class="fa-solid fa-crown text-[200px] text-gold-500"></i>
+        <!-- Welcome Banner & Active Tournament Hero Card -->
+        <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-white/60 shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2 max-w-2xl">
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-500/15 text-emerald-800 border border-emerald-500/30 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active League Environment
+                    </span>
+                    <span class="text-xs text-slate-700 font-mono font-bold">Code: <strong class="text-amber-800 font-black"><?php echo htmlspecialchars($activeTournament['code'] ?? 'N/A'); ?></strong></span>
                 </div>
 
-                <div>
-                    <div class="flex items-center justify-between gap-4 mb-4">
-                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Environment
-                        </span>
-                        <span class="text-xs text-slate-500 font-mono">Code: <strong class="text-gold-700"><?php echo htmlspecialchars($activeTournament['code'] ?? 'N/A'); ?></strong></span>
-                    </div>
-
-                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight mb-2">
-                        <?php echo htmlspecialchars($activeTournament['name'] ?? 'No Active Tournament'); ?>
-                    </h2>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-6 font-medium">
-                        Provisioned multi-tenant environment with automated purse limits (₹<?php echo number_format($activeTournament['total_purse_default'] ?? 10000); ?>) and max squad size (<?php echo $activeTournament['max_squad_size_default'] ?? 11; ?> players per team).
-                    </p>
-                </div>
-
-                <!-- Shareable Link Boxes -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-200">
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
-                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
-                            <i class="fa-solid fa-link text-gold-600"></i> Player Registration URL
-                        </span>
-                        <div class="flex items-center gap-2">
-                            <input type="text" readonly value="<?php echo htmlspecialchars($regUrl); ?>" class="bg-transparent text-xs text-gold-700 font-mono font-bold w-full outline-none select-all truncate">
-                            <button onclick="copyToClipboard('<?php echo htmlspecialchars($regUrl); ?>')" class="text-slate-500 hover:text-slate-800 text-xs px-2 py-1 bg-white border border-slate-200 rounded hover:bg-slate-100 transition shadow-sm">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
-                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
-                            <i class="fa-solid fa-tv text-cyan-600"></i> Spectator Live View
-                        </span>
-                        <div class="flex items-center gap-2">
-                            <input type="text" readonly value="<?php echo htmlspecialchars($specUrl); ?>" class="bg-transparent text-xs text-cyan-700 font-mono font-bold w-full outline-none select-all truncate">
-                            <a href="<?php echo htmlspecialchars($specUrl); ?>" target="_blank" class="text-slate-500 hover:text-slate-800 text-xs px-2 py-1 bg-white border border-slate-200 rounded hover:bg-slate-100 transition shadow-sm">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-2xl sm:text-4xl font-black text-slate-900 uppercase tracking-tight">
+                    <?php echo htmlspecialchars($activeTournament['name'] ?? 'No Active Tournament'); ?>
+                </h2>
+                <p class="text-xs text-slate-700 font-bold leading-relaxed">
+                    Default Team Purse: <strong class="text-amber-800 font-mono">₹<?php echo number_format($activeTournament['total_purse_default'] ?? 10000); ?></strong> &bull; Max Squad Size: <strong class="text-slate-900 font-mono"><?php echo $activeTournament['max_squad_size_default'] ?? 11; ?> Players</strong>
+                </p>
             </div>
 
-            <!-- Tournament Environment Switcher Card (1 col) -->
-            <div class="bento-card p-6 flex flex-col justify-between bg-white border border-slate-200 shadow-sm">
-                <div>
-                    <h3 class="text-xs font-extrabold uppercase text-slate-900 tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-layer-group text-gold-600"></i> Your Tournaments (<?php echo count($tournaments); ?>)
-                    </h3>
-
-                    <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                        <?php foreach ($tournaments as $tourn): ?>
-                            <?php $isSelected = ((int)$tourn['id'] === (int)($activeTournament['id'] ?? 0)); ?>
-                            <a href="index.php?switch_t=<?php echo $tourn['id']; ?>" class="flex items-center justify-between p-3 rounded-xl border transition <?php echo $isSelected ? 'bg-amber-50 border-gold-400 text-slate-900 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100'; ?>">
-                                <div class="truncate">
-                                    <h4 class="text-xs font-extrabold truncate text-slate-900"><?php echo htmlspecialchars($tourn['name']); ?></h4>
-                                    <span class="text-[10px] font-mono text-slate-500">Code: <?php echo htmlspecialchars($tourn['code']); ?></span>
-                                </div>
-                                <?php if ($isSelected): ?>
-                                    <span class="text-gold-700 text-xs"><i class="fa-solid fa-circle-check"></i></span>
-                                <?php endif; ?>
-                            </a>
-                        <?php endforeach; ?>
+            <!-- Tournament Environment Switcher Button -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                <?php if (count($tournaments) > 1): ?>
+                    <div class="relative">
+                        <select onchange="window.location.href='index.php?switch_t=' + this.value" class="bg-white/90 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-black outline-none shadow-sm cursor-pointer hover:border-amber-500">
+                            <?php foreach ($tournaments as $tourn): ?>
+                                <option value="<?php echo $tourn['id']; ?>" <?php echo ((int)$tourn['id'] === (int)($activeTournament['id'] ?? 0)) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($tourn['name']); ?> (<?php echo htmlspecialchars($tourn['code']); ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                </div>
-
-                <button onclick="openCreateModal()" class="w-full mt-4 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-extrabold text-slate-800 py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-plus text-gold-600"></i> Provision Another League
+                <?php endif; ?>
+                <button onclick="openCreateModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus text-amber-400"></i> New League
                 </button>
             </div>
         </div>
 
-        <!-- Metric Stat Cards Bento Row -->
+        <!-- Metric Stat Cards Row -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div class="bento-card p-5 bg-white border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">Franchise Teams</span>
-                <div class="text-2xl font-black text-slate-900 mt-1 flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved text-gold-600 text-lg"></i> <?php echo $stats['teams_count']; ?>
+            <div class="glass-card-subtle p-5 rounded-2xl shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-black uppercase text-slate-700 tracking-wider block">Franchise Teams</span>
+                    <div class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 font-mono">
+                        <?php echo $stats['teams_count']; ?>
+                    </div>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-700">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
                 </div>
             </div>
 
-            <div class="bento-card p-5 bg-white border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">Verified Players</span>
-                <div class="text-2xl font-black text-emerald-700 mt-1 flex items-center gap-2">
-                    <i class="fa-solid fa-user-check text-lg"></i> <?php echo $stats['players_verified']; ?>
+            <div class="glass-card-subtle p-5 rounded-2xl shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-black uppercase text-slate-700 tracking-wider block">Verified Players</span>
+                    <div class="text-2xl sm:text-3xl font-black text-emerald-800 mt-1 font-mono">
+                        <?php echo $stats['players_verified']; ?>
+                    </div>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-700">
+                    <i class="fa-solid fa-user-check text-xl"></i>
                 </div>
             </div>
 
-            <div class="bento-card p-5 bg-white border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">Pending Verification</span>
-                <div class="text-2xl font-black text-amber-600 mt-1 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-lg"></i> <?php echo $stats['players_pending']; ?>
+            <div class="glass-card-subtle p-5 rounded-2xl shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-black uppercase text-slate-700 tracking-wider block">Pending Approval</span>
+                    <div class="text-2xl sm:text-3xl font-black text-amber-800 mt-1 font-mono">
+                        <?php echo $stats['players_pending']; ?>
+                    </div>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-800">
+                    <i class="fa-solid fa-clock-rotate-left text-xl"></i>
                 </div>
             </div>
 
-            <div class="bento-card p-5 bg-white border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">Players Sold</span>
-                <div class="text-2xl font-black text-cyan-700 mt-1 flex items-center gap-2">
-                    <i class="fa-solid fa-gavel text-lg"></i> <?php echo $stats['players_sold']; ?>
+            <div class="glass-card-subtle p-5 rounded-2xl shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-black uppercase text-slate-700 tracking-wider block">Players Sold</span>
+                    <div class="text-2xl sm:text-3xl font-black text-cyan-800 mt-1 font-mono">
+                        <?php echo $stats['players_sold']; ?>
+                    </div>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-700">
+                    <i class="fa-solid fa-gavel text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Action Hub Bento Row -->
-        <div class="bento-card p-6 bg-white border border-slate-200 shadow-sm">
-            <h3 class="text-xs font-extrabold uppercase text-slate-900 tracking-wider mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-rocket text-gold-600"></i> Auction Operations Control Desk
-            </h3>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <a href="../admin/auction.php" class="bg-slate-50 hover:bg-amber-50 p-5 rounded-xl border border-slate-200 hover:border-gold-400 transition group flex flex-col justify-between shadow-sm">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-gold-50 border border-gold-200 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i class="fa-solid fa-gavel text-gold-700 text-lg"></i>
-                        </div>
-                        <h4 class="text-sm font-black text-slate-900 uppercase tracking-tight">Live Auctioneer Desk</h4>
-                        <p class="text-xs text-slate-600 mt-1 font-medium">Control real-time bidding, bring players to block, pause, sell, or undo actions.</p>
+        <!-- Primary Quick Actions 4-Card Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- 1. Live Auctioneer Desk -->
+            <a href="../admin/auction.php" class="glass-panel p-6 rounded-2xl border border-amber-500/40 hover:border-amber-500 transition group flex flex-col justify-between shadow-lg hover:-translate-y-1 duration-200">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-gavel text-amber-800 text-2xl"></i>
                     </div>
-                    <span class="text-xs font-extrabold text-gold-700 uppercase tracking-wider mt-4 flex items-center gap-1">
-                        Launch Console <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-                    </span>
-                </a>
+                    <h3 class="text-base font-black text-slate-900 uppercase tracking-tight">Live Auctioneer Desk</h3>
+                    <p class="text-xs text-slate-700 mt-2 font-bold leading-relaxed">Control real-time bidding, bring players to block, pause, sell, or undo actions.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-900/10 flex items-center justify-between">
+                    <span class="text-xs font-black text-amber-800 uppercase tracking-wider">Launch Desk</span>
+                    <i class="fa-solid fa-arrow-right text-amber-800 group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
 
-                <a href="../admin/index.php" class="bg-slate-50 hover:bg-cyan-50 p-5 rounded-xl border border-slate-200 hover:border-cyan-400 transition group flex flex-col justify-between shadow-sm">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i class="fa-solid fa-users-gear text-cyan-700 text-lg"></i>
-                        </div>
-                        <h4 class="text-sm font-black text-slate-900 uppercase tracking-tight">Team & Roster Manager</h4>
-                        <p class="text-xs text-slate-600 mt-1 font-medium">Manage franchise accounts, create manager credentials, adjust purse balances.</p>
+            <!-- 2. Team & Roster Manager -->
+            <a href="../admin/index.php" class="glass-panel p-6 rounded-2xl border border-white/60 hover:border-cyan-500/50 transition group flex flex-col justify-between shadow-lg hover:-translate-y-1 duration-200">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-users-gear text-cyan-800 text-2xl"></i>
                     </div>
-                    <span class="text-xs font-extrabold text-cyan-700 uppercase tracking-wider mt-4 flex items-center gap-1">
-                        Manage Teams <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-                    </span>
-                </a>
+                    <h3 class="text-base font-black text-slate-900 uppercase tracking-tight">Teams & Purses</h3>
+                    <p class="text-xs text-slate-700 mt-2 font-bold leading-relaxed">Manage franchise accounts, create manager credentials, adjust purse balances.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-900/10 flex items-center justify-between">
+                    <span class="text-xs font-black text-cyan-800 uppercase tracking-wider">Manage Teams</span>
+                    <i class="fa-solid fa-arrow-right text-cyan-800 group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
 
-                <a href="../admin/index.php#players" class="bg-slate-50 hover:bg-emerald-50 p-5 rounded-xl border border-slate-200 hover:border-emerald-400 transition group flex flex-col justify-between shadow-sm">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i class="fa-solid fa-id-card text-emerald-700 text-lg"></i>
-                        </div>
-                        <h4 class="text-sm font-black text-slate-900 uppercase tracking-tight">Player Payment Verification</h4>
-                        <p class="text-xs text-slate-600 mt-1 font-medium">Review player UTR payment receipts and approve registrations into pool.</p>
+            <!-- 3. Player Registration Link -->
+            <div class="glass-panel p-6 rounded-2xl border border-white/60 transition group flex flex-col justify-between shadow-lg">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-gold-500/20 border border-gold-500/40 flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-link text-amber-800 text-2xl"></i>
                     </div>
-                    <span class="text-xs font-extrabold text-emerald-700 uppercase tracking-wider mt-4 flex items-center gap-1">
-                        Verify Receipts <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-                    </span>
-                </a>
+                    <h3 class="text-base font-black text-slate-900 uppercase tracking-tight">Player Registration Link</h3>
+                    <p class="text-xs text-slate-700 mt-2 font-bold leading-relaxed">Share this registration URL with players to join your league pool.</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-900/10 space-y-2">
+                    <input type="text" readonly value="<?php echo htmlspecialchars($regUrl); ?>" class="w-full bg-white/90 border border-slate-300 rounded-xl px-3 py-1.5 text-[11px] text-amber-900 font-mono font-bold outline-none select-all truncate shadow-sm">
+                    <button onclick="copyToClipboard('<?php echo htmlspecialchars($regUrl); ?>')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-2 rounded-xl uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-copy"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. Spectator Live View -->
+            <div class="glass-panel p-6 rounded-2xl border border-white/60 transition group flex flex-col justify-between shadow-lg">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-tv text-emerald-800 text-2xl"></i>
+                    </div>
+                    <h3 class="text-base font-black text-slate-900 uppercase tracking-tight">Spectator Stream</h3>
+                    <p class="text-xs text-slate-700 mt-2 font-bold leading-relaxed">Share live bidding broadcast screen with audience and spectators.</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-900/10 space-y-2">
+                    <input type="text" readonly value="<?php echo htmlspecialchars($specUrl); ?>" class="w-full bg-white/90 border border-slate-300 rounded-xl px-3 py-1.5 text-[11px] text-emerald-900 font-mono font-bold outline-none select-all truncate shadow-sm">
+                    <a href="<?php echo htmlspecialchars($specUrl); ?>" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs py-2 rounded-xl uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Stream
+                    </a>
+                </div>
             </div>
         </div>
     </main>
