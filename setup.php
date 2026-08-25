@@ -17,19 +17,26 @@ $message = [];
 $success = true;
 
 try {
-    // 1. Establish connection to MySQL server
-    $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
-    $message[] = "🟢 Connected to MySQL server successfully.";
-
-    // 2. Create database
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
-    $message[] = "🟢 Database '$db' created or verified.";
-
-    // 3. Connect to database
-    $pdo->exec("USE `$db`;");
+    // 1. Establish connection to MySQL server & target database
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]);
+        $message[] = "🟢 Connected to MySQL database '$db' successfully.";
+    } catch (\PDOException $e) {
+        if ($e->getCode() == 1049) { // Unknown database, create it (Local XAMPP mode)
+            $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+            $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+            $pdo->exec("USE `$db`;");
+            $message[] = "🟢 Database '$db' created or verified.";
+        } else {
+            throw $e;
+        }
+    }
 
     // 4. Create Tables
     
