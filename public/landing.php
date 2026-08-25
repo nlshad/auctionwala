@@ -162,9 +162,14 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                     </h2>
                     <p class="text-xs text-slate-500 mt-0.5">Leagues currently on the block with live real-time bidding active.</p>
                 </div>
-                <span class="bg-red-50 border border-red-200 text-red-600 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                    <?php echo count($liveAuctions); ?> Live Now
-                </span>
+                <div class="flex items-center gap-3">
+                    <span class="bg-red-50 border border-red-200 text-red-600 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider hidden sm:inline-block">
+                        <?php echo count($liveAuctions); ?> Live Now
+                    </span>
+                    <a href="today_auctions.php" class="bg-red-600 hover:bg-red-500 text-white font-black text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition shadow-sm flex items-center gap-1.5 shrink-0">
+                        View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
             </div>
 
             <?php if (!empty($liveAuctions)): ?>
@@ -228,6 +233,9 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                     </h2>
                     <p class="text-xs text-slate-500 mt-0.5">Leagues preparing for bidding. Register early to enter the draft pool.</p>
                 </div>
+                <a href="upcoming_auctions.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-4 py-2 rounded-xl uppercase tracking-wider transition shadow-sm flex items-center gap-1.5 shrink-0">
+                    View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
             </div>
 
             <?php if (!empty($upcomingAuctions)): ?>
