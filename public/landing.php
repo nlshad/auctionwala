@@ -94,17 +94,8 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 
         <!-- Right Navigation Action Links -->
         <div class="flex items-center gap-2 sm:gap-3">
-            <a href="today_auctions.php" class="bg-red-600 hover:bg-red-500 text-white font-black px-3 py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5">
-                <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Live Today
-            </a>
-            <a href="upcoming_auctions.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5">
-                <i class="fa-solid fa-calendar-days"></i> Upcoming
-            </a>
             <a href="login.php" class="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-zinc-950 font-extrabold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-gold-500/20 transition flex items-center gap-1.5">
                 <i class="fa-solid fa-crown text-sm"></i> Host Your Auction
-            </a>
-            <a href="index.php" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-2 rounded-xl text-xs uppercase tracking-wider transition hidden sm:inline-flex shadow-sm">
-                Spectator Room
             </a>
         </div>
     </header>
