@@ -173,42 +173,59 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             </div>
 
             <?php if (!empty($liveAuctions)): ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <?php foreach ($liveAuctions as $auction): ?>
-                        <div class="bento-card bento-card-live p-6 flex flex-col justify-between relative overflow-hidden bg-white">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase animate-pulse flex items-center gap-1">
-                                        <i class="fa-solid fa-broadcast-tower"></i> Live Bidding
-                                    </span>
-                                    <span class="text-[10px] font-mono text-gold-600 font-bold">Code: <?php echo htmlspecialchars($auction['code']); ?></span>
+                        <div class="live-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-red-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative">
+                            
+                            <!-- Left Banner / Logo -->
+                            <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
+                                <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($auction['logo'] ?: 'auctionwala_logo.png'); ?>" alt="Logo" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 bg-red-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> Live
+                                </span>
+                            </div>
+
+                            <!-- Right Details Content -->
+                            <div class="flex-grow space-y-3 w-full">
+                                <!-- Title & Code -->
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-red-700 transition cursor-pointer" onclick="window.location.href='index.php?t_id=<?php echo $auction['id']; ?>'">
+                                        <?php echo htmlspecialchars($auction['name']); ?>
+                                    </h4>
                                 </div>
 
-                                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">
-                                    <?php echo htmlspecialchars($auction['name']); ?>
-                                </h3>
+                                <!-- 2-Column Specs Grid -->
+                                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-slate-600 font-extrabold">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-solid fa-users text-slate-400 text-xs w-4"></i>
+                                        <span><?php echo $auction['max_squad_size_default']; ?> Players/Team</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-solid fa-trophy text-amber-500 text-xs w-4"></i>
+                                        <span><?php echo number_format($auction['total_purse_default']); ?> Points</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-regular fa-clock text-slate-400 text-xs w-4"></i>
+                                        <span><?php echo date('h:i A', strtotime($auction['created_at'])); ?></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-regular fa-calendar text-slate-400 text-xs w-4"></i>
+                                        <span><?php echo date('d-m-Y', strtotime($auction['created_at'])); ?></span>
+                                    </div>
+                                </div>
 
-                                <div class="space-y-2 my-4 text-xs text-slate-600">
-                                    <div class="flex justify-between py-1 border-b border-slate-100">
-                                        <span>Franchises Participating:</span>
-                                        <strong class="text-slate-900"><?php echo $auction['team_count']; ?> Teams</strong>
+                                <!-- Location Pill & Action Buttons -->
+                                <div class="flex items-center justify-between gap-2 pt-1">
+                                    <div class="bg-sky-50 text-sky-800 font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-sky-100 flex-grow truncate">
+                                        <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
+                                        <span class="truncate"><?php echo htmlspecialchars($auction['place'] ?? 'League Arena'); ?></span>
                                     </div>
-                                    <div class="flex justify-between py-1 border-b border-slate-100">
-                                        <span>Verified Player Pool:</span>
-                                        <strong class="text-emerald-600"><?php echo $auction['player_count']; ?> Players</strong>
-                                    </div>
-                                    <div class="flex justify-between py-1 border-b border-slate-100">
-                                        <span>Default Purse Limit:</span>
-                                        <strong class="text-gold-600">₹<?php echo number_format($auction['total_purse_default']); ?></strong>
-                                    </div>
+                                    <a href="index.php?t_id=<?php echo $auction['id']; ?>" class="bg-red-600 hover:bg-red-500 text-white font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
+                                        <i class="fa-solid fa-tv text-xs"></i> Watch
+                                    </a>
                                 </div>
                             </div>
 
-                            <div class="pt-4 border-t border-slate-100 flex gap-2">
-                                <a href="index.php?t=<?php echo htmlspecialchars($auction['code']); ?>" class="w-full bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold py-2.5 rounded-xl text-xs uppercase tracking-wider transition text-center shadow-md shadow-red-600/20">
-                                    Watch Live Arena <i class="fa-solid fa-arrow-right ml-1"></i>
-                                </a>
-                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -239,45 +256,63 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             </div>
 
             <?php if (!empty($upcomingAuctions)): ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <?php foreach ($upcomingAuctions as $auction): ?>
-                        <div class="bento-card p-6 flex flex-col justify-between bg-white">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold px-2 py-0.5 rounded tracking-widest uppercase">
-                                        Registration Open
+                        <div class="upcoming-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative">
+                            
+                            <!-- Left Banner / Logo -->
+                            <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
+                                <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($auction['logo'] ?: 'auctionwala_logo.png'); ?>" alt="Logo" class="w-full h-full object-cover">
+                                <?php if ($auction['registration_enabled']): ?>
+                                    <span class="absolute top-2 left-2 bg-emerald-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                                        Open
                                     </span>
-                                    <span class="text-[10px] font-mono text-slate-500">Code: <?php echo htmlspecialchars($auction['code']); ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Right Details Content -->
+                            <div class="flex-grow space-y-3 w-full">
+                                <!-- Title & Code -->
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-amber-800 transition cursor-pointer" onclick="window.location.href='register.php?t_id=<?php echo $auction['id']; ?>'">
+                                        <?php echo htmlspecialchars($auction['name']); ?>
+                                    </h4>
                                 </div>
 
-                                <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">
-                                    <?php echo htmlspecialchars($auction['name']); ?>
-                                </h3>
+                                <!-- 2-Column Specs Grid -->
+                                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-slate-600 font-extrabold">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-solid fa-users text-slate-400 text-xs w-4"></i>
+                                        <span><?php echo $auction['max_squad_size_default']; ?> Players/Team</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-solid fa-trophy text-amber-500 text-xs w-4"></i>
+                                        <span><?php echo number_format($auction['total_purse_default']); ?> Points</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-regular fa-clock text-slate-400 text-xs w-4"></i>
+                                        <span><?php echo date('h:i A', strtotime($auction['created_at'])); ?></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-regular fa-calendar text-slate-400 text-xs w-4"></i>
+                                        <span><?php echo date('d-m-Y', strtotime($auction['created_at'])); ?></span>
+                                    </div>
+                                </div>
 
-                                <div class="space-y-2 my-4 text-xs text-slate-600">
-                                    <div class="flex justify-between py-1 border-b border-slate-100">
-                                        <span>Purse Per Team:</span>
-                                        <strong class="text-gold-600">₹<?php echo number_format($auction['total_purse_default']); ?></strong>
+                                <!-- Location Pill & Action Buttons -->
+                                <div class="flex items-center justify-between gap-2 pt-1">
+                                    <div class="bg-sky-50 text-sky-800 font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-sky-100 flex-grow truncate">
+                                        <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
+                                        <span class="truncate"><?php echo htmlspecialchars($auction['place'] ?? 'League Arena'); ?></span>
                                     </div>
-                                    <div class="flex justify-between py-1 border-b border-slate-100">
-                                        <span>Max Squad Limit:</span>
-                                        <strong class="text-slate-900"><?php echo $auction['max_squad_size_default']; ?> Players</strong>
-                                    </div>
-                                    <div class="flex justify-between py-1 border-b border-slate-100">
-                                        <span>Registered Players:</span>
-                                        <strong class="text-cyan-600"><?php echo $auction['player_count']; ?> Registered</strong>
-                                    </div>
+                                    <?php if ($auction['registration_enabled']): ?>
+                                        <a href="register.php?t_id=<?php echo $auction['id']; ?>" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
+                                            <i class="fa-solid fa-id-card text-xs"></i> Register
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
-                            <div class="pt-4 border-t border-slate-100 flex gap-2">
-                                <a href="register.php?t=<?php echo htmlspecialchars($auction['code']); ?>" class="w-1/2 bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-zinc-950 font-extrabold py-2.5 rounded-xl text-xs uppercase tracking-wider transition text-center shadow-sm">
-                                    Register <i class="fa-solid fa-user-plus ml-1"></i>
-                                </a>
-                                <a href="index.php?t=<?php echo htmlspecialchars($auction['code']); ?>" class="w-1/2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition text-center">
-                                    Arena View
-                                </a>
-                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
