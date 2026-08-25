@@ -80,21 +80,25 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                 <span class="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded tracking-widest uppercase animate-pulse">LIVE</span>
             </a>
         </div>
-
-        <nav class="hidden md:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-slate-600">
-            <a href="#live-auctions" class="hover:text-gold-600 transition flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> Today's Live
+        <nav class="hidden md:flex items-center gap-6 text-xs uppercase font-extrabold tracking-wider text-slate-700">
+            <a href="today_auctions.php" class="text-red-600 hover:text-red-700 transition flex items-center gap-1.5 font-black">
+                <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span> Today's Live
             </a>
-            <a href="#upcoming-auctions" class="hover:text-gold-600 transition">Upcoming</a>
-            <a href="#completed-auctions" class="hover:text-gold-600 transition">Completed</a>
-            <a href="#features" class="hover:text-gold-600 transition">Features</a>
-            <a href="#help" class="hover:text-gold-600 transition">Help & FAQ</a>
+            <a href="upcoming_auctions.php" class="text-amber-800 hover:text-amber-900 transition font-black flex items-center gap-1">
+                <i class="fa-solid fa-calendar-days text-amber-600"></i> Upcoming Auctions
+            </a>
+            <a href="#completed-auctions" class="hover:text-slate-900 transition">Completed</a>
+            <a href="#features" class="hover:text-slate-900 transition">Features</a>
+            <a href="#help" class="hover:text-slate-900 transition">Help & FAQ</a>
         </nav>
 
         <!-- Right Navigation Action Links -->
-        <div class="flex items-center gap-3">
-            <a href="auctions.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5">
-                <i class="fa-solid fa-gavel"></i> Auctions Hub
+        <div class="flex items-center gap-2 sm:gap-3">
+            <a href="today_auctions.php" class="bg-red-600 hover:bg-red-500 text-white font-black px-3 py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Live Today
+            </a>
+            <a href="upcoming_auctions.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-days"></i> Upcoming
             </a>
             <a href="login.php" class="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-zinc-950 font-extrabold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-gold-500/20 transition flex items-center gap-1.5">
                 <i class="fa-solid fa-crown text-sm"></i> Host Your Auction
