@@ -91,7 +91,11 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             <a href="#help" class="hover:text-gold-600 transition">Help & FAQ</a>
         </nav>
 
-        <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Right Navigation Action Links -->
+        <div class="flex items-center gap-3">
+            <a href="auctions.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-gavel"></i> Auctions Hub
+            </a>
             <a href="login.php" class="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-zinc-950 font-extrabold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-gold-500/20 transition flex items-center gap-1.5">
                 <i class="fa-solid fa-crown text-sm"></i> Host Your Auction
             </a>
@@ -123,11 +127,11 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 
                 <!-- Hero Action CTAs -->
                 <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
+                    <a href="auctions.php" class="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl transition flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-gavel text-amber-400"></i> Today's & Upcoming Auctions
+                    </a>
                     <a href="login.php" class="bg-gradient-to-r from-gold-500 via-amber-500 to-yellow-500 hover:from-gold-400 hover:to-amber-400 text-zinc-950 font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl shadow-xl shadow-gold-500/20 transition flex items-center gap-2 active:scale-95">
                         <i class="fa-solid fa-trophy text-sm"></i> Host an Auction Now
-                    </a>
-                    <a href="#upcoming-auctions" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl transition flex items-center gap-2 shadow-sm">
-                        <i class="fa-solid fa-user-plus text-gold-400"></i> Join as Player
                     </a>
                 </div>
 
