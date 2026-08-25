@@ -230,6 +230,18 @@ function get_tournament_by_code($pdo, $code) {
 }
 
 /**
+ * Helper function to check if user/admin/manager is logged in.
+ */
+function isLoggedIn() {
+    if (session_status() === PHP_SESSION_NONE) {
+        @session_start();
+    }
+    return (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true)
+        || (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true)
+        || (isset($_SESSION['manager_logged_in']) && $_SESSION['manager_logged_in'] === true);
+}
+
+/**
  * Helper function to resolve active tournament ID from session or request parameter.
  */
 function get_active_tournament_id($pdo = null, $requestParam = null) {

@@ -1,7 +1,6 @@
 <?php
 // public/today_auctions.php — Dedicated Page for Today's Live Player Auctions
 require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../config/auth.php';
 
 // Fetch categorized tournaments
 $categorized = get_categorized_tournaments($pdo);
