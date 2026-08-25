@@ -118,7 +118,8 @@ $uploadPath = "uploads/";
         <?php else: ?>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="live-auctions-container">
                 <?php foreach ($liveAuctions as $t): ?>
-                    <div class="live-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-red-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative"
+                    <div class="live-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-red-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative cursor-pointer"
+                         onclick="window.location.href='index.php?t_id=<?php echo $t['id']; ?>'"
                          data-name="<?php echo htmlspecialchars(strtolower($t['name'])); ?>">
                         
                         <!-- Left Banner / Logo -->

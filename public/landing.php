@@ -175,7 +175,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             <?php if (!empty($liveAuctions)): ?>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <?php foreach ($liveAuctions as $auction): ?>
-                        <div class="live-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-red-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative">
+                        <div class="live-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-red-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative cursor-pointer" onclick="window.location.href='index.php?t_id=<?php echo $auction['id']; ?>'">
                             
                             <!-- Left Banner / Logo -->
                             <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
@@ -189,7 +189,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                             <div class="flex-grow space-y-3 w-full">
                                 <!-- Title & Code -->
                                 <div class="flex items-start justify-between gap-2">
-                                    <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-red-700 transition cursor-pointer" onclick="window.location.href='index.php?t_id=<?php echo $auction['id']; ?>'">
+                                    <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-red-700 transition">
                                         <?php echo htmlspecialchars($auction['name']); ?>
                                     </h4>
                                 </div>
@@ -220,7 +220,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                                         <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
                                         <span class="truncate"><?php echo htmlspecialchars($auction['place'] ?? 'League Arena'); ?></span>
                                     </div>
-                                    <a href="index.php?t_id=<?php echo $auction['id']; ?>" class="bg-red-600 hover:bg-red-500 text-white font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
+                                    <a href="index.php?t_id=<?php echo $auction['id']; ?>" onclick="event.stopPropagation();" class="bg-red-600 hover:bg-red-500 text-white font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
                                         <i class="fa-solid fa-tv text-xs"></i> Watch
                                     </a>
                                 </div>
@@ -258,7 +258,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             <?php if (!empty($upcomingAuctions)): ?>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <?php foreach ($upcomingAuctions as $auction): ?>
-                        <div class="upcoming-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative">
+                        <div class="upcoming-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative cursor-pointer" onclick="window.location.href='index.php?t_id=<?php echo $auction['id']; ?>'">
                             
                             <!-- Left Banner / Logo -->
                             <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
@@ -274,7 +274,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                             <div class="flex-grow space-y-3 w-full">
                                 <!-- Title & Code -->
                                 <div class="flex items-start justify-between gap-2">
-                                    <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-amber-800 transition cursor-pointer" onclick="window.location.href='register.php?t_id=<?php echo $auction['id']; ?>'">
+                                    <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-amber-800 transition">
                                         <?php echo htmlspecialchars($auction['name']); ?>
                                     </h4>
                                 </div>
@@ -306,7 +306,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                                         <span class="truncate"><?php echo htmlspecialchars($auction['place'] ?? 'League Arena'); ?></span>
                                     </div>
                                     <?php if ($auction['registration_enabled']): ?>
-                                        <a href="register.php?t_id=<?php echo $auction['id']; ?>" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
+                                        <a href="register.php?t_id=<?php echo $auction['id']; ?>" onclick="event.stopPropagation();" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
                                             <i class="fa-solid fa-id-card text-xs"></i> Register
                                         </a>
                                     <?php endif; ?>
