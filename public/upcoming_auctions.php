@@ -115,68 +115,62 @@ $uploadPath = "uploads/";
                 </div>
             </div>
         <?php else: ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="upcoming-auctions-container">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="upcoming-auctions-container">
                 <?php foreach ($upcomingAuctions as $t): ?>
-                    <div class="upcoming-card glass-panel rounded-2xl p-6 border border-white/80 shadow-xl flex flex-col justify-between space-y-4 hover:border-amber-500 transition duration-300"
+                    <div class="upcoming-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative"
                          data-name="<?php echo htmlspecialchars(strtolower($t['name'])); ?>">
                         
-                        <!-- Top Card Info -->
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <?php if ($t['registration_enabled']): ?>
-                                    <span class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-circle-check text-emerald-600 text-[10px]"></i> Registration Open
-                                    </span>
-                                <?php else: ?>
-                                    <span class="bg-amber-500/15 border border-amber-500/30 text-amber-900 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-clock text-amber-700 text-[10px]"></i> Upcoming
-                                    </span>
-                                <?php endif; ?>
-
-                                <span class="text-[10px] font-mono font-black text-slate-600 uppercase bg-slate-100 px-2.5 py-0.5 rounded border border-slate-300">
-                                    Code: <?php echo htmlspecialchars($t['code']); ?>
-                                </span>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl overflow-hidden border border-slate-300 bg-white p-1 shrink-0 shadow-sm">
-                                    <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($t['logo'] ?: 'auctionwala_logo.png'); ?>" alt="Logo" class="w-full h-full object-contain">
-                                </div>
-                                <div>
-                                    <h4 class="font-black text-slate-900 text-base leading-tight hover:text-amber-800 transition">
-                                        <?php echo htmlspecialchars($t['name']); ?>
-                                    </h4>
-                                    <p class="text-xs text-slate-600 font-extrabold mt-0.5">Purse Cap: ₹<?php echo number_format($t['total_purse_default']); ?></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Metrics Bar -->
-                        <div class="grid grid-cols-3 gap-2 bg-slate-100 border border-slate-300 p-3.5 rounded-xl text-center shadow-inner">
-                            <div>
-                                <div class="text-sm font-black font-mono text-slate-900"><?php echo $t['player_count']; ?></div>
-                                <div class="text-[8px] font-extrabold text-slate-600 uppercase">Registered</div>
-                            </div>
-                            <div>
-                                <div class="text-sm font-black font-mono text-slate-900"><?php echo $t['team_count']; ?></div>
-                                <div class="text-[8px] font-extrabold text-slate-600 uppercase">Teams</div>
-                            </div>
-                            <div>
-                                <div class="text-sm font-black font-mono text-amber-800"><?php echo $t['max_squad_size_default']; ?></div>
-                                <div class="text-[8px] font-extrabold text-slate-600 uppercase">Squad Cap</div>
-                            </div>
-                        </div>
-
-                        <!-- Action CTA Buttons -->
-                        <div class="pt-2 flex gap-2">
+                        <!-- Left Banner / Logo -->
+                        <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
+                            <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($t['logo'] ?: 'auctionwala_logo.png'); ?>" alt="Logo" class="w-full h-full object-cover">
                             <?php if ($t['registration_enabled']): ?>
-                                <a href="register.php?t_id=<?php echo $t['id']; ?>" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-3 px-3 rounded-xl transition shadow-md text-center flex items-center justify-center gap-1.5 uppercase tracking-wider">
-                                    <i class="fa-solid fa-id-card text-xs"></i> Register Player
-                                </a>
+                                <span class="absolute top-2 left-2 bg-emerald-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                                    Open
+                                </span>
                             <?php endif; ?>
-                            <a href="index.php?t_id=<?php echo $t['id']; ?>" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-3 px-3 rounded-xl transition shadow-md text-center flex items-center justify-center gap-1.5 uppercase tracking-wider">
-                                <i class="fa-solid fa-eye text-xs"></i> View League
-                            </a>
+                        </div>
+
+                        <!-- Right Details Content -->
+                        <div class="flex-grow space-y-3 w-full">
+                            <!-- Title & Code -->
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-amber-800 transition cursor-pointer" onclick="window.location.href='register.php?t_id=<?php echo $t['id']; ?>'">
+                                    <?php echo htmlspecialchars($t['name']); ?>
+                                </h4>
+                            </div>
+
+                            <!-- 2-Column Specs Grid -->
+                            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-slate-600 font-extrabold">
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-users text-slate-400 text-xs w-4"></i>
+                                    <span><?php echo $t['max_squad_size_default']; ?> Players/Team</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-trophy text-amber-500 text-xs w-4"></i>
+                                    <span><?php echo number_format($t['total_purse_default']); ?> Points</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-slate-400 text-xs w-4"></i>
+                                    <span><?php echo date('h:i A', strtotime($t['created_at'])); ?></span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fa-regular fa-calendar text-slate-400 text-xs w-4"></i>
+                                    <span><?php echo date('d-m-Y', strtotime($t['created_at'])); ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Location Pill & Action Buttons -->
+                            <div class="flex items-center justify-between gap-2 pt-1">
+                                <div class="bg-sky-50 text-sky-800 font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-sky-100 flex-grow truncate">
+                                    <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
+                                    <span class="truncate"><?php echo htmlspecialchars($t['place'] ?? 'League Arena'); ?></span>
+                                </div>
+                                <?php if ($t['registration_enabled']): ?>
+                                    <a href="register.php?t_id=<?php echo $t['id']; ?>" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
+                                        <i class="fa-solid fa-id-card text-xs"></i> Register
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
                     </div>
