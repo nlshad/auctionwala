@@ -95,7 +95,6 @@ if ('serviceWorker' in navigator) {
     }
     h1, h2, h3, h4, .font-title {
         font-family: 'Outfit', sans-serif;
-        color: #0f172a;
     }
     .glass-panel {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);
