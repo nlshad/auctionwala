@@ -61,6 +61,9 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             border: 2px solid #ff5451;
             box-shadow: 0 0 25px rgba(255, 84, 81, 0.2);
         }
+        .hero-bg {
+            background: linear-gradient(180deg, rgba(6, 14, 32, 0.45) 0%, rgba(11, 19, 38, 0.95) 100%), url('<?php echo $uploadPath; ?>app_bg.jpg') center/cover no-repeat;
+        }
         .whatsapp-float {
             position: fixed;
             bottom: 24px;
@@ -113,59 +116,52 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="hero" class="relative py-12 lg:py-16 px-4 max-w-7xl mx-auto w-full">
-        <div class="pro-container rounded-xl p-6 sm:p-10 border border-[#1e293d] relative overflow-hidden">
-            <!-- Background Stadium Image Layer -->
-            <div class="absolute inset-0 z-0 opacity-25 pointer-events-none">
-                <img src="<?php echo $uploadPath; ?>app_bg.jpg" alt="Stadium" class="w-full h-full object-cover">
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-                <!-- Left Hero Content -->
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="inline-flex items-center gap-2 bg-[#171f33] border border-[#ff5451]/40 px-3 py-1 rounded text-xs font-mono text-[#ffb3ad] uppercase tracking-wider shadow-inner">
-                        <i class="fa-solid fa-bolt text-[#ff5451]"></i> NEXT-GEN REAL-TIME AUCTION ENGINE
-                    </div>
-
-                    <h1 class="text-3xl sm:text-5xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight leading-tight">
-                        Online Cricket Auction <br>
-                        App For Live Player <br>
-                        Bidding
-                    </h1>
-
-                    <p class="text-[#94A3B8] font-inter text-sm sm:text-base leading-relaxed max-w-xl">
-                        Streamline your teams, league auctions with real-time bidding, instant squad updates, player photo registration, franchise budget tracking, and broadcast-ready YouTube stream overlays.
-                    </p>
-
-                    <div class="flex flex-wrap items-center gap-4 pt-2">
-                        <a href="login.php" class="bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-extrabold text-xs sm:text-sm px-6 py-3 rounded transition shadow-lg uppercase tracking-wider flex items-center gap-2">
-                            Host Your Auction
-                        </a>
-                        <a href="#today-auctions" class="border border-[#31394d] hover:border-[#ff5451] bg-[#171f33]/80 text-[#F8FAFC] font-montserrat font-bold text-xs sm:text-sm px-6 py-3 rounded transition uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-regular fa-circle-play text-[#ffb95f]"></i> Watch Live Arena
-                        </a>
-                    </div>
-
-                    <div class="flex items-center gap-2 text-xs font-inter text-[#94A3B8] pt-2">
-                        <i class="fa-solid fa-circle-check text-[#22C55E]"></i>
-                        <span>Google & Trustpilot Verified Software (4.9 / 5.0 Rating)</span>
-                    </div>
+    <!-- Full-Bleed Stadium Hero Section -->
+    <section id="hero" class="hero-bg relative pt-10 pb-16 px-4 sm:px-8 w-full border-b border-[#1e293d]">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            <!-- Left Hero Content -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="inline-flex items-center gap-2 bg-[#060e20]/80 backdrop-blur border border-[#ff5451]/50 px-3 py-1 rounded text-xs font-mono text-[#ffb3ad] uppercase tracking-wider shadow">
+                    <i class="fa-solid fa-bolt text-[#ff5451]"></i> NEXT-GEN REAL-TIME AUCTION ENGINE
                 </div>
 
-                <!-- Right Stadium Visual Showcase -->
-                <div class="lg:col-span-5 relative">
-                    <div class="pro-container rounded-xl overflow-hidden border border-[#1e293d] shadow-2xl relative">
-                        <img src="<?php echo $uploadPath; ?>app_bg.jpg" alt="Live Match Broadcast" class="w-full h-64 sm:h-80 object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#060e20] via-transparent to-transparent opacity-80"></div>
-                        <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-mono">
-                            <span class="bg-[#ff5451] text-white font-bold px-2.5 py-1 rounded uppercase tracking-widest flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> PRO BROADCAST
-                            </span>
-                            <span class="bg-[#171f33]/90 text-[#7bd0ff] px-2.5 py-1 rounded border border-[#1e293d]">
-                                1080p60 FULL HD
-                            </span>
-                        </div>
+                <h1 class="text-3xl sm:text-5xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight leading-tight drop-shadow-md">
+                    Online Cricket Auction <br>
+                    App For Live Player <br>
+                    Bidding
+                </h1>
+
+                <p class="text-[#dae2fd]/90 font-inter text-sm sm:text-base leading-relaxed max-w-xl">
+                    Streamline your teams, league auctions with real-time bidding, instant squad updates, player photo registration, franchise budget tracking, and broadcast-ready YouTube stream overlays.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 pt-2">
+                    <a href="login.php" class="bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-extrabold text-xs sm:text-sm px-6 py-3 rounded transition shadow-lg uppercase tracking-wider flex items-center gap-2 shadow-red-500/30">
+                        Host Your Auction
+                    </a>
+                    <a href="#today-auctions" class="border border-[#31394d] hover:border-[#ff5451] bg-[#060e20]/80 backdrop-blur text-[#F8FAFC] font-montserrat font-bold text-xs sm:text-sm px-6 py-3 rounded transition uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-regular fa-circle-play text-[#ffb95f]"></i> Watch Live Arena
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2 text-xs font-inter text-[#dae2fd]/80 pt-2">
+                    <i class="fa-solid fa-circle-check text-[#22C55E]"></i>
+                    <span>Google & Trustpilot Verified Software (4.9 / 5.0 Rating)</span>
+                </div>
+            </div>
+
+            <!-- Right Stadium Visual Showcase -->
+            <div class="lg:col-span-5 relative">
+                <div class="pro-container rounded-xl overflow-hidden border border-[#1e293d] shadow-2xl relative">
+                    <img src="<?php echo $uploadPath; ?>app_bg.jpg" alt="Live Match Broadcast" class="w-full h-64 sm:h-80 object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#060e20] via-transparent to-transparent opacity-85"></div>
+                    <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-mono">
+                        <span class="bg-[#ff5451] text-white font-bold px-2.5 py-1 rounded uppercase tracking-widest flex items-center gap-1.5 shadow">
+                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> PRO BROADCAST
+                        </span>
+                        <span class="bg-[#171f33]/90 text-[#7bd0ff] px-2.5 py-1 rounded border border-[#1e293d]">
+                            1080p60 FULL HD
+                        </span>
                     </div>
                 </div>
             </div>
@@ -174,7 +170,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 
     <!-- Metrics Bar (4-Column Bento Stat Bar) -->
     <section class="py-6 px-4 max-w-7xl mx-auto w-full">
-        <div class="pro-container rounded-xl p-6 border border-[#1e293d] grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+        <div class="bg-[#060e20]/90 backdrop-blur-md rounded-xl p-6 border border-[#1e293d] grid grid-cols-2 lg:grid-cols-4 gap-6 text-center shadow-xl">
             <div class="space-y-1">
                 <div class="text-2xl sm:text-3xl font-montserrat font-black text-[#ffb95f] tracking-tight">
                     <?php echo max(1890, $totalBids); ?>+
@@ -233,7 +229,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                     <i class="fa-solid fa-hourglass-half"></i>
                 </div>
                 <h3 class="text-sm font-montserrat font-bold text-[#F8FAFC] uppercase">No Auctions Live Right Now</h3>
-                <p class="text-xs text-[#94A3B8] font-inter mt-1">There are no live bidding sessions at this exact moment. Check the upcoming schedule below to see what's starting soon!</p>
+                <p class="text-xs text-[#94A3B8] font-inter mt-1">There are no live bidding sessions at this exact moment. Check out upcoming schedule below to see what's starting soon!</p>
             </div>
         <?php else: ?>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -321,8 +317,8 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                             <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($t['logo'] ?: 'app_bg.jpg'); ?>" alt="Tournament Banner" class="w-full h-full object-cover">
                             <div class="absolute top-2 right-2">
                                 <?php if ($t['registration_enabled']): ?>
-                                    <span class="bg-[#22C55E] text-white font-mono font-bold text-[9px] px-2.5 py-1 rounded uppercase tracking-wider shadow">
-                                        REGISTRATION OPEN
+                                    <span class="bg-[#ff5451] text-white font-mono font-bold text-[9px] px-2.5 py-1 rounded uppercase tracking-wider shadow">
+                                        UPCOMING
                                     </span>
                                 <?php else: ?>
                                     <span class="bg-[#ffb95f] text-[#060e20] font-mono font-bold text-[9px] px-2.5 py-1 rounded uppercase tracking-wider shadow">
@@ -360,7 +356,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 
                         <!-- Action Button -->
                         <div class="pt-2">
-                            <?php if ($t['registration_enabled']): ?>
+                            <?php if ($t['id'] == 3 || strpos(strtolower($t['name']), 'auctionwala') !== false): ?>
                                 <a href="register.php?t_id=<?php echo $t['id']; ?>" onclick="event.stopPropagation();" class="w-full bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block shadow">
                                     REGISTER NOW
                                 </a>
@@ -416,7 +412,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 
             <!-- Feature 4 -->
             <div class="pro-container pro-container-hover rounded-xl p-6">
-                <div class="w-10 h-10 rounded bg-[#22C55E]/15 border border-[#22C55E]/30 flex items-center justify-center text-[#22C55E] mb-4 text-lg">
+                <div class="w-10 h-10 rounded bg-[#ff5451]/15 border border-[#ff5451]/30 flex items-center justify-center text-[#ff5451] mb-4 text-lg">
                     <i class="fa-solid fa-id-card"></i>
                 </div>
                 <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Player Registration</h3>
@@ -425,7 +421,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 
             <!-- Feature 5 -->
             <div class="pro-container pro-container-hover rounded-xl p-6">
-                <div class="w-10 h-10 rounded bg-[#ff5451]/15 border border-[#ff5451]/30 flex items-center justify-center text-[#ff5451] mb-4 text-lg">
+                <div class="w-10 h-10 rounded bg-[#22C55E]/15 border border-[#22C55E]/30 flex items-center justify-center text-[#22C55E] mb-4 text-lg">
                     <i class="fa-solid fa-rotate"></i>
                 </div>
                 <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Real-Time Concurrency</h3>
@@ -557,7 +553,7 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
                     </ul>
                 </div>
                 <a href="login.php" class="w-full bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block shadow">
-                    STARTER PLAN
+                    CHOOSE PLAN
                 </a>
             </div>
 
