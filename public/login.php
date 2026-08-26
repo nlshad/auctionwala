@@ -139,8 +139,28 @@ $isPlaceholderKey = str_contains($fbConfig['apiKey'], 'EXAMPLE');
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background-color: #0f172a;
             color: #0f172a;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            background: url('uploads/app_bg.jpg') no-repeat center center / cover;
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.55) 100%);
+            z-index: -1;
+            pointer-events: none;
         }
         h1, h2, h3 { font-family: 'Outfit', sans-serif; }
         .glass-login {

@@ -57,11 +57,41 @@ if ('serviceWorker' in navigator) {
 <style>
     body {
         font-family: 'Inter', sans-serif;
-        background: url('<?php echo $assetBase; ?>uploads/app_bg.jpg') no-repeat center center fixed;
-        background-size: cover;
+        background-color: #0f172a;
         color: #0f172a;
         overflow-x: hidden;
         min-height: 100vh;
+        position: relative;
+    }
+
+    /* Fixed background layer that renders reliably on all mobile browsers & devices */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: url('<?php echo $assetBase; ?>uploads/app_bg.jpg') no-repeat center center / cover;
+        z-index: -2;
+        pointer-events: none;
+    }
+
+    /* Subtle overlay gradient to ensure high readability on mobile screens */
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at top, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
+        z-index: -1;
+        pointer-events: none;
     }
     h1, h2, h3, h4, .font-title {
         font-family: 'Outfit', sans-serif;
