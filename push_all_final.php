@@ -1,22 +1,3 @@
 <?php
-// push_all_final.php
-chdir('c:/xampp/htdocs/SMCL');
-
-$out1 = [];
-exec('git add -f public/uploads/app_bg.jpg 2>&1', $out1);
-exec('git add -A 2>&1', $out1);
-
-$outStatus = [];
-exec('git status --short 2>&1', $outStatus);
-
-$out2 = [];
-exec('git commit -m "Update home page design, stadium floodlight background, light header typography, and spectator navigation" 2>&1', $out2);
-
-$out3 = [];
-exec('git push origin main 2>&1', $out3);
-
-echo "<pre>";
-echo "GIT STATUS:\n" . implode("\n", $outStatus) . "\n\n";
-echo "GIT COMMIT:\n" . implode("\n", $out2) . "\n\n";
-echo "GIT PUSH:\n" . implode("\n", $out3) . "\n\n";
-echo "</pre>";
+@unlink(__DIR__ . '/push_all_final.php');
+echo "CLEAN";
