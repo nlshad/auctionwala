@@ -1,5 +1,6 @@
 # Ignore custom uploaded player photos to keep repository light
 public/uploads/*
+!public/uploads/app_bg.jpg
 !public/uploads/player_placeholder.jpg
 !public/uploads/team_placeholder.jpg
 !public/uploads/league_logo.png
@@ -18,4 +19,3 @@ Desktop.ini
 
 # Exclude secret Hostinger production database configuration file
 config/db_prod.php
-
