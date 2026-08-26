@@ -189,13 +189,13 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             <div class="flex items-center gap-3">
                 <span class="w-3.5 h-3.5 rounded-full bg-red-600 animate-ping"></span>
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight flex items-center gap-2 drop-shadow-md">
                         🔴 Today's Live Player Auctions
                     </h2>
-                    <p class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Watch active player bidding in real time</p>
+                    <p class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Watch active player bidding in real time</p>
                 </div>
             </div>
-            <a href="today_auctions.php" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider flex items-center gap-1">
+            <a href="today_auctions.php" class="bg-white/95 border border-slate-200 hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider flex items-center gap-1">
                 View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
         </div>
@@ -272,13 +272,13 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
             <div class="flex items-center gap-3">
                 <span class="w-3.5 h-3.5 rounded-full bg-amber-500"></span>
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight flex items-center gap-2 drop-shadow-md">
                         📅 Upcoming Scheduled Auctions
                     </h2>
-                    <p class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Scheduled player auctions ready for player registration</p>
+                    <p class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Scheduled player auctions ready for player registration</p>
                 </div>
             </div>
-            <a href="upcoming_auctions.php" class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider flex items-center gap-1">
+            <a href="upcoming_auctions.php" class="bg-white/95 border border-slate-200 hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider flex items-center gap-1">
                 View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
         </div>
@@ -384,10 +384,10 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
     <!-- Our Features Section -->
     <section id="features" class="py-16 px-4 max-w-7xl mx-auto w-full">
         <div class="text-center max-w-2xl mx-auto mb-12">
-            <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-slate-900">
-                Our <span class="text-amber-600">Features</span>
+            <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white drop-shadow-md">
+                Our <span class="text-amber-400">Features</span>
             </h2>
-            <p class="text-xs text-slate-500 font-extrabold mt-1.5 uppercase tracking-widest">Everything you need to manage & stream professional sports auctions</p>
+            <p class="text-xs text-slate-300 font-extrabold mt-1.5 uppercase tracking-widest">Everything you need to manage & stream professional sports auctions</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -488,10 +488,10 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
     <!-- Pricing Section -->
     <section id="pricing" class="py-16 px-4 max-w-7xl mx-auto w-full">
         <div class="text-center max-w-2xl mx-auto mb-12">
-            <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-slate-900">
-                Our <span class="text-amber-600">Pricing</span> Plans
+            <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white drop-shadow-md">
+                Our <span class="text-amber-400">Pricing</span> Plans
             </h2>
-            <p class="text-xs text-slate-500 font-extrabold mt-1.5 uppercase tracking-widest">Affordable transparent pricing for local & professional tournaments</p>
+            <p class="text-xs text-slate-300 font-extrabold mt-1.5 uppercase tracking-widest">Affordable transparent pricing for local & professional tournaments</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
