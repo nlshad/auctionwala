@@ -29,6 +29,21 @@ if ('serviceWorker' in navigator) {
         theme: {
             extend: {
                 colors: {
+                    surface: {
+                        DEFAULT: '#0b1326',
+                        dim: '#0b1326',
+                        bright: '#31394d',
+                        lowest: '#060e20',
+                        low: '#131b2e',
+                        container: '#171f33',
+                        high: '#222a3d',
+                        highest: '#2d3449'
+                    },
+                    brand: {
+                        red: '#ff5451',
+                        gold: '#ffb95f',
+                        blue: '#7bd0ff'
+                    },
                     gold: {
                         50: '#fdfbeb',
                         100: '#fbf5c4',
@@ -40,25 +55,24 @@ if ('serviceWorker' in navigator) {
                         700: '#7e5a07',
                         800: '#533c07',
                         900: '#2b1f03',
-                    },
-                    cyber: {
-                        cyan: '#00f0ff',
-                        purple: '#bd00ff',
-                        pink: '#ff0055',
-                        green: '#39ff14'
                     }
+                },
+                fontFamily: {
+                    montserrat: ['Montserrat', 'sans-serif'],
+                    inter: ['Inter', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace']
                 }
             }
         }
     }
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
     body {
         font-family: 'Inter', sans-serif;
-        background-color: #0f172a;
-        color: #0f172a;
+        background-color: #0b1326;
+        color: #dae2fd;
         overflow-x: hidden;
         min-height: 100vh;
         position: relative;
@@ -94,7 +108,13 @@ if ('serviceWorker' in navigator) {
         pointer-events: none;
     }
     h1, h2, h3, h4, .font-title {
-        font-family: 'Outfit', sans-serif;
+        font-family: 'Montserrat', sans-serif;
+    }
+    .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .font-inter {
+        font-family: 'Inter', sans-serif;
     }
     .glass-panel {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);

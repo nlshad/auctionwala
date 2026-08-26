@@ -36,41 +36,42 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuctionWala — #1 Sports Auction App for Cricket, Football & Turf Leagues</title>
+    <title>AuctionWala Pro-Broadcast — #1 Sports Auction App for Cricket, Football & Turf Leagues</title>
     <meta name="description" content="AuctionWala is the premier sports auction app for live player bidding, player registration, team purse management, and tournament streaming worldwide.">
     <link rel="icon" type="image/png" href="<?php echo $uploadPath; ?>auctionwala_logo.png">
     <?php require_once 'components/ui_head.php'; ?>
     <style>
-        .glass-hero {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(24px);
-            border: 1.5px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.12);
+        .pro-surface {
+            background-color: #0b1326;
+            color: #dae2fd;
         }
-        .bento-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            border-radius: 1.25rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        .pro-container {
+            background-color: #131b2e;
+            border: 1px solid #1e293d;
+        }
+        .pro-container-hover {
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .bento-card:hover {
-            border-color: rgba(212, 163, 12, 0.6);
-            box-shadow: 0 20px 40px -10px rgba(212, 163, 12, 0.2);
-            transform: translateY(-3px);
+        .pro-container-hover:hover {
+            border-color: #ff5451;
+            box-shadow: 0 10px 30px -10px rgba(255, 84, 81, 0.25);
+            transform: translateY(-2px);
+        }
+        .pro-card-popular {
+            border: 2px solid #ff5451;
+            box-shadow: 0 0 25px rgba(255, 84, 81, 0.2);
         }
         .whatsapp-float {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             background-color: #25d366;
             color: #fff;
             border-radius: 50px;
             text-align: center;
-            font-size: 30px;
+            font-size: 28px;
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
             z-index: 100;
             display: flex;
@@ -84,177 +85,201 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col justify-between selection:bg-gold-500 selection:text-black">
-
-    <!-- Top Announcement & Social Bar -->
-    <div class="bg-slate-950 text-slate-300 text-xs py-2 px-4 border-b border-slate-800 flex items-center justify-between font-extrabold">
-        <div class="flex items-center gap-2 truncate">
-            <span class="bg-red-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shrink-0">#1 Platform</span>
-            <span class="truncate">World’s Premier Cricket & Sports Auction Platform for Live Player Bidding</span>
-        </div>
-        <div class="hidden md:flex items-center gap-4 text-xs shrink-0">
-            <a href="tel:+917698767767" class="hover:text-amber-400 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-phone text-amber-500"></i> +91 76 98 767 767
-            </a>
-            <span class="text-slate-700">|</span>
-            <a href="https://wa.me/917698767767" target="_blank" class="hover:text-emerald-400 transition flex items-center gap-1.5">
-                <i class="fa-brands fa-whatsapp text-emerald-500"></i> Live Support
-            </a>
-        </div>
-    </div>
+<body class="pro-surface min-h-screen flex flex-col justify-between selection:bg-red-500 selection:text-white font-inter">
 
     <!-- Header Navigation Bar -->
-    <header class="w-full glass-panel border-b border-slate-200/80 px-4 py-3 sm:px-8 sm:py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <header class="w-full bg-[#060e20]/95 backdrop-blur-md border-b border-[#1e293d] px-4 py-3 sm:px-8 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="landing.php" class="flex items-center gap-2">
-                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-9 sm:h-10 object-contain mix-blend-multiply">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain">
             </a>
         </div>
 
-        <nav class="hidden lg:flex items-center gap-6 font-extrabold text-xs text-slate-700 uppercase tracking-wider">
-            <a href="#hero" class="hover:text-amber-600 transition">Home</a>
-            <a href="#today-auctions" class="hover:text-amber-600 transition flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span> Live Today
+        <nav class="hidden lg:flex items-center gap-7 font-montserrat font-bold text-xs text-[#dae2fd] uppercase tracking-wider">
+            <a href="#hero" class="hover:text-[#ff5451] transition">Auctions</a>
+            <a href="#today-auctions" class="hover:text-[#ff5451] transition flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#ff5451] animate-ping"></span> Live Today
             </a>
-            <a href="#upcoming-auctions" class="hover:text-amber-600 transition">Upcoming</a>
-            <a href="#features" class="hover:text-amber-600 transition">Features</a>
-            <a href="#how-it-works" class="hover:text-amber-600 transition">How It Works</a>
-            <a href="#pricing" class="hover:text-amber-600 transition">Pricing</a>
+            <a href="#upcoming-auctions" class="hover:text-[#ff5451] transition">Tournaments</a>
+            <a href="#features" class="hover:text-[#ff5451] transition">Features</a>
+            <a href="#how-it-works" class="hover:text-[#ff5451] transition">How It Works</a>
+            <a href="#pricing" class="hover:text-[#ff5451] transition">Pricing</a>
         </nav>
 
         <div class="flex items-center gap-3">
-            <a href="login.php" class="bg-gradient-to-r from-amber-500 to-gold-600 hover:from-amber-600 hover:to-gold-700 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-md transition transform hover:scale-105 uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-gavel text-xs"></i> Host Your Auction
+            <a href="login.php" class="bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-extrabold text-xs px-5 py-2.5 rounded transition uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-red-500/20">
+                Sign In
             </a>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section id="hero" class="relative py-12 lg:py-20 px-4 max-w-7xl mx-auto w-full">
-        <div class="glass-hero rounded-3xl p-8 lg:p-12 border border-white/80 shadow-2xl relative overflow-hidden">
-            <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-red-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <section id="hero" class="relative py-12 lg:py-16 px-4 max-w-7xl mx-auto w-full">
+        <div class="pro-container rounded-xl p-6 sm:p-10 border border-[#1e293d] relative overflow-hidden">
+            <!-- Background Stadium Image Layer -->
+            <div class="absolute inset-0 z-0 opacity-25 pointer-events-none">
+                <img src="<?php echo $uploadPath; ?>app_bg.jpg" alt="Stadium" class="w-full h-full object-cover">
+            </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-                <div class="lg:col-span-8 space-y-6">
-                    <div class="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-xs font-black text-amber-900 uppercase tracking-wider">
-                        <i class="fa-solid fa-shield-halved text-amber-600"></i> Next-Gen Real-Time Auction Engine
+                <!-- Left Hero Content -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center gap-2 bg-[#171f33] border border-[#ff5451]/40 px-3 py-1 rounded text-xs font-mono text-[#ffb3ad] uppercase tracking-wider shadow-inner">
+                        <i class="fa-solid fa-bolt text-[#ff5451]"></i> NEXT-GEN REAL-TIME AUCTION ENGINE
                     </div>
 
-                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 uppercase tracking-tight leading-none">
-                        Online Cricket Auction App <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-gold-600 to-amber-700">For Live Player Bidding</span>
+                    <h1 class="text-3xl sm:text-5xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight leading-tight">
+                        Online Cricket Auction <br>
+                        App For Live Player <br>
+                        Bidding
                     </h1>
 
-                    <p class="text-slate-600 font-extrabold text-sm sm:text-base leading-relaxed max-w-2xl">
-                        Streamline your sports league auctions with real-time bidding, instant squad updates, player photo registration, franchise budget tracking, and broadcast-ready YouTube stream overlays.
+                    <p class="text-[#94A3B8] font-inter text-sm sm:text-base leading-relaxed max-w-xl">
+                        Streamline your teams, league auctions with real-time bidding, instant squad updates, player photo registration, franchise budget tracking, and broadcast-ready YouTube stream overlays.
                     </p>
 
                     <div class="flex flex-wrap items-center gap-4 pt-2">
-                        <a href="login.php" class="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl transition shadow-xl uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-plus-circle text-amber-400"></i> Create League Auction
+                        <a href="login.php" class="bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-extrabold text-xs sm:text-sm px-6 py-3 rounded transition shadow-lg uppercase tracking-wider flex items-center gap-2">
+                            Host Your Auction
                         </a>
-                        <a href="#today-auctions" class="bg-white/90 border-2 border-slate-300 hover:border-amber-500 text-slate-900 font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl transition shadow-md uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-tv text-red-600"></i> Watch Live Arena
+                        <a href="#today-auctions" class="border border-[#31394d] hover:border-[#ff5451] bg-[#171f33]/80 text-[#F8FAFC] font-montserrat font-bold text-xs sm:text-sm px-6 py-3 rounded transition uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-regular fa-circle-play text-[#ffb95f]"></i> Watch Live Arena
                         </a>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs font-inter text-[#94A3B8] pt-2">
+                        <i class="fa-solid fa-circle-check text-[#22C55E]"></i>
+                        <span>Google & Trustpilot Verified Software (4.9 / 5.0 Rating)</span>
                     </div>
                 </div>
 
-                <!-- Hero Side Badges & Ratings -->
-                <div class="lg:col-span-4 space-y-4">
-                    <div class="bento-card p-5 border border-slate-200/90 shadow-md">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-black text-slate-900 uppercase tracking-wider">Trusted Rating</span>
-                            <span class="text-xs font-black text-amber-600 font-mono">4.9 / 5.0 ★</span>
+                <!-- Right Stadium Visual Showcase -->
+                <div class="lg:col-span-5 relative">
+                    <div class="pro-container rounded-xl overflow-hidden border border-[#1e293d] shadow-2xl relative">
+                        <img src="<?php echo $uploadPath; ?>app_bg.jpg" alt="Live Match Broadcast" class="w-full h-64 sm:h-80 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#060e20] via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-mono">
+                            <span class="bg-[#ff5451] text-white font-bold px-2.5 py-1 rounded uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> PRO BROADCAST
+                            </span>
+                            <span class="bg-[#171f33]/90 text-[#7bd0ff] px-2.5 py-1 rounded border border-[#1e293d]">
+                                1080p60 FULL HD
+                            </span>
                         </div>
-                        <div class="flex items-center gap-2 text-xs font-extrabold text-slate-600">
-                            <i class="fa-solid fa-star text-amber-500"></i>
-                            <span>Google & Trustpilot Verified Software</span>
-                        </div>
-                    </div>
-
-                    <div class="bento-card p-5 bg-gradient-to-br from-slate-900 to-slate-950 text-white shadow-xl">
-                        <div class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">Live Concurrency</div>
-                        <div class="text-2xl font-black font-mono text-white"><?php echo max(1890, $totalBids); ?>+</div>
-                        <div class="text-xs text-slate-400 font-bold mt-1">Real-time bids processed with instant socket sync.</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Today's Live Auctions Section -->
-    <section id="today-auctions" class="py-10 px-4 max-w-7xl mx-auto w-full">
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <span class="w-3.5 h-3.5 rounded-full bg-red-600 animate-ping"></span>
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight flex items-center gap-2 drop-shadow-md">
-                        🔴 Today's Live Player Auctions
-                    </h2>
-                    <p class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Watch active player bidding in real time</p>
+    <!-- Metrics Bar (4-Column Bento Stat Bar) -->
+    <section class="py-6 px-4 max-w-7xl mx-auto w-full">
+        <div class="pro-container rounded-xl p-6 border border-[#1e293d] grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div class="space-y-1">
+                <div class="text-2xl sm:text-3xl font-montserrat font-black text-[#ffb95f] tracking-tight">
+                    <?php echo max(1890, $totalBids); ?>+
+                </div>
+                <div class="text-[11px] font-mono font-medium text-[#94A3B8] uppercase tracking-widest">
+                    LIVE BIDS
                 </div>
             </div>
-            <a href="today_auctions.php" class="bg-white/95 border border-slate-200 hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider flex items-center gap-1">
-                View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+
+            <div class="space-y-1 border-l-0 sm:border-l border-[#1e293d]">
+                <div class="text-2xl sm:text-3xl font-montserrat font-black text-[#F8FAFC] tracking-tight">
+                    <?php echo max(64, $totalTournaments); ?>+
+                </div>
+                <div class="text-[11px] font-mono font-medium text-[#94A3B8] uppercase tracking-widest">
+                    AUCTIONS
+                </div>
+            </div>
+
+            <div class="space-y-1 border-l-0 lg:border-l border-[#1e293d]">
+                <div class="text-2xl sm:text-3xl font-montserrat font-black text-[#7bd0ff] tracking-tight">
+                    <?php echo max(106, $totalTeams); ?>+
+                </div>
+                <div class="text-[11px] font-mono font-medium text-[#94A3B8] uppercase tracking-widest">
+                    TEAMS
+                </div>
+            </div>
+
+            <div class="space-y-1 border-l-0 sm:border-l border-[#1e293d]">
+                <div class="text-2xl sm:text-3xl font-montserrat font-black text-[#22C55E] tracking-tight">
+                    <?php echo max(542, $totalPlayers); ?>+
+                </div>
+                <div class="text-[11px] font-mono font-medium text-[#94A3B8] uppercase tracking-widest">
+                    PLAYERS
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Player Auctions (Today) Section -->
+    <section id="today-auctions" class="py-10 px-4 max-w-7xl mx-auto w-full">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight flex items-center gap-2">
+                    Live Player Auctions (Today)
+                </h2>
+                <p class="text-xs font-inter text-[#94A3B8]">Active bidding rooms happening right now across the platform.</p>
+            </div>
+            <a href="today_auctions.php" class="text-xs font-mono font-bold text-[#ff5451] hover:text-[#ffb3ad] uppercase tracking-wider flex items-center gap-1 transition">
+                VIEW ALL LIVE <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
         </div>
 
         <?php if (empty($liveAuctions)): ?>
-            <div class="bento-card p-8 text-center shadow-md">
-                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 text-slate-400 text-lg">
-                    <i class="fa-solid fa-gavel text-slate-500"></i>
+            <div class="pro-container rounded-xl p-10 text-center shadow-lg">
+                <div class="w-12 h-12 rounded-full bg-[#171f33] flex items-center justify-center mx-auto mb-3 text-[#94A3B8] text-xl">
+                    <i class="fa-solid fa-hourglass-half"></i>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 uppercase">No Auctions Live Right Now</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-1">Check out the upcoming scheduled player auctions below!</p>
+                <h3 class="text-sm font-montserrat font-bold text-[#F8FAFC] uppercase">No Auctions Live Right Now</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-1">There are no live bidding sessions at this exact moment. Check the upcoming schedule below to see what's starting soon!</p>
             </div>
         <?php else: ?>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <?php foreach (array_slice($liveAuctions, 0, 4) as $t): ?>
-                    <div class="auction-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-red-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative cursor-pointer"
+                    <div class="pro-container pro-container-hover rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative cursor-pointer"
                          onclick="window.location.href='index.php?t_id=<?php echo $t['id']; ?>'">
                         
                         <!-- Left Logo -->
-                        <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
+                        <div class="w-full sm:w-36 h-32 sm:h-36 rounded-lg overflow-hidden bg-[#060e20] border border-[#1e293d] shrink-0 relative">
                             <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($t['logo'] ?: 'auctionwala_logo.png'); ?>" alt="Logo" class="w-full h-full object-cover">
-                            <span class="absolute top-2 left-2 bg-red-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> Live
+                            <span class="absolute top-2 left-2 bg-[#ff5451] text-white font-mono font-bold text-[9px] px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> LIVE
                             </span>
                         </div>
 
                         <!-- Right Details Content -->
                         <div class="flex-grow space-y-3 w-full">
-                            <div class="flex items-start justify-between gap-2">
-                                <h3 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-red-700 transition">
-                                    <?php echo htmlspecialchars($t['name']); ?>
-                                </h3>
-                            </div>
+                            <h3 class="font-montserrat font-bold text-[#F8FAFC] text-base sm:text-lg leading-snug hover:text-[#ff5451] transition">
+                                <?php echo htmlspecialchars($t['name']); ?>
+                            </h3>
 
-                            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-slate-600 font-extrabold">
+                            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-[#94A3B8] font-inter">
                                 <div class="flex items-center gap-1.5">
-                                    <i class="fa-solid fa-users text-slate-400 text-xs w-4"></i>
+                                    <i class="fa-solid fa-users text-[#7bd0ff] text-xs w-4"></i>
                                     <span><?php echo $t['max_squad_size_default']; ?> Players/Team</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <i class="fa-solid fa-trophy text-amber-500 text-xs w-4"></i>
+                                    <i class="fa-solid fa-trophy text-[#ffb95f] text-xs w-4"></i>
                                     <span><?php echo number_format($t['total_purse_default']); ?> Points</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <i class="fa-regular fa-clock text-slate-400 text-xs w-4"></i>
+                                    <i class="fa-regular fa-clock text-[#94A3B8] text-xs w-4"></i>
                                     <span><?php echo date('h:i A', strtotime($t['created_at'])); ?></span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <i class="fa-regular fa-calendar text-slate-400 text-xs w-4"></i>
+                                    <i class="fa-regular fa-calendar text-[#94A3B8] text-xs w-4"></i>
                                     <span><?php echo date('d-m-Y', strtotime($t['created_at'])); ?></span>
                                 </div>
                             </div>
 
                             <div class="flex items-center justify-between gap-2 pt-1">
-                                <div class="bg-sky-50 text-sky-800 font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-sky-100 flex-grow truncate">
-                                    <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
+                                <div class="bg-[#171f33] text-[#7bd0ff] font-mono px-3 py-1.5 rounded text-xs flex items-center gap-1.5 border border-[#1e293d] flex-grow truncate">
+                                    <i class="fa-solid fa-location-dot text-[#7bd0ff] text-xs"></i>
                                     <span class="truncate"><?php echo htmlspecialchars($t['place'] ?? 'League Arena'); ?></span>
                                 </div>
-                                <a href="index.php?t_id=<?php echo $t['id']; ?>" onclick="event.stopPropagation();" class="bg-red-600 hover:bg-red-500 text-white font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
+                                <a href="index.php?t_id=<?php echo $t['id']; ?>" onclick="event.stopPropagation();" class="bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-xs px-4 py-1.5 rounded transition uppercase tracking-wider shrink-0 flex items-center gap-1">
                                     <i class="fa-solid fa-tv text-xs"></i> Watch Stream
                                 </a>
                             </div>
@@ -269,79 +294,81 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
     <!-- Upcoming Scheduled Auctions Section -->
     <section id="upcoming-auctions" class="py-10 px-4 max-w-7xl mx-auto w-full">
         <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <span class="w-3.5 h-3.5 rounded-full bg-amber-500"></span>
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight flex items-center gap-2 drop-shadow-md">
-                        📅 Upcoming Scheduled Auctions
-                    </h2>
-                    <p class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Scheduled player auctions ready for player registration</p>
-                </div>
+            <div>
+                <h2 class="text-xl sm:text-2xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight flex items-center gap-2">
+                    Upcoming Scheduled Auctions
+                </h2>
+                <p class="text-xs font-inter text-[#94A3B8]">Explore upcoming tournaments and secure your spot.</p>
             </div>
-            <a href="upcoming_auctions.php" class="bg-white/95 border border-slate-200 hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider flex items-center gap-1">
-                View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            <a href="upcoming_auctions.php" class="text-xs font-mono font-bold text-[#ffb95f] hover:text-[#ffddb8] uppercase tracking-wider flex items-center gap-1 transition">
+                VIEW ALL UPCOMING <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
         </div>
 
         <?php if (empty($upcomingAuctions)): ?>
-            <div class="bento-card p-8 text-center shadow-md">
-                <h3 class="text-sm font-black text-slate-800 uppercase">No Upcoming Auctions Listed</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-1">Host your league on AuctionWala today!</p>
+            <div class="pro-container rounded-xl p-8 text-center shadow-md">
+                <h3 class="text-sm font-montserrat font-bold text-[#F8FAFC] uppercase">No Upcoming Auctions Listed</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-1">Host your league on AuctionWala today!</p>
             </div>
         <?php else: ?>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <?php foreach (array_slice($upcomingAuctions, 0, 4) as $t): ?>
-                    <div class="auction-card bg-white/95 rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-500 transition duration-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center relative cursor-pointer"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <?php foreach (array_slice($upcomingAuctions, 0, 3) as $t): ?>
+                    <div class="pro-container pro-container-hover rounded-xl p-5 flex flex-col justify-between space-y-4 relative cursor-pointer"
                          onclick="window.location.href='index.php?t_id=<?php echo $t['id']; ?>'">
                         
-                        <!-- Left Logo -->
-                        <div class="w-full sm:w-36 h-32 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm relative">
-                            <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($t['logo'] ?: 'auctionwala_logo.png'); ?>" alt="Logo" class="w-full h-full object-cover">
-                            <?php if ($t['registration_enabled']): ?>
-                                <span class="absolute top-2 left-2 bg-emerald-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
-                                    Open
-                                </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Right Details Content -->
-                        <div class="flex-grow space-y-3 w-full">
-                            <div class="flex items-start justify-between gap-2">
-                                <h3 class="font-black text-slate-900 text-base sm:text-lg leading-snug hover:text-amber-800 transition">
-                                    <?php echo htmlspecialchars($t['name']); ?>
-                                </h3>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-slate-600 font-extrabold">
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fa-solid fa-users text-slate-400 text-xs w-4"></i>
-                                    <span><?php echo $t['max_squad_size_default']; ?> Players/Team</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fa-solid fa-trophy text-amber-500 text-xs w-4"></i>
-                                    <span><?php echo number_format($t['total_purse_default']); ?> Points</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fa-regular fa-clock text-slate-400 text-xs w-4"></i>
-                                    <span><?php echo date('h:i A', strtotime($t['created_at'])); ?></span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fa-regular fa-calendar text-slate-400 text-xs w-4"></i>
-                                    <span><?php echo date('d-m-Y', strtotime($t['created_at'])); ?></span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2 pt-1">
-                                <div class="bg-sky-50 text-sky-800 font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-sky-100 flex-grow truncate">
-                                    <i class="fa-solid fa-location-dot text-sky-600 text-xs"></i>
-                                    <span class="truncate"><?php echo htmlspecialchars($t['place'] ?? 'League Arena'); ?></span>
-                                </div>
+                        <!-- Top Thumbnail Image Banner -->
+                        <div class="w-full h-40 rounded-lg overflow-hidden bg-[#060e20] border border-[#1e293d] relative">
+                            <img src="<?php echo $uploadPath; ?><?php echo htmlspecialchars($t['logo'] ?: 'app_bg.jpg'); ?>" alt="Tournament Banner" class="w-full h-full object-cover">
+                            <div class="absolute top-2 right-2">
                                 <?php if ($t['registration_enabled']): ?>
-                                    <a href="register.php?t_id=<?php echo $t['id']; ?>" onclick="event.stopPropagation();" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-lg transition shadow-sm uppercase tracking-wider shrink-0 flex items-center gap-1">
-                                        <i class="fa-solid fa-id-card text-xs"></i> Register
-                                    </a>
+                                    <span class="bg-[#22C55E] text-white font-mono font-bold text-[9px] px-2.5 py-1 rounded uppercase tracking-wider shadow">
+                                        REGISTRATION OPEN
+                                    </span>
+                                <?php else: ?>
+                                    <span class="bg-[#ffb95f] text-[#060e20] font-mono font-bold text-[9px] px-2.5 py-1 rounded uppercase tracking-wider shadow">
+                                        UPCOMING
+                                    </span>
                                 <?php endif; ?>
                             </div>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="space-y-3">
+                            <h3 class="font-montserrat font-bold text-[#F8FAFC] text-base leading-snug hover:text-[#ff5451] transition">
+                                <?php echo htmlspecialchars($t['name']); ?>
+                            </h3>
+
+                            <div class="space-y-1.5 text-xs text-[#94A3B8] font-inter">
+                                <div class="flex justify-between border-b border-[#1e293d] pb-1">
+                                    <span>Players/Team:</span>
+                                    <span class="font-mono font-bold text-[#F8FAFC]"><?php echo $t['max_squad_size_default']; ?></span>
+                                </div>
+                                <div class="flex justify-between border-b border-[#1e293d] pb-1">
+                                    <span>Total Purse/Team:</span>
+                                    <span class="font-mono font-bold text-[#ffb95f]"><?php echo number_format($t['total_purse_default']); ?></span>
+                                </div>
+                                <div class="flex justify-between border-b border-[#1e293d] pb-1">
+                                    <span>Date:</span>
+                                    <span class="font-mono text-[#F8FAFC]"><?php echo date('F d, Y', strtotime($t['created_at'])); ?></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Time:</span>
+                                    <span class="font-mono text-[#F8FAFC]"><?php echo date('h:i A', strtotime($t['created_at'])); ?> IST</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="pt-2">
+                            <?php if ($t['registration_enabled']): ?>
+                                <a href="register.php?t_id=<?php echo $t['id']; ?>" onclick="event.stopPropagation();" class="w-full bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block shadow">
+                                    REGISTER NOW
+                                </a>
+                            <?php else: ?>
+                                <a href="index.php?t_id=<?php echo $t['id']; ?>" onclick="event.stopPropagation();" class="w-full border border-[#31394d] hover:border-[#ff5451] bg-[#171f33] text-[#F8FAFC] font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block">
+                                    VIEW DETAILS
+                                </a>
+                            <?php endif; ?>
                         </div>
 
                     </div>
@@ -350,194 +377,246 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
         <?php endif; ?>
     </section>
 
-    <!-- Platform Numbers Section -->
-    <section class="py-12 bg-slate-950 text-white border-y border-slate-800">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <h2 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
-                    AuctionWala <span class="text-amber-400">in Numbers</span>
-                </h2>
-                <p class="text-xs text-slate-400 font-extrabold mt-1.5 uppercase tracking-wider">Trusted by thousands of cricket league organizers & team owners</p>
-            </div>
-
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bento-card p-6 bg-slate-900 border-slate-800 text-center shadow-lg">
-                    <div class="text-3xl sm:text-4xl font-black font-mono text-amber-400"><?php echo max(64, $totalTournaments); ?>+</div>
-                    <div class="text-xs font-black text-slate-300 uppercase tracking-widest mt-2">Auctions Hosted</div>
-                </div>
-                <div class="bento-card p-6 bg-slate-900 border-slate-800 text-center shadow-lg">
-                    <div class="text-3xl sm:text-4xl font-black font-mono text-white"><?php echo max(106, $totalTeams); ?>+</div>
-                    <div class="text-xs font-black text-slate-300 uppercase tracking-widest mt-2">Franchise Teams</div>
-                </div>
-                <div class="bento-card p-6 bg-slate-900 border-slate-800 text-center shadow-lg">
-                    <div class="text-3xl sm:text-4xl font-black font-mono text-emerald-400"><?php echo max(542, $totalPlayers); ?>+</div>
-                    <div class="text-xs font-black text-slate-300 uppercase tracking-widest mt-2">Verified Players</div>
-                </div>
-                <div class="bento-card p-6 bg-slate-900 border-slate-800 text-center shadow-lg">
-                    <div class="text-3xl sm:text-4xl font-black font-mono text-cyan-400"><?php echo max(1890, $totalBids); ?>+</div>
-                    <div class="text-xs font-black text-slate-300 uppercase tracking-widest mt-2">Live Bids Placed</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Our Features Section -->
+    <!-- Core Auction Features Section -->
     <section id="features" class="py-16 px-4 max-w-7xl mx-auto w-full">
         <div class="text-center max-w-2xl mx-auto mb-12">
-            <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white drop-shadow-md">
-                Our <span class="text-amber-400">Features</span>
+            <h2 class="text-2xl sm:text-4xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight">
+                Core Auction Features
             </h2>
-            <p class="text-xs text-slate-300 font-extrabold mt-1.5 uppercase tracking-widest">Everything you need to manage & stream professional sports auctions</p>
+            <p class="text-xs text-[#94A3B8] font-inter mt-1.5">Everything you need to host professional sports auctions online with real-time sync.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Feature 1 -->
-            <div class="bento-card p-6">
-                <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 mb-4 text-lg">
+            <div class="pro-container pro-container-hover rounded-xl p-6">
+                <div class="w-10 h-10 rounded bg-[#ff5451]/15 border border-[#ff5451]/30 flex items-center justify-center text-[#ff5451] mb-4 text-lg">
                     <i class="fa-solid fa-gavel"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900 uppercase">Live Real-Time Bidding</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-2 leading-relaxed">Experience dynamic player bidding with instant sound FX, bidder team highlights, and zero-latency state synchronization.</p>
+                <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Live Bidding</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-2 leading-relaxed">Experience real-time player bidding with dynamic updates and seamless functionality across all spectator screens.</p>
             </div>
 
             <!-- Feature 2 -->
-            <div class="bento-card p-6">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 mb-4 text-lg">
+            <div class="pro-container pro-container-hover rounded-xl p-6">
+                <div class="w-10 h-10 rounded bg-[#ffb95f]/15 border border-[#ffb95f]/30 flex items-center justify-center text-[#ffb95f] mb-4 text-lg">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900 uppercase">Tournament Management</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-2 leading-relaxed">Customize purse defaults, base prices, bid increment slabs, squad caps, and category limits per league.</p>
+                <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Tournament Management</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-2 leading-relaxed">Create and manage tournaments effortlessly with customizable settings for teams, players, bid increments, and purse limits.</p>
             </div>
 
             <!-- Feature 3 -->
-            <div class="bento-card p-6">
-                <div class="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-600 mb-4 text-lg">
+            <div class="pro-container pro-container-hover rounded-xl p-6">
+                <div class="w-10 h-10 rounded bg-[#7bd0ff]/15 border border-[#7bd0ff]/30 flex items-center justify-center text-[#7bd0ff] mb-4 text-lg">
                     <i class="fa-solid fa-users-gear"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900 uppercase">Franchise Team Portals</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-2 leading-relaxed">Organize franchise teams with custom logos, live purse remaining progress bars, and full squad rosters.</p>
+                <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Franchise Portals</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-2 leading-relaxed">Dedicated portals for franchise team owners to track live purse balance, squad roster Composition, and bid history.</p>
             </div>
 
             <!-- Feature 4 -->
-            <div class="bento-card p-6">
-                <div class="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-600 mb-4 text-lg">
+            <div class="pro-container pro-container-hover rounded-xl p-6">
+                <div class="w-10 h-10 rounded bg-[#22C55E]/15 border border-[#22C55E]/30 flex items-center justify-center text-[#22C55E] mb-4 text-lg">
                     <i class="fa-solid fa-id-card"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900 uppercase">Player Registration Pool</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-2 leading-relaxed">Allow candidates to register via public form, upload cropped profile photos, and submit registration UTR receipts.</p>
+                <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Player Registration</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-2 leading-relaxed">Allow players to register online with profile photos, stats, and base prices ready for the live player auction pool.</p>
             </div>
 
             <!-- Feature 5 -->
-            <div class="bento-card p-6">
-                <div class="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-600 mb-4 text-lg">
-                    <i class="fa-solid fa-wifi"></i>
+            <div class="pro-container pro-container-hover rounded-xl p-6">
+                <div class="w-10 h-10 rounded bg-[#ff5451]/15 border border-[#ff5451]/30 flex items-center justify-center text-[#ff5451] mb-4 text-lg">
+                    <i class="fa-solid fa-rotate"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900 uppercase">Real-Time Concurrency</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-2 leading-relaxed">Keep thousands of live viewers synced across smartphones, tablets, laptops, and smart TVs simultaneously.</p>
+                <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Real-Time Concurrency</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-2 leading-relaxed">Ultra-low latency socket state engine ensures instantaneous bid updates across mobile and web users.</p>
             </div>
 
             <!-- Feature 6 -->
-            <div class="bento-card p-6">
-                <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-600 mb-4 text-lg">
+            <div class="pro-container pro-container-hover rounded-xl p-6">
+                <div class="w-10 h-10 rounded bg-[#7bd0ff]/15 border border-[#7bd0ff]/30 flex items-center justify-center text-[#7bd0ff] mb-4 text-lg">
                     <i class="fa-solid fa-share-nodes"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900 uppercase">Shareable Spectator Links</h3>
-                <p class="text-xs text-slate-600 font-extrabold mt-2 leading-relaxed">Share your tournament link (`index.php?t_id=XX`) for instant viewing without forcing spectators to log in.</p>
+                <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Shareable Spectator Links</h3>
+                <p class="text-xs text-[#94A3B8] font-inter mt-2 leading-relaxed">Share unique tournament room links for live public spectator view without requiring login rights.</p>
             </div>
         </div>
     </section>
 
     <!-- How It Works Section -->
-    <section id="how-it-works" class="py-16 bg-slate-900 text-white border-y border-slate-800">
+    <section id="how-it-works" class="py-16 bg-[#060e20] border-y border-[#1e293d]">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center max-w-2xl mx-auto mb-12">
-                <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white">
-                    How It <span class="text-amber-400">Works</span>
+                <h2 class="text-2xl sm:text-4xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight">
+                    How It Works
                 </h2>
-                <p class="text-xs text-slate-400 font-extrabold mt-1.5 uppercase tracking-widest">Follow these simple steps to host your auction</p>
+                <p class="text-xs text-[#94A3B8] font-inter mt-1.5">Get your professional auction up and running in four simple steps.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bento-card p-6 bg-slate-950 border-slate-800 text-slate-200">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-base mb-4 font-mono">01</div>
-                    <h3 class="text-base font-black text-white uppercase">Create Auction</h3>
-                    <p class="text-xs text-slate-400 font-extrabold mt-2">Set up tournament details, total purse per team, and maximum squad size.</p>
+                <!-- Step 1 -->
+                <div class="pro-container rounded-xl p-6 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-[#ff5451] bg-[#171f33] text-[#ff5451] font-mono font-bold flex items-center justify-center text-lg mx-auto shadow-lg">
+                        01
+                    </div>
+                    <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Create Auction</h3>
+                    <p class="text-xs text-[#94A3B8] font-inter">Set up your tournament rules, total purse, and base prices.</p>
                 </div>
 
-                <div class="bento-card p-6 bg-slate-950 border-slate-800 text-slate-200">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-base mb-4 font-mono">02</div>
-                    <h3 class="text-base font-black text-white uppercase">Add Teams</h3>
-                    <p class="text-xs text-slate-400 font-extrabold mt-2">Add franchise teams, logos, owner details, and purse allocations.</p>
+                <!-- Step 2 -->
+                <div class="pro-container rounded-xl p-6 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-[#ffb95f] bg-[#171f33] text-[#ffb95f] font-mono font-bold flex items-center justify-center text-lg mx-auto shadow-lg">
+                        02
+                    </div>
+                    <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Add Teams</h3>
+                    <p class="text-xs text-[#94A3B8] font-inter">Register franchise teams and assign initial purse budgets.</p>
                 </div>
 
-                <div class="bento-card p-6 bg-slate-950 border-slate-800 text-slate-200">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-base mb-4 font-mono">03</div>
-                    <h3 class="text-base font-black text-white uppercase">Add Players</h3>
-                    <p class="text-xs text-slate-400 font-extrabold mt-2">Share registration link for players to fill details and upload photos.</p>
+                <!-- Step 3 -->
+                <div class="pro-container rounded-xl p-6 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-[#7bd0ff] bg-[#171f33] text-[#7bd0ff] font-mono font-bold flex items-center justify-center text-lg mx-auto shadow-lg">
+                        03
+                    </div>
+                    <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Add Players</h3>
+                    <p class="text-xs text-[#94A3B8] font-inter">Import players or share a link for self-registration.</p>
                 </div>
 
-                <div class="bento-card p-6 bg-slate-950 border-slate-800 text-slate-200">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-base mb-4 font-mono">04</div>
-                    <h3 class="text-base font-black text-white uppercase">Start Bidding</h3>
-                    <p class="text-xs text-slate-400 font-extrabold mt-2">Bring players to the auction block and execute live real-time bidding!</p>
+                <!-- Step 4 -->
+                <div class="pro-container rounded-xl p-6 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-full border-2 border-[#22C55E] bg-[#171f33] text-[#22C55E] font-mono font-bold flex items-center justify-center text-lg mx-auto shadow-lg">
+                        04
+                    </div>
+                    <h3 class="text-base font-montserrat font-bold text-[#F8FAFC] uppercase">Start Bidding</h3>
+                    <p class="text-xs text-[#94A3B8] font-inter">Launch live auction and execute real-time player bids.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
+    <!-- Pricing Plans Section -->
     <section id="pricing" class="py-16 px-4 max-w-7xl mx-auto w-full">
         <div class="text-center max-w-2xl mx-auto mb-12">
-            <h2 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white drop-shadow-md">
-                Our <span class="text-amber-400">Pricing</span> Plans
+            <h2 class="text-2xl sm:text-4xl font-montserrat font-black text-[#F8FAFC] uppercase tracking-tight">
+                Pricing Plans
             </h2>
-            <p class="text-xs text-slate-300 font-extrabold mt-1.5 uppercase tracking-widest">Affordable transparent pricing for local & professional tournaments</p>
+            <p class="text-xs text-[#94A3B8] font-inter mt-1.5">Choose the perfect plan for your tournament size and needs.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Plan 1 -->
-            <div class="bento-card p-6 border-2 border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Free Tier</div>
-                    <h3 class="text-xl font-black text-slate-900 uppercase mt-1">Starter</h3>
-                    <div class="text-2xl font-black text-amber-600 font-mono mt-3">Free</div>
-                    <p class="text-xs text-slate-600 font-extrabold mt-2">Up to 3 Teams. Perfect for mini-leagues & trial auctions.</p>
+            <!-- Plan 1: Starter -->
+            <div class="pro-container rounded-xl p-6 flex flex-col justify-between space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-montserrat font-bold text-[#F8FAFC] uppercase">Starter</h3>
+                        <div class="text-2xl font-montserrat font-black text-[#F8FAFC] mt-2">
+                            ₹999 <span class="text-xs text-[#94A3B8] font-inter font-normal">/ auction</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-xs font-inter text-[#94A3B8]">
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Up to 4 Teams
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Up to 60 Players
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Real-time Arena
+                        </li>
+                    </ul>
                 </div>
-                <a href="login.php" class="mt-6 w-full bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2.5 rounded-xl transition text-center uppercase tracking-wider block">Get Started</a>
+                <a href="login.php" class="w-full border border-[#31394d] hover:border-[#ff5451] bg-[#171f33] text-[#F8FAFC] font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block">
+                    CHOOSE PLAN
+                </a>
             </div>
 
-            <!-- Plan 2 -->
-            <div class="bento-card p-6 border-2 border-amber-400 flex flex-col justify-between relative overflow-hidden shadow-lg">
-                <span class="absolute top-0 right-0 bg-amber-500 text-slate-950 font-black text-[9px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">Popular</span>
-                <div>
-                    <div class="text-xs font-black text-amber-700 uppercase tracking-widest">Standard</div>
-                    <h3 class="text-xl font-black text-slate-900 uppercase mt-1">League</h3>
-                    <div class="text-2xl font-black text-slate-900 font-mono mt-3">₹1,999 <span class="text-xs font-extrabold text-slate-500">/ Auction</span></div>
-                    <p class="text-xs text-slate-600 font-extrabold mt-2">Up to 6 Teams. Full spectator room & real-time bidding engine.</p>
+            <!-- Plan 2: League (Popular Highlighted) -->
+            <div class="pro-container pro-card-popular rounded-xl p-6 flex flex-col justify-between space-y-6 relative overflow-hidden">
+                <span class="absolute top-0 right-0 bg-[#ff5451] text-white font-mono font-bold text-[9px] px-3 py-1 rounded-bl uppercase tracking-wider">
+                    POPULAR
+                </span>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-montserrat font-bold text-[#F8FAFC] uppercase">League</h3>
+                        <div class="text-2xl font-montserrat font-black text-[#F8FAFC] mt-2">
+                            ₹1,999 <span class="text-xs text-[#94A3B8] font-inter font-normal">/ auction</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-xs font-inter text-[#94A3B8]">
+                        <li class="flex items-center gap-2 text-[#F8FAFC]">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Up to 8 Teams
+                        </li>
+                        <li class="flex items-center gap-2 text-[#F8FAFC]">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Up to 120 Players
+                        </li>
+                        <li class="flex items-center gap-2 text-[#F8FAFC]">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Shareable Domain
+                        </li>
+                        <li class="flex items-center gap-2 text-[#F8FAFC]">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Player Self-Registration
+                        </li>
+                    </ul>
                 </div>
-                <a href="login.php" class="mt-6 w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 rounded-xl transition text-center uppercase tracking-wider block shadow-md">Select Plan</a>
+                <a href="login.php" class="w-full bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block shadow">
+                    STARTER PLAN
+                </a>
             </div>
 
-            <!-- Plan 3 -->
-            <div class="bento-card p-6 border-2 border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Professional</div>
-                    <h3 class="text-xl font-black text-slate-900 uppercase mt-1">Pro League</h3>
-                    <div class="text-2xl font-black text-slate-900 font-mono mt-3">₹2,999 <span class="text-xs font-extrabold text-slate-500">/ Auction</span></div>
-                    <p class="text-xs text-slate-600 font-extrabold mt-2">Up to 12 Teams. Player registration pool & photo cropping.</p>
+            <!-- Plan 3: Pro League -->
+            <div class="pro-container rounded-xl p-6 flex flex-col justify-between space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-montserrat font-bold text-[#F8FAFC] uppercase">Pro League</h3>
+                        <div class="text-2xl font-montserrat font-black text-[#F8FAFC] mt-2">
+                            ₹2,999 <span class="text-xs text-[#94A3B8] font-inter font-normal">/ auction</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-xs font-inter text-[#94A3B8]">
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Up to 12 Teams
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Up to 200 Players
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Pro Live Analytics
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Stream Overlay
+                        </li>
+                    </ul>
                 </div>
-                <a href="login.php" class="mt-6 w-full bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2.5 rounded-xl transition text-center uppercase tracking-wider block">Select Plan</a>
+                <a href="login.php" class="w-full border border-[#31394d] hover:border-[#ff5451] bg-[#171f33] text-[#F8FAFC] font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block">
+                    CHOOSE PLAN
+                </a>
             </div>
 
-            <!-- Plan 4 -->
-            <div class="bento-card p-6 border-2 border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Enterprise</div>
-                    <h3 class="text-xl font-black text-slate-900 uppercase mt-1">Premier</h3>
-                    <div class="text-2xl font-black text-slate-900 font-mono mt-3">₹4,999 <span class="text-xs font-extrabold text-slate-500">/ Auction</span></div>
-                    <p class="text-xs text-slate-600 font-extrabold mt-2">Up to 16+ Teams. Broadcast stream overlay & priority support.</p>
+            <!-- Plan 4: Premier -->
+            <div class="pro-container rounded-xl p-6 flex flex-col justify-between space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-montserrat font-bold text-[#F8FAFC] uppercase">Premier</h3>
+                        <div class="text-2xl font-montserrat font-black text-[#F8FAFC] mt-2">
+                            ₹4,999 <span class="text-xs text-[#94A3B8] font-inter font-normal">/ auction</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-xs font-inter text-[#94A3B8]">
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Unlimited Teams
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Unlimited Players
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Priority Support
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-[#22C55E]"></i> Custom Branding
+                        </li>
+                    </ul>
                 </div>
-                <a href="login.php" class="mt-6 w-full bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2.5 rounded-xl transition text-center uppercase tracking-wider block">Select Plan</a>
+                <a href="login.php" class="w-full border border-[#31394d] hover:border-[#ff5451] bg-[#171f33] text-[#F8FAFC] font-montserrat font-bold text-xs py-2.5 rounded transition uppercase tracking-wider text-center block">
+                    CHOOSE PLAN
+                </a>
             </div>
         </div>
     </section>
@@ -548,50 +627,61 @@ $uploadPath = is_dir('uploads') ? 'uploads/' : '../uploads/';
     </a>
 
     <!-- Footer Section -->
-    <footer class="bg-slate-950 text-slate-400 border-t border-slate-800 py-12 px-4 mt-12">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs font-extrabold">
+    <footer class="bg-[#060e20] border-t border-[#1e293d] py-12 px-4 mt-12">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs">
             <div class="space-y-3">
                 <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 object-contain">
-                <p class="text-slate-400 leading-relaxed">AuctionWala is the premier sports auction app for live player bidding, player registration, team purse management, and tournament streaming worldwide.</p>
+                <p class="text-[#94A3B8] leading-relaxed">The ultimate platform for hosting professional-grade online sports auctions. Real-time bidding, team account management, and broadcast-ready features.</p>
+                <div class="flex items-center gap-3 pt-2 text-[#94A3B8]">
+                    <a href="https://wa.me/917698767767" target="_blank" class="hover:text-white"><i class="fa-brands fa-whatsapp text-lg"></i></a>
+                    <a href="#" class="hover:text-white"><i class="fa-solid fa-share-nodes text-lg"></i></a>
+                </div>
             </div>
 
             <div>
-                <h4 class="text-white text-sm font-black uppercase tracking-wider mb-3">Quick Navigation</h4>
-                <ul class="space-y-2">
-                    <li><a href="#hero" class="hover:text-amber-400 transition">Home</a></li>
-                    <li><a href="today_auctions.php" class="hover:text-amber-400 transition">Today's Live Auctions</a></li>
-                    <li><a href="upcoming_auctions.php" class="hover:text-amber-400 transition">Upcoming Scheduled Auctions</a></li>
-                    <li><a href="#features" class="hover:text-amber-400 transition">Our Features</a></li>
-                    <li><a href="#pricing" class="hover:text-amber-400 transition">Pricing Plans</a></li>
+                <h4 class="font-montserrat font-bold text-[#F8FAFC] text-xs uppercase tracking-wider mb-3">QUICK NAVIGATION</h4>
+                <ul class="space-y-2 text-[#94A3B8]">
+                    <li><a href="#today-auctions" class="hover:text-[#ff5451] transition">Live Auctions</a></li>
+                    <li><a href="#upcoming-auctions" class="hover:text-[#ff5451] transition">Upcoming Tournaments</a></li>
+                    <li><a href="#features" class="hover:text-[#ff5451] transition">Feature Overview</a></li>
+                    <li><a href="#pricing" class="hover:text-[#ff5451] transition">Pricing Plans</a></li>
+                    <li><a href="#how-it-works" class="hover:text-[#ff5451] transition">About Us</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="text-white text-sm font-black uppercase tracking-wider mb-3">Portals & Support</h4>
-                <ul class="space-y-2">
-                    <li><a href="login.php" class="hover:text-amber-400 transition">Organizer Login</a></li>
-                    <li><a href="register.php" class="hover:text-amber-400 transition">Player Registration Portal</a></li>
-                    <li><a href="https://wa.me/917698767767" target="_blank" class="hover:text-emerald-400 transition">WhatsApp Support (+91 76 98 767 767)</a></li>
+                <h4 class="font-montserrat font-bold text-[#F8FAFC] text-xs uppercase tracking-wider mb-3">PORTALS & SUPPORT</h4>
+                <ul class="space-y-2 text-[#94A3B8]">
+                    <li><a href="login.php" class="hover:text-[#ff5451] transition">Organizer Login</a></li>
+                    <li><a href="login.php" class="hover:text-[#ff5451] transition">Franchise Portal</a></li>
+                    <li><a href="register.php" class="hover:text-[#ff5451] transition">Player Registration</a></li>
+                    <li><a href="https://wa.me/917698767767" target="_blank" class="hover:text-[#22C55E] transition">Help Center & FAQs</a></li>
+                    <li><a href="https://wa.me/917698767767" target="_blank" class="hover:text-[#22C55E] transition">Contact Support</a></li>
                 </ul>
             </div>
 
-            <div>
-                <h4 class="text-white text-sm font-black uppercase tracking-wider mb-3">Verified Ratings</h4>
-                <div class="space-y-2 text-slate-300">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-star text-amber-400"></i>
-                        <span>Google Rating: <strong>4.8 / 5.0</strong></span>
+            <div class="space-y-3">
+                <h4 class="font-montserrat font-bold text-[#F8FAFC] text-xs uppercase tracking-wider mb-3">AUTHENTICATED RATINGS</h4>
+                <div class="pro-container rounded p-3 text-xs space-y-1.5">
+                    <div class="flex items-center gap-1.5 text-[#ffb95f]">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        <span class="font-mono text-[#F8FAFC] font-bold">4.9 / 5.0</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-star text-amber-400"></i>
-                        <span>Trustpilot Rating: <strong>4.9 / 5.0</strong></span>
-                    </div>
+                    <p class="text-[10px] text-[#94A3B8]">Trustpilot & Google Verified Sports Software</p>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto border-t border-slate-900 pt-6 text-center text-[10px] uppercase tracking-widest text-slate-500 font-extrabold">
-            © 2026 <strong>AuctionWala</strong>. All Rights Reserved. Built for premier sports events.
+        <div class="max-w-7xl mx-auto border-t border-[#1e293d] pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#94A3B8] font-inter gap-4">
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-white">Privacy Policy</a>
+                <a href="#" class="hover:text-white">Terms of Service</a>
+                <a href="#" class="hover:text-white">API Documentation</a>
+                <a href="#" class="hover:text-white">Press Kit</a>
+            </div>
+            <div>
+                © 2026 AuctionWala. All Rights Reserved. Broadcast Ready Systems.
+            </div>
         </div>
     </footer>
 
