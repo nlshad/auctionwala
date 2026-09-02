@@ -431,6 +431,11 @@ $specUrl = $baseUrl . '/public/index.php?t=' . ($activeTournament['code'] ?? 'sm
                     <button onclick="openCreateModal()" class="bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-extrabold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-red-500/20 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus text-xs"></i> New League
                     </button>
+                    <?php if ($activeTournament): ?>
+                        <button onclick="deleteLeague(<?php echo (int)$activeTournament['id']; ?>, '<?php echo htmlspecialchars(addslashes($activeTournament['name'])); ?>')" class="bg-[#060e20] hover:bg-red-500/20 text-[#94A3B8] hover:text-[#ff5451] border border-[#1e293d] hover:border-red-500/50 font-montserrat font-bold px-3 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5" title="Delete Active League">
+                            <i class="fa-solid fa-trash-can text-[#ff5451]"></i> <span class="hidden sm:inline">Delete</span>
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -594,14 +599,17 @@ $specUrl = $baseUrl . '/public/index.php?t=' . ($activeTournament['code'] ?? 'sm
 
                                 <div class="pt-2 border-t border-[#1e293d] flex items-center justify-between gap-2">
                                     <?php if (!$isCurrent): ?>
-                                        <a href="index.php?switch_t=<?php echo $tItem['id']; ?>" class="w-full bg-[#171f33] hover:bg-[#1e293d] text-[#F8FAFC] font-montserrat font-bold text-[11px] py-1.5 rounded transition text-center uppercase tracking-wider">
+                                        <a href="index.php?switch_t=<?php echo $tItem['id']; ?>" class="flex-grow bg-[#171f33] hover:bg-[#1e293d] text-[#F8FAFC] font-montserrat font-bold text-[11px] py-1.5 rounded transition text-center uppercase tracking-wider">
                                             Switch to League
                                         </a>
                                     <?php else: ?>
-                                        <a href="../admin/auction.php" class="w-full bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-[11px] py-1.5 rounded transition text-center uppercase tracking-wider shadow">
+                                        <a href="../admin/auction.php" class="flex-grow bg-[#ff5451] hover:bg-[#ef4444] text-white font-montserrat font-bold text-[11px] py-1.5 rounded transition text-center uppercase tracking-wider shadow">
                                             Open Auction Desk
                                         </a>
                                     <?php endif; ?>
+                                    <button onclick="deleteLeague(<?php echo $tItem['id']; ?>, '<?php echo htmlspecialchars(addslashes($tItem['name'])); ?>')" class="bg-[#171f33] hover:bg-red-500/20 text-[#94A3B8] hover:text-[#ff5451] border border-[#1e293d] hover:border-red-500/40 px-2.5 py-1.5 rounded transition text-xs" title="Delete League">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -714,6 +722,31 @@ $specUrl = $baseUrl . '/public/index.php?t=' . ($activeTournament['code'] ?? 'sm
                 }
             } catch (err) {
                 alert('Error creating tournament: ' + err.message);
+            }
+        }
+
+        async function deleteLeague(id, name) {
+            if (!confirm(`Are you sure you want to permanently delete "${name}"?\n\nThis will remove all teams, registered players, and live bidding records for this league!`)) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('tournament_id', id);
+
+                const res = await fetch('../api/delete_tournament.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = 'index.php';
+                } else {
+                    alert(data.error || 'Failed to delete tournament.');
+                }
+            } catch (err) {
+                alert('Error deleting tournament: ' + err.message);
             }
         }
     </script>
