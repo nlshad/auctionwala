@@ -184,6 +184,17 @@ try {
          }
      } catch (\Exception $ex) {}
 
+     // Auto-heal primary key AUTO_INCREMENT constraints on core tables
+     try {
+         $pdo->exec("ALTER TABLE tournaments MODIFY id INT AUTO_INCREMENT");
+     } catch (\PDOException $ex) {}
+     try {
+         $pdo->exec("ALTER TABLE users MODIFY id INT AUTO_INCREMENT");
+         $pdo->exec("ALTER TABLE teams MODIFY id INT AUTO_INCREMENT");
+         $pdo->exec("ALTER TABLE players MODIFY id INT AUTO_INCREMENT");
+         $pdo->exec("ALTER TABLE bids MODIFY id INT AUTO_INCREMENT");
+     } catch (\PDOException $ex) {}
+
      // Ensure default tournament row exists
      try {
          $chk = $pdo->query("SELECT COUNT(*) FROM tournaments WHERE id = 1");

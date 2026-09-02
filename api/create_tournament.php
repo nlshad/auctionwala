@@ -43,15 +43,52 @@ try {
         exit;
     }
 
+    // Auto-heal tournaments table schema if AUTO_INCREMENT is missing
+    try {
+        $pdo->exec("ALTER TABLE tournaments MODIFY id INT AUTO_INCREMENT");
+    } catch (Exception $ex) {}
+
     $pdo->beginTransaction();
 
-    // 1. Create Tournament
-    $stmt = $pdo->prepare("INSERT INTO tournaments (organizer_id, name, code, total_purse_default, max_squad_size_default) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$organizerId, $name, $code, $totalPurse, $maxSquadSize]);
-    $tId = (int)$pdo->lastInsertId();
+    // 1. Calculate explicit next ID as failsafe against missing AUTO_INCREMENT
+    $maxIdStmt = $pdo->query("SELECT COALESCE(MAX(id), 0) FROM tournaments");
+    $nextId = (int)$maxIdStmt->fetchColumn() + 1;
+    if ($nextId <= 0) $nextId = 1;
 
-    // 2. Create Auction State row
-    $stmt = $pdo->prepare("INSERT INTO auction_state (tournament_id, status) VALUES (?, 'Idle')");
+    $inserted = false;
+    $tId = $nextId;
+
+    // Retry loop with explicit IDs to guarantee no duplicate '0' primary key error
+    for ($attempts = 0; $attempts < 10; $attempts++) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO tournaments (id, organizer_id, name, code, total_purse_default, max_squad_size_default) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$tId, $organizerId, $name, $code, $totalPurse, $maxSquadSize]);
+            $inserted = true;
+            break;
+        } catch (Exception $insEx) {
+            $tId++;
+        }
+    }
+
+    if (!$inserted) {
+        // Fallback standard insert
+        $stmt = $pdo->prepare("INSERT INTO tournaments (organizer_id, name, code, total_purse_default, max_squad_size_default) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$organizerId, $name, $code, $totalPurse, $maxSquadSize]);
+        $tId = (int)$pdo->lastInsertId();
+    }
+
+    if ($tId <= 0) {
+        // Lookup inserted ID by unique code if lastInsertId returned 0
+        $findStmt = $pdo->prepare("SELECT id FROM tournaments WHERE code = ?");
+        $findStmt->execute([$code]);
+        $tRow = $findStmt->fetch();
+        if ($tRow) {
+            $tId = (int)$tRow['id'];
+        }
+    }
+
+    // 2. Create or Update Auction State row
+    $stmt = $pdo->prepare("INSERT INTO auction_state (tournament_id, status) VALUES (?, 'Idle') ON DUPLICATE KEY UPDATE status = 'Idle'");
     $stmt->execute([$tId]);
 
     $pdo->commit();
