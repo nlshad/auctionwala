@@ -173,26 +173,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- html2canvas CDN for image download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-<body class="text-slate-800 min-h-screen py-8 px-4 flex items-center justify-center">
-    <div class="max-w-3xl w-full glass-panel rounded-2xl border border-white/60 overflow-hidden shadow-2xl">
+<body class="text-slate-900 min-h-screen py-8 px-4 flex items-center justify-center font-inter">
+    <div class="max-w-3xl w-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xl">
         <!-- Top Banner -->
-        <div class="bg-slate-900 p-6 sm:p-8 border-b border-slate-800 text-center relative shadow-md">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(218,165,32,0.12)_0%,transparent_70%)] pointer-events-none"></div>
-            
+        <div class="bg-white p-6 sm:p-8 border-b border-slate-200 text-center relative shadow-sm">
             <div class="mb-4">
-                <a href="landing.php" class="text-xs uppercase tracking-widest text-amber-400 hover:text-amber-300 font-extrabold inline-flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Startup Portal
+                <a href="landing.php" class="text-xs uppercase tracking-widest text-amber-700 hover:text-amber-800 font-extrabold inline-flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Portal Home
                 </a>
             </div>
 
             <a href="landing.php" class="inline-block mb-3">
-                <img src="uploads/auctionwala_logo.png" alt="AuctionWala Logo" class="h-12 sm:h-14 object-contain mx-auto mix-blend-multiply">
+                <img src="uploads/auctionwala_logo.png" alt="AuctionWala Logo" class="h-12 sm:h-14 object-contain mx-auto">
             </a>
 
-            <h1 class="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight mt-1">
+            <h1 class="text-2xl sm:text-4xl font-montserrat font-black text-slate-900 uppercase tracking-tight mt-1">
                 <?php echo htmlspecialchars($tName); ?>
             </h1>
-            <p class="text-slate-300 text-xs mt-1.5 uppercase tracking-widest font-extrabold">Official Player Registration Pool</p>
+            <p class="text-slate-600 text-xs mt-1.5 uppercase tracking-widest font-mono font-bold">Official Player Registration Pool</p>
         </div>
 
         <!-- Feedback Messages -->

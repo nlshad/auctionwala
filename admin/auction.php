@@ -31,48 +31,48 @@ try {
     <title>AuctionWala — Live Auctioneer Room</title>
     <?php require_once '../public/components/ui_head.php'; ?>
 </head>
-<body class="text-gray-250 min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between selection:bg-red-500 selection:text-white font-inter">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-3 pointer-events-none max-w-sm w-full"></div>
 
     <!-- Header Navigation -->
-    <header class="w-full glass-panel border-b border-white/60 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <header class="w-full bg-white border-b border-slate-200 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div class="flex items-center gap-3">
             <a href="../public/landing.php" class="flex items-center gap-2">
-                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain mix-blend-multiply">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain">
             </a>
-            <div class="h-6 w-px bg-slate-300 hidden sm:block"></div>
+            <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
             <div class="hidden sm:block">
-                <h1 class="text-sm font-black uppercase tracking-tight text-slate-900 leading-none flex items-center gap-1.5">
-                    Auctioneer Desk <span class="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded tracking-widest uppercase animate-pulse">Live</span>
+                <h1 class="text-sm font-montserrat font-black uppercase tracking-tight text-slate-900 leading-none flex items-center gap-1.5">
+                    Auctioneer Desk <span class="bg-red-600 text-white text-[8px] font-mono font-bold px-1.5 py-0.5 rounded tracking-widest uppercase animate-pulse">Live</span>
                 </h1>
-                <p class="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">Live Bidding Console</p>
+                <p class="text-[9px] font-mono text-slate-500 font-bold uppercase tracking-wider mt-0.5">Live Bidding Console</p>
             </div>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
             <!-- Undo & Redo Action Buttons -->
-            <div class="flex items-center bg-white/90 border border-slate-300 rounded-xl p-0.5 shadow-sm">
-                <button onclick="triggerHistoryAction('undo')" class="flex items-center justify-center hover:bg-slate-100 hover:text-slate-900 w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-600 transition" title="Undo Last Action">
+            <div class="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5 shadow-sm">
+                <button onclick="triggerHistoryAction('undo')" class="flex items-center justify-center hover:bg-slate-200 hover:text-slate-900 w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-700 transition" title="Undo Last Action">
                     <i class="fa-solid fa-rotate-left text-xs"></i>
                 </button>
                 <div class="w-[1px] h-4 bg-slate-200"></div>
-                <button onclick="triggerHistoryAction('redo')" class="flex items-center justify-center hover:bg-slate-100 hover:text-slate-900 w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-600 transition" title="Redo Next Action">
+                <button onclick="triggerHistoryAction('redo')" class="flex items-center justify-center hover:bg-slate-200 hover:text-slate-900 w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-700 transition" title="Redo Next Action">
                     <i class="fa-solid fa-rotate-right text-xs"></i>
                 </button>
             </div>
 
-            <button id="sound-toggle-btn" onclick="toggleMute()" class="flex items-center justify-center bg-white/90 border border-slate-300 hover:bg-slate-100 w-8 h-8 rounded-xl text-xs transition shadow-sm" title="Toggle Sound Effects">
-                <i id="sound-icon" class="fa-solid fa-volume-high text-xs text-amber-700"></i>
+            <button id="sound-toggle-btn" onclick="toggleMute()" class="flex items-center justify-center bg-slate-100 border border-slate-200 hover:bg-slate-200 w-8 h-8 sm:w-9 sm:h-9 rounded-xl text-xs transition shadow-sm" title="Toggle Sound Effects">
+                <i id="sound-icon" class="fa-solid fa-volume-high text-xs text-amber-600"></i>
             </button>
 
-            <a href="../organizer/index.php" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+            <a href="../organizer/index.php" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-montserrat font-extrabold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-grid-2 text-xs text-amber-400"></i> <span class="hidden sm:inline">Organizer</span> Dashboard
             </a>
 
-            <a href="../public/logout.php" class="bg-white/90 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-300 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
-                <i class="fa-solid fa-power-off text-red-500"></i> <span class="hidden sm:inline">Logout</span>
+            <a href="../public/logout.php" class="bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-200 hover:border-red-200 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-montserrat font-bold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
+                <i class="fa-solid fa-power-off text-red-600"></i> <span class="hidden sm:inline">Logout</span>
             </a>
         </div>
     </header>

@@ -20,10 +20,10 @@ $uploadPath = "uploads/";
 <body class="text-slate-900 min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
 
     <!-- Top Navigation Header -->
-    <header class="w-full glass-panel border-b border-white/60 px-4 py-3 sm:px-8 sm:py-4 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <header class="w-full bg-white border-b border-slate-200 px-4 py-3 sm:px-8 sm:py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div class="flex items-center gap-3">
             <a href="landing.php" class="flex items-center gap-2">
-                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain mix-blend-multiply">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain">
             </a>
             <div class="h-6 w-px bg-slate-300 hidden sm:block"></div>
             <div class="hidden sm:block">

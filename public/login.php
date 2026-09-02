@@ -139,7 +139,7 @@ $isPlaceholderKey = str_contains($fbConfig['apiKey'], 'EXAMPLE');
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
+            background-color: #f8fafc;
             color: #0f172a;
             min-height: 100vh;
             position: relative;
@@ -149,25 +149,15 @@ $isPlaceholderKey = str_contains($fbConfig['apiKey'], 'EXAMPLE');
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%;
-            background: url('uploads/app_bg.jpg') no-repeat center center / cover;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
             z-index: -2;
-            pointer-events: none;
-        }
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.55) 100%);
-            z-index: -1;
             pointer-events: none;
         }
         h1, h2, h3 { font-family: 'Outfit', sans-serif; }
         .glass-login {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>

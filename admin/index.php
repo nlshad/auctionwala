@@ -265,12 +265,12 @@ try {
 <body class="text-gray-255 min-h-screen flex flex-col justify-between">
 
     <!-- Header Navigation -->
-    <header class="w-full glass-panel border-b border-white/60 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <header class="w-full bg-white border-b border-slate-200 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div class="flex items-center gap-3">
             <a href="../public/landing.php" class="flex items-center gap-2">
-                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain mix-blend-multiply">
+                <img src="<?php echo $uploadPath; ?>auctionwala_logo.png" alt="AuctionWala Logo" class="h-8 sm:h-9 object-contain">
             </a>
-            <div class="h-6 w-px bg-slate-300 hidden sm:block"></div>
+            <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
             <div class="hidden sm:block">
                 <h1 class="text-sm font-black uppercase tracking-tight text-slate-900 leading-none">Team & Roster Manager</h1>
                 <p class="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">League Operations</p>
@@ -279,34 +279,33 @@ try {
 
         <div class="flex items-center gap-2 sm:gap-3">
             <!-- Link to Live Bidding Desk -->
-            <a href="auction.php" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black px-3.5 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 uppercase tracking-wider">
+            <a href="auction.php" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 uppercase tracking-wider">
                 <i class="fa-solid fa-gavel text-xs"></i> <span class="hidden xs:inline">Live </span>Auction Room
             </a>
             <a href="../organizer/index.php" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-grid-2 text-xs text-amber-400"></i> <span class="hidden sm:inline">Organizer</span> Dashboard
             </a>
             <!-- Logout -->
-            <a href="../public/logout.php" class="bg-white/90 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-300 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
-                <i class="fa-solid fa-power-off text-red-500"></i> <span class="hidden sm:inline">Logout</span>
+            <a href="../public/logout.php" class="bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-200 hover:border-red-200 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-sm" title="Logout">
+                <i class="fa-solid fa-power-off text-red-600"></i> <span class="hidden sm:inline">Logout</span>
             </a>
         </div>
     </header>
 
     <!-- Main Container -->
     <main class="flex-grow p-4 md:p-6 max-w-7xl w-full mx-auto space-y-6 relative">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,163,12,0.01)_0%,transparent_75%)] pointer-events-none"></div>
 
         <!-- Success/Error Feedback Alerts -->
         <?php if (!empty($successMsg)): ?>
-            <div class="bg-gold-950/20 border border-gold-500/40 text-gold-300 px-5 py-3.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-                <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
                 <div><?php echo $successMsg; ?></div>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($errorMsg)): ?>
-            <div class="bg-red-950/20 border border-red-500/40 text-red-300 px-5 py-3.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-                <i class="fa-solid fa-circle-exclamation text-red-400 text-sm"></i>
+            <div class="bg-red-50 border border-red-200 text-red-800 px-5 py-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-circle-exclamation text-red-600 text-sm"></i>
                 <div><?php echo $errorMsg; ?></div>
             </div>
         <?php endif; ?>

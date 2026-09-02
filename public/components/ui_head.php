@@ -71,14 +71,14 @@ if ('serviceWorker' in navigator) {
 <style>
     body {
         font-family: 'Inter', sans-serif;
-        background-color: #0b1326;
-        color: #dae2fd;
+        background-color: #f8fafc;
+        color: #0f172a;
         overflow-x: hidden;
         min-height: 100vh;
         position: relative;
     }
 
-    /* Fixed background layer that renders reliably on all mobile browsers & devices */
+    /* Clean subtle light gradient background */
     body::before {
         content: "";
         position: fixed;
@@ -88,25 +88,11 @@ if ('serviceWorker' in navigator) {
         bottom: 0;
         width: 100%;
         height: 100%;
-        background: url('<?php echo $assetBase; ?>uploads/app_bg.jpg') no-repeat center center / cover;
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
         z-index: -2;
         pointer-events: none;
     }
 
-    /* Subtle overlay gradient to ensure high readability on mobile screens */
-    body::after {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at top, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
-        z-index: -1;
-        pointer-events: none;
-    }
     h1, h2, h3, h4, .font-title {
         font-family: 'Montserrat', sans-serif;
     }
@@ -116,34 +102,27 @@ if ('serviceWorker' in navigator) {
     .font-inter {
         font-family: 'Inter', sans-serif;
     }
-    .glass-panel {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);
-        backdrop-filter: blur(25px) saturate(210%);
-        -webkit-backdrop-filter: blur(25px) saturate(210%);
-        border: 1.5px solid rgba(255, 255, 255, 0.75);
-        box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.18), inset 0 1.5px 2px rgba(255, 255, 255, 0.9);
+    .glass-panel, .pro-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     }
     .bento-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);
-        backdrop-filter: blur(25px) saturate(210%);
-        -webkit-backdrop-filter: blur(25px) saturate(210%);
-        border: 1.5px solid rgba(255, 255, 255, 0.75);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 1.25rem;
-        box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.18), inset 0 1.5px 2px rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .bento-card:hover {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.45) 100%);
-        border-color: rgba(234, 179, 8, 0.8);
-        box-shadow: 0 30px 60px -10px rgba(212, 163, 12, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.95);
-        transform: translateY(-3px);
+        background: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
     }
     .glass-card-subtle {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.25) 100%);
-        backdrop-filter: blur(16px) saturate(190%);
-        -webkit-backdrop-filter: blur(16px) saturate(190%);
-        border: 1px solid rgba(255, 255, 255, 0.65);
-        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7);
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
     }
     .live-dot {
         box-shadow: 0 0 10px #ef4444;
@@ -156,11 +135,11 @@ if ('serviceWorker' in navigator) {
         background: #f1f5f9;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(212, 163, 12, 0.4);
+        background: #cbd5e1;
         border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(212, 163, 12, 0.8);
+        background: #94a3b8;
     }
     @keyframes pulse-gold {
         0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(212, 163, 12, 0)); }
